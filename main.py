@@ -3,8 +3,8 @@ import shutil
 import time
 from pathlib import Path
 
-import cv2
-import numpy
+import cv2 as cv
+import numpy as np
 
 from logger_setup import get_log
 
@@ -15,11 +15,11 @@ class SubtitleExtractor:
     def __init__(self, video_path: Path, sub_area: tuple = None) -> None:
         self.video_path = video_path
         self.video_name = self.video_path.stem
-        self.video_cap = cv2.VideoCapture(str(video_path))
-        self.frame_count = self.video_cap.get(cv2.CAP_PROP_FRAME_COUNT)
-        self.fps = self.video_cap.get(cv2.CAP_PROP_FPS)
-        self.frame_height = int(self.video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.frame_width = int(self.video_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.video_cap = cv.VideoCapture(str(video_path))
+        self.frame_count = self.video_cap.get(cv.CAP_PROP_FRAME_COUNT)
+        self.fps = self.video_cap.get(cv.CAP_PROP_FPS)
+        self.frame_height = int(self.video_cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+        self.frame_width = int(self.video_cap.get(cv.CAP_PROP_FRAME_WIDTH))
         self.sub_area = self.__subtitle_area(sub_area)
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
@@ -62,29 +62,30 @@ class SubtitleExtractor:
             return sub_area
 
     @staticmethod
-    def rescale_frame(frame: numpy.ndarray, scale=0.5):
+    def rescale_frame(frame: np.ndarray, scale=0.5):
         height = int(frame.shape[0] * scale)
         width = int(frame.shape[1] * scale)
         dimensions = (width, height)
-        return cv2.resize(frame, dimensions, interpolation=cv2.INTER_AREA)
+        return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
     def extract_subtitle_frame(self) -> None:
         while self.video_cap.isOpened():
             success, frame = self.video_cap.read()
             if not success:
-                logger.info(f"Video has ended!")
+                logger.warning(f"Video has ended!")  # or failed to read
                 break
-
+            # draw rectangle over subtitle area
             color_red = (0, 0, 255)
-            cv2.rectangle(frame, self.sub_area[0], self.sub_area[1], color_red, 2)
-            frame_resized = self.rescale_frame(frame)
-            cv2.imshow("Video Output", frame_resized)
+            cv.rectangle(frame, self.sub_area[0], self.sub_area[1], color_red, 2)
 
-            if cv2.waitKey(4) & 0xFF == ord('d'):
+            frame_resized = self.rescale_frame(frame)
+            cv.imshow("Video Output", frame_resized)
+
+            if cv.waitKey(1) == ord('q'):
                 break
 
         self.video_cap.release()
-        cv2.destroyAllWindows()
+        cv.destroyAllWindows()
 
     def empty_cache(self) -> None:
         """
