@@ -1,6 +1,5 @@
 import logging
 import shutil
-import time
 from pathlib import Path
 
 import cv2 as cv
@@ -36,7 +35,7 @@ class SubtitleExtractor:
         """
         Run through the steps of extracting video.
         """
-        start = time.perf_counter()
+        start = cv.getTickCount()
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
         logger.info(f"Resolution: {self.frame_height} X {self.frame_width}")
@@ -44,8 +43,8 @@ class SubtitleExtractor:
         logger.info("Start to extracting video keyframes...")
         self.extract_subtitle_frame()
 
-        end = time.perf_counter()
-        total_time = end - start
+        end = cv.getTickCount()
+        total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
         # self.empty_cache()
 
