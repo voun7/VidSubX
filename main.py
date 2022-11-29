@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 
 import cv2
+import numpy
 
 from logger_setup import get_log
 
@@ -60,16 +61,24 @@ class SubtitleExtractor:
         else:
             return sub_area
 
+    @staticmethod
+    def rescale_frame(frame: numpy.ndarray, scale=0.5):
+        height = int(frame.shape[0] * scale)
+        width = int(frame.shape[1] * scale)
+        dimensions = (width, height)
+        return cv2.resize(frame, dimensions, interpolation=cv2.INTER_AREA)
+
     def extract_subtitle_frame(self) -> None:
         while self.video_cap.isOpened():
             success, frame = self.video_cap.read()
             if not success:
-                logger.error("Video failed to read")
+                logger.info(f"Video has ended!")
                 break
-            color_red = (0, 0, 255)
 
+            color_red = (0, 0, 255)
             cv2.rectangle(frame, self.sub_area[0], self.sub_area[1], color_red, 2)
-            cv2.imshow('Video', frame)
+            frame_resized = self.rescale_frame(frame)
+            cv2.imshow("Video Output", frame_resized)
 
             if cv2.waitKey(4) & 0xFF == ord('d'):
                 break
