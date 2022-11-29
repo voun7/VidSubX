@@ -1,0 +1,78 @@
+import logging
+import shutil
+import time
+from pathlib import Path
+
+import cv2
+
+from logger_setup import get_log
+
+logger = logging.getLogger(__name__)
+
+
+class SubtitleExtractor:
+    def __init__(self, video_path: Path, sub_area=None):
+        self.video_path = video_path
+        self.sub_area = sub_area
+        self.video_name = self.video_path.stem
+        self.video_cap = cv2.VideoCapture(str(video_path))
+        self.frame_count = self.video_cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.fps = self.video_cap.get(cv2.CAP_PROP_FPS)
+        self.frame_height = int(self.video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.frame_width = int(self.video_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
+        # Extracted video frame storage directory
+        self.frame_output_dir = self.vd_output_dir / "frames"
+        # Extracted subtitle file storage directory
+        self.subtitle_output_dir = self.vd_output_dir / "subtitle"
+        # If the directory does not exist, create the folder
+        if not self.frame_output_dir.exists():
+            self.frame_output_dir.mkdir(parents=True)
+        if not self.subtitle_output_dir.exists():
+            self.subtitle_output_dir.mkdir(parents=True)
+
+    def run(self):
+        """
+        Run through the steps of extracting video
+        """
+        start = time.perf_counter()
+        logger.info(f"File Path: {self.video_path}")
+        logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
+        logger.info(f"Resolution: {self.frame_height} X {self.frame_width}")
+
+        logger.info("Start to extracting video keyframes...")
+        print(self.video_cap)
+
+        end = time.perf_counter()
+        total_time = end - start
+        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
+        # self.empty_cache()
+
+    def empty_cache(self) -> None:
+        """
+        Delete all cache files produced during subtitle extraction
+        """
+        if self.vd_output_dir.exists():
+            shutil.rmtree(self.vd_output_dir.parent)
+
+
+def rescale_frame(frame, scale=0.4):
+    width = int(frame.shape[1] * scale)
+    height = int(frame.shape[0] * scale)
+    dimension = (width, height)
+    return cv2.resize(frame, dimension, interpolation=cv2.INTER_AREA)
+
+
+def main():
+    get_log()
+    logger.debug("Logging Started")
+
+    video = Path("tests/anime video.mp4")
+    se = SubtitleExtractor(video)
+    se.run()
+
+    logger.debug("Logging Ended\n")
+
+
+if __name__ == '__main__':
+    main()
