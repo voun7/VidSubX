@@ -43,7 +43,7 @@ class SubtitleExtractor:
             return x1, y1, x2, y2
 
     @staticmethod
-    def rescale_frame(frame: np.ndarray, scale=0.5):
+    def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
         height = int(frame.shape[0] * scale)
         width = int(frame.shape[1] * scale)
         dimensions = (width, height)
@@ -102,7 +102,7 @@ class SubtitleExtractor:
         # self.empty_cache()
 
 
-def main():
+def main() -> None:
     get_log()
     logger.debug("Logging Started")
 
