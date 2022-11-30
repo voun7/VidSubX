@@ -31,24 +31,6 @@ class SubtitleExtractor:
         if not self.subtitle_output_dir.exists():
             self.subtitle_output_dir.mkdir(parents=True)
 
-    def run(self) -> None:
-        """
-        Run through the steps of extracting video.
-        """
-        start = cv.getTickCount()
-        logger.info(f"File Path: {self.video_path}")
-        logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
-        logger.info(f"Resolution: {self.frame_width} X {self.frame_height}")
-        logger.info(f"Subtitle Area: {self.sub_area}")
-
-        logger.info("Start to extracting video keyframes...")
-        self.extract_subtitle_frame()
-
-        end = cv.getTickCount()
-        total_time = (end - start) / cv.getTickFrequency()
-        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        # self.empty_cache()
-
     def __subtitle_area(self, sub_area: None | tuple) -> tuple:
         """
         Returns a default subtitle area that can be used if no subtitle is given.
@@ -98,6 +80,24 @@ class SubtitleExtractor:
         """
         if self.vd_output_dir.exists():
             shutil.rmtree(self.vd_output_dir.parent)
+
+    def run(self) -> None:
+        """
+        Run through the steps of extracting video.
+        """
+        start = cv.getTickCount()
+        logger.info(f"File Path: {self.video_path}")
+        logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
+        logger.info(f"Resolution: {self.frame_width} X {self.frame_height}")
+        logger.info(f"Subtitle Area: {self.sub_area}")
+
+        logger.info("Start to extracting video keyframes...")
+        self.extract_subtitle_frame()
+
+        end = cv.getTickCount()
+        total_time = (end - start) / cv.getTickFrequency()
+        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
+        # self.empty_cache()
 
 
 def main():
