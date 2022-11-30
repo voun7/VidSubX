@@ -48,15 +48,16 @@ class SubtitleExtractor:
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
         # self.empty_cache()
 
-    def __subtitle_area(self, sub_area: None | tuple) -> tuple:
+    @staticmethod
+    def __subtitle_area(sub_area: None | tuple) -> tuple:
         """
         Returns a default subtitle area if no subtitle is given.
-        :return: A nested tuple containing 2 tuple points
+        :return: Position of subtitle. x2 = width and y2 = height
         """
         if not sub_area:
-            top, bottom, left, right = 300, 25, 25, 25
-            default_sub_area = (left, self.frame_height - top), (self.frame_width - right, self.frame_height - bottom)
-            return default_sub_area
+            # x1, y1, x2, y2 = 300, 20, 25, 25
+            x1, y1, x2, y2 = 842, 1080, 96, 1824
+            return x1, y1, x2, y2
         else:
             return sub_area
 
@@ -73,14 +74,21 @@ class SubtitleExtractor:
             if not success:
                 logger.warning(f"Video has ended!")  # or failed to read
                 break
+            x1, y1, x2, y2 = self.sub_area
             # draw rectangle over subtitle area
+            top_left_corner = ()
+            bottom_right_corner = ()
             color_red = (0, 0, 255)
-            cv.rectangle(frame, self.sub_area[0], self.sub_area[1], color_red, 2)
+            cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
+            # crop subtitle area
+            cropped_area = frame[300:25, 20:25]
+            print(cropped_area)
+            cv.imshow("Cropped frame", cropped_area)
 
             frame_resized = self.rescale_frame(frame)
             cv.imshow("Video Output", frame_resized)
 
-            if cv.waitKey(1) == ord('q'):
+            if cv.waitKey(25) == ord('q'):
                 break
 
         self.video_cap.release()
