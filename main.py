@@ -50,6 +50,7 @@ class SubtitleExtractor:
         return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
     def extract_subtitle_frame(self) -> None:
+        count = 0
         while self.video_cap.isOpened():
             success, frame = self.video_cap.read()
             if not success:
@@ -61,14 +62,15 @@ class SubtitleExtractor:
             bottom_right_corner = (x2, y2)
             color_red = (0, 0, 255)
             cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
-            # crop subtitle area
-            # cropped_area = frame[20:800, 100:100]
-            # cv.imshow("Cropped frame", cropped_area)
+            # crop and save subtitle area
+            cropped_frame = frame[y1:y2, x1:x2]
+            cv.imwrite(f"{self.frame_output_dir}/frame{count}.jpg", cropped_frame)
+            count += 1
 
             frame_resized = self.rescale_frame(frame)
             cv.imshow("Video Output", frame_resized)
 
-            if cv.waitKey(25) == ord('q'):
+            if cv.waitKey(1) == ord('q'):
                 break
 
         self.video_cap.release()
