@@ -63,9 +63,9 @@ class SubtitleExtractor:
             cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
             # crop and save subtitle area
             cropped_frame = frame[y1:y2, x1:x2]
-            frame_name = ''
+            frame_position = self.video_cap.get(cv.CAP_PROP_POS_MSEC)
+            frame_name = f"{self.frame_output_dir}/{frame_position}.jpeg"
             cv.imwrite(frame_name, cropped_frame)
-            # print(self.video_cap.get(cv.CAP_PROP_POS_MSEC))
 
             frame_resized = self.rescale_frame(frame)
             cv.imshow("Video Output", frame_resized)
@@ -99,7 +99,7 @@ class SubtitleExtractor:
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        # self.empty_cache()
+        self.empty_cache()
 
 
 def main() -> None:
