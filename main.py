@@ -14,12 +14,12 @@ class SubtitleExtractor:
     def __init__(self, video_path: Path, sub_area: tuple = None) -> None:
         self.video_path = video_path
         self.video_name = self.video_path.stem
+        self.sub_area = sub_area
         self.video_cap = cv.VideoCapture(str(video_path))
         self.frame_count = self.video_cap.get(cv.CAP_PROP_FRAME_COUNT)
         self.fps = self.video_cap.get(cv.CAP_PROP_FPS)
         self.frame_height = int(self.video_cap.get(cv.CAP_PROP_FRAME_HEIGHT))
         self.frame_width = int(self.video_cap.get(cv.CAP_PROP_FRAME_WIDTH))
-        self.sub_area = self.__subtitle_area(sub_area)
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
         self.frame_output_dir = self.vd_output_dir / "frames"
@@ -31,16 +31,13 @@ class SubtitleExtractor:
         if not self.subtitle_output_dir.exists():
             self.subtitle_output_dir.mkdir(parents=True)
 
-    def __subtitle_area(self, sub_area: None | tuple) -> tuple:
+    def default_subtitle_area(self) -> tuple:
         """
         Returns a default subtitle area that can be used if no subtitle is given.
         :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
         """
-        if sub_area:
-            return sub_area
-        else:
-            x1, y1, x2, y2 = 0, int(self.frame_height * 0.75), self.frame_width, self.frame_height
-            return x1, y1, x2, y2
+        x1, y1, x2, y2 = 0, int(self.frame_height * 0.75), self.frame_width, self.frame_height
+        return x1, y1, x2, y2
 
     @staticmethod
     def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
@@ -49,13 +46,16 @@ class SubtitleExtractor:
         dimensions = (width, height)
         return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
-    def extract_subtitle_frame(self) -> None:
+    def extract_frames(self) -> None:
         while self.video_cap.isOpened():
             success, frame = self.video_cap.read()
             if not success:
                 logger.warning(f"Video has ended!")  # or failed to read
                 break
-            x1, y1, x2, y2 = self.sub_area
+            if self.sub_area:
+                x1, y1, x2, y2 = self.sub_area
+            else:
+                x1, y1, x2, y2 = self.default_subtitle_area()
             # draw rectangle over subtitle area
             top_left_corner = (x1, y1)
             bottom_right_corner = (x2, y2)
@@ -74,7 +74,6 @@ class SubtitleExtractor:
                 break
 
         self.video_cap.release()
-        cv.destroyAllWindows()
 
     def empty_cache(self) -> None:
         """
@@ -94,12 +93,12 @@ class SubtitleExtractor:
         logger.info(f"Subtitle Area: {self.sub_area}")
 
         logger.info("Start to extracting video keyframes...")
-        self.extract_subtitle_frame()
+        self.extract_frames()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        self.empty_cache()
+        # self.empty_cache()
 
 
 def main() -> None:
