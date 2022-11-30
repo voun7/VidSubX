@@ -38,7 +38,8 @@ class SubtitleExtractor:
         start = cv.getTickCount()
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
-        logger.info(f"Resolution: {self.frame_height} X {self.frame_width}")
+        logger.info(f"Resolution: {self.frame_width} X {self.frame_height}")
+        logger.info(f"Subtitle Area: {self.sub_area}")
 
         logger.info("Start to extracting video keyframes...")
         self.extract_subtitle_frame()
@@ -48,18 +49,16 @@ class SubtitleExtractor:
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
         # self.empty_cache()
 
-    @staticmethod
-    def __subtitle_area(sub_area: None | tuple) -> tuple:
+    def __subtitle_area(self, sub_area: None | tuple) -> tuple:
         """
-        Returns a default subtitle area if no subtitle is given.
-        :return: Position of subtitle. x2 = width and y2 = height
+        Returns a default subtitle area that can be used if no subtitle is given.
+        :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
         """
-        if not sub_area:
-            # x1, y1, x2, y2 = 300, 20, 25, 25
-            x1, y1, x2, y2 = 842, 1080, 96, 1824
-            return x1, y1, x2, y2
-        else:
+        if sub_area:
             return sub_area
+        else:
+            x1, y1, x2, y2 = 0, int(self.frame_height * 0.75), self.frame_width, self.frame_height
+            return x1, y1, x2, y2
 
     @staticmethod
     def rescale_frame(frame: np.ndarray, scale=0.5):
@@ -76,14 +75,13 @@ class SubtitleExtractor:
                 break
             x1, y1, x2, y2 = self.sub_area
             # draw rectangle over subtitle area
-            top_left_corner = ()
-            bottom_right_corner = ()
+            top_left_corner = (x1, y1)
+            bottom_right_corner = (x2, y2)
             color_red = (0, 0, 255)
             cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
             # crop subtitle area
-            cropped_area = frame[300:25, 20:25]
-            print(cropped_area)
-            cv.imshow("Cropped frame", cropped_area)
+            # cropped_area = frame[20:800, 100:100]
+            # cv.imshow("Cropped frame", cropped_area)
 
             frame_resized = self.rescale_frame(frame)
             cv.imshow("Video Output", frame_resized)
@@ -106,7 +104,9 @@ def main():
     get_log()
     logger.debug("Logging Started")
 
-    video = Path("tests/anime video-cut.mp4")
+    video = Path("tests/I Can Copy Talents.mp4")
+    # video = Path("tests/40,000 Years of the Stars.mp4")
+    # video = Path("tests/anime video-cut.mp4")
     se = SubtitleExtractor(video)
     se.run()
 
