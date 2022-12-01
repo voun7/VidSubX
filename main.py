@@ -94,8 +94,8 @@ class SubtitleExtractor:
         logger.info(f"Subtitle Area: {self.sub_area}")
 
         logger.info("Start to extracting video keyframes...")
-        self.view_frames()
-        video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=5, chunk_size=500)
+        # self.view_frames()
+        video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=1)
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()

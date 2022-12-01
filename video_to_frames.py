@@ -92,8 +92,7 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, every: int, chunk_size: int)\
-        -> None:
+def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, every: int) -> None:
     """
     Extracts the frames from a video using multiprocessing
 
@@ -102,13 +101,15 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
     :param sub_area: coordinates of the frame containing subtitle
     :param overwrite: overwrite frames if they exist
     :param every: extract every this many frames
-    :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
     :return: path to the directory where the frames were saved, or None if fails
     """
 
     capture = cv2.VideoCapture(str(video_path))  # load the video
     total = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
+
+    # how many frames to split into chunks (one chunk per cpu core process)
+    chunk_size = 500 if total > 500 else total - 1
 
     if total < 1:  # if video has no frames, might be and opencv error
         print("Video has no frames. Check your OpenCV installation")
