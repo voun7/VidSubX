@@ -1,9 +1,12 @@
+import logging
 import multiprocessing
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import cv2
+
+logger = logging.getLogger(__name__)
 
 
 def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
@@ -43,7 +46,7 @@ def extract_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwrit
 
     x1, y1, x2, y2 = sub_area
 
-    capture = cv2.VideoCapture(video_path)  # open the video using OpenCV
+    capture = cv2.VideoCapture(str(video_path))  # open the video using OpenCV
 
     if start < 0:  # if start isn't specified lets assume 0
         start = 0
@@ -109,6 +112,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwri
     # make sure last chunk has correct end frame, also handles case chunk_size < total
     frame_chunks[-1][-1] = min(frame_chunks[-1][-1], total-1)
 
+    logger.debug("Using multiprocessing for frames")
     # execute across multiple cpu cores to speed up processing, get the count automatically
     with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
 
@@ -117,3 +121,4 @@ def video_to_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwri
 
         for i, f in enumerate(as_completed(futures)):  # as each process completes
             print_progress(i, len(frame_chunks)-1)  # print it's progress
+        print("")
