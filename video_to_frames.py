@@ -1,3 +1,7 @@
+"""
+@FileName: video_to_frames.py
+@desc: Fast frame extraction from videos using Python and OpenCV
+"""
 import logging
 import multiprocessing
 import sys
@@ -30,12 +34,13 @@ def print_progress(iteration: int, total: float, decimals: float = 3, bar_length
     sys.stdout.flush()  # flush to stdout
 
 
-def extract_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwrite: bool, start: int, end: int, every: int) -> int:
+def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, start: int, end: int, every: int)\
+        -> int:
     """
     Extract frames from a video using OpenCVs VideoCapture
 
     :param video_path: path of the video
-    :param frames_dir: the directory to save the frames
+    :param output: the directory to save the frames
     :param sub_area: coordinates of the frame containing subtitle
     :param overwrite: to overwrite frames that already exist?
     :param start: start frame
@@ -75,8 +80,8 @@ def extract_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwrit
             # crop and save subtitle area
             cropped_frame = image[y1:y2, x1:x2]
             frame_position = capture.get(cv2.CAP_PROP_POS_MSEC)
-            save_path = f"{frames_dir}/{frame_position}.jpg"  # create the save path
-            if not overwrite:  # we want to overwrite anyway
+            save_path = f"{output}/{frame_position}.jpg"  # create the save path
+            if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
                 cv2.imwrite(save_path, cropped_frame)  # save the extracted image
                 saved_count += 1  # increment our counter by one
 
@@ -87,12 +92,13 @@ def extract_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwrit
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwrite: bool, every: int, chunk_size: int) -> None:
+def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, every: int, chunk_size: int)\
+        -> None:
     """
     Extracts the frames from a video using multiprocessing
 
     :param video_path: path to the video
-    :param frames_dir: directory to save the frames
+    :param output: directory to save the frames
     :param sub_area: coordinates of the frame containing subtitle
     :param overwrite: overwrite frames if they exist
     :param every: extract every this many frames
@@ -116,7 +122,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwri
     # execute across multiple cpu cores to speed up processing, get the count automatically
     with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
 
-        futures = [executor.submit(extract_frames, video_path, frames_dir, sub_area, overwrite, f[0], f[1], every)
+        futures = [executor.submit(extract_frames, video_path, output, sub_area, overwrite, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)
 
         for i, f in enumerate(as_completed(futures)):  # as each process completes
