@@ -1,8 +1,9 @@
-from concurrent.futures import ProcessPoolExecutor, as_completed
-import cv2
 import multiprocessing
 import os
 import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+import cv2
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=100):
