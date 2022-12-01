@@ -97,7 +97,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, sub_area: tuple, overwri
     :return: path to the directory where the frames were saved, or None if fails
     """
 
-    capture = cv2.VideoCapture(video_path)  # load the video
+    capture = cv2.VideoCapture(str(video_path))  # load the video
     total = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
 
