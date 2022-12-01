@@ -113,12 +113,13 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
     chunk_size = 500 if total > 500 else total - 1
 
     if total < 1:  # if video has no frames, might be and opencv error
-        print("Video has no frames. Check your OpenCV installation")
+        logger.error("Video has no frames. Check your OpenCV installation")
 
     # split the frames into chunk lists
     frame_chunks = [[i, i+chunk_size] for i in range(0, total, chunk_size)]
     # make sure last chunk has correct end frame, also handles case chunk_size < total
     frame_chunks[-1][-1] = min(frame_chunks[-1][-1], total-1)
+    logger.debug(f"frame chunks = {frame_chunks}")
 
     logger.debug("Using multiprocessing for frames")
     # execute across multiple cpu cores to speed up processing, get the count automatically
