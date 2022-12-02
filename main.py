@@ -102,17 +102,17 @@ class SubtitleExtractor:
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
         self.video_cap.release()
         cv.destroyAllWindows()
-        self.empty_cache()
+        # self.empty_cache()
 
 
 if __name__ == '__main__':
     get_log()
     logger.debug("Logging Started")
 
-    # video = Path("tests/I Can Copy Talents.mp4")
+    video = Path("tests/I Can Copy Talents.mp4")
     # video = Path("tests/40,000 Years of the Stars.mp4")
     # video = Path("tests/anime video-cut.mp4")
-    video = Path("tests/anime video.mp4")
+    # video = Path("tests/anime video.mp4")
     se = SubtitleExtractor(video)
     se.run()
 
