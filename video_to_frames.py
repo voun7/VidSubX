@@ -10,6 +10,8 @@ from pathlib import Path
 
 import cv2 as cv
 
+from frame_ocr import text_detector
+
 logger = logging.getLogger(__name__)
 
 
@@ -81,10 +83,10 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
             cropped_frame = image[y1:y2, x1:x2]
             frame_position = capture.get(cv.CAP_PROP_POS_MSEC)
             save_path = f"{output}/{frame_position}.jpg"  # create the save path
-            # TODO: create and add function or method here that can convert the frame to text instead of saving it.
-            if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
-                cv.imwrite(save_path, cropped_frame)  # save the extracted image
-                saved_count += 1  # increment our counter by one
+            if text_detector(cropped_frame):
+                if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
+                    cv.imwrite(save_path, cropped_frame)  # save the extracted image
+                    saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
 
