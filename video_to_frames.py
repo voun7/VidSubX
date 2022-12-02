@@ -8,7 +8,7 @@ import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-import cv2
+import cv2 as cv
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +51,12 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
 
     x1, y1, x2, y2 = sub_area
 
-    capture = cv2.VideoCapture(str(video_path))  # open the video using OpenCV
+    capture = cv.VideoCapture(str(video_path))  # open the video using OpenCV
 
     if start < 0:  # if start isn't specified lets assume 0
         start = 0
     if end < 0:  # if end isn't specified assume the end of the video
-        end = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        end = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
 
     capture.set(1, start)  # set the starting frame of the capture
     frame = start  # keep track of which frame we are up to, starting from start
@@ -79,11 +79,11 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
             while_safety = 0  # reset the safety count
             # crop and save subtitle area
             cropped_frame = image[y1:y2, x1:x2]
-            frame_position = capture.get(cv2.CAP_PROP_POS_MSEC)
+            frame_position = capture.get(cv.CAP_PROP_POS_MSEC)
             save_path = f"{output}/{frame_position}.jpg"  # create the save path
             # TODO: create and add function or method here that can convert the frame to text instead of saving it.
             if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
-                cv2.imwrite(save_path, cropped_frame)  # save the extracted image
+                cv.imwrite(save_path, cropped_frame)  # save the extracted image
                 saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
@@ -105,8 +105,8 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
     :return: path to the directory where the frames were saved, or None if fails
     """
 
-    capture = cv2.VideoCapture(str(video_path))  # load the video
-    total = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))  # get its total frame count
+    capture = cv.VideoCapture(str(video_path))  # load the video
+    total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
 
     # how many frames to split into chunks (one chunk per cpu core process)
