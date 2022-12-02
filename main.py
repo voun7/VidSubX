@@ -25,12 +25,12 @@ class SubtitleExtractor:
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted subtitle file storage directory
-        self.subtitle_output = self.vd_output_dir / "subtitle"
+        self.text_output = self.vd_output_dir / "text"
         # If the directory does not exist, create the folder
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
-        if not self.subtitle_output.exists():
-            self.subtitle_output.mkdir(parents=True)
+        if not self.text_output.exists():
+            self.text_output.mkdir(parents=True)
 
     def __subtitle_area(self, sub_area: None | tuple) -> tuple:
         """
