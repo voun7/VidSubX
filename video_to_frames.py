@@ -112,7 +112,7 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
     capture.release()  # release the capture straight away
 
     # how many frames to split into chunks (one chunk per cpu core process)
-    chunk_size = 500 if total > 500 else total - 1
+    chunk_size = 250 if total > 250 else total - 1
 
     if total < 1:  # if video has no frames, might be and opencv error
         logger.error("Video has no frames. Check your OpenCV installation")
