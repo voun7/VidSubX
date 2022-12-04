@@ -25,7 +25,7 @@ class SubtitleExtractor:
         # Extracted video frame storage directory
         # self.frame_output = self.vd_output_dir / "frames"
         # Extracted subtitle file storage directory
-        self.text_output = self.vd_output_dir / "text"
+        self.text_output = self.vd_output_dir / "texts"
         # If the directory does not exist, create the folder
         # if not self.frame_output.exists():
         #     self.frame_output.mkdir(parents=True)

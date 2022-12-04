@@ -19,12 +19,13 @@ ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
 
 
 def extract_and_save_text(save_path: Path, frame_name: float, frame: np.array) -> None:
-    result = ocr.ocr(frame, cls=True)
-    if result[0]:
-        text = result[0][0][1][0]
-        name = Path(f"{save_path}/{frame_name}.txt")
-        with open(name, 'w', encoding="utf-8") as text_file:
-            text_file.write(text)
+    name = Path(f"{save_path}/{frame_name}.txt")
+    if not name.exists():
+        result = ocr.ocr(frame, cls=True)
+        if result[0]:
+            text = result[0][0][1][0]
+            with open(name, 'w', encoding="utf-8") as text_file:
+                text_file.write(text)
 
 
 def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
