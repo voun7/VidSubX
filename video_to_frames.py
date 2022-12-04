@@ -1,5 +1,5 @@
 """
-@FileName: video_frames_ocr.py
+@FileName: video_to_frames.py
 @desc: Fast frame extraction from videos using Python and OpenCV
 """
 import logging
@@ -9,23 +9,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import cv2 as cv
-import numpy as np
-from paddleocr import PaddleOCR
-
 
 logger = logging.getLogger(__name__)
-
-ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
-
-
-def extract_and_save_text(save_path: Path, frame_name: float, frame: np.array) -> None:
-    name = Path(f"{save_path}/{frame_name}.txt")
-    if not name.exists():
-        result = ocr.ocr(frame, cls=True)
-        if result[0]:
-            text = result[0][0][1][0]
-            with open(name, 'w', encoding="utf-8") as text_file:
-                text_file.write(text)
 
 
 def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
@@ -49,13 +34,15 @@ def print_progress(iteration: int, total: float, decimals: float = 3, bar_length
     sys.stdout.flush()  # flush to stdout
 
 
-def extract_frames(video_path: Path, output: Path, sub_area: tuple, start: int, end: int, every: int) -> int:
+def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, start: int, end: int,
+                   every: int) -> int:
     """
     Extract frames from a video using OpenCVs VideoCapture
 
     :param video_path: path of the video
     :param output: the directory to save the frames
     :param sub_area: coordinates of the frame containing subtitle
+    :param overwrite: to overwrite frames that already exist?
     :param start: start frame
     :param end: end frame
     :param every: frame spacing
@@ -90,11 +77,12 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, start: int, 
 
         if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
             while_safety = 0  # reset the safety count
-            # crop and send the subtitle area for recognition
-            cropped_frame = image[y1:y2, x1:x2]
-            frame_position = capture.get(cv.CAP_PROP_POS_MSEC)
-            extract_and_save_text(output, frame_position, cropped_frame)
-            saved_count += 1  # increment our counter by one
+            frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
+            save_path = f"{output}/{frame_position}.jpg"  # create the save path
+            if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
+                cropped_frame = image[y1:y2, x1:x2]  # crop the subtitle area
+                cv.imwrite(save_path, cropped_frame)  # save the extracted image
+                saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
 
@@ -103,14 +91,17 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, start: int, 
     return saved_count  # and return the count of the images we saved
 
 
-def video_frames_to_text(video_path: Path, output: Path, sub_area: tuple, every: int) -> None:
+def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, every: int,
+                    chunk_size: int) -> None:
     """
     Extracts the frames from a video using multiprocessing
 
     :param video_path: path to the video
     :param output: directory to save the frames
     :param sub_area: coordinates of the frame containing subtitle
+    :param overwrite: overwrite frames if they exist
     :param every: extract every this many frames
+    :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
     :return: path to the directory where the frames were saved, or None if fails
     """
 
@@ -118,25 +109,26 @@ def video_frames_to_text(video_path: Path, output: Path, sub_area: tuple, every:
     total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
 
-    # how many frames to split into chunks (one chunk per cpu core process)
-    chunk_size = 250 if total > 250 else total - 1
+    logger.debug(f"Video has {total} frames and is being asked to be split into {chunk_size}. "
+                 f"Will split? {total > chunk_size}")
+    chunk_size = chunk_size if total > chunk_size else total - 1
 
     if total < 1:  # if video has no frames, might be and opencv error
         logger.error("Video has no frames. Check your OpenCV installation")
 
     # split the frames into chunk lists
-    frame_chunks = [[i, i+chunk_size] for i in range(0, total, chunk_size)]
+    frame_chunks = [[i, i + chunk_size] for i in range(0, total, chunk_size)]
     # make sure last chunk has correct end frame, also handles case chunk_size < total
-    frame_chunks[-1][-1] = min(frame_chunks[-1][-1], total-1)
-    logger.debug(f"frame chunks = {frame_chunks}")
+    frame_chunks[-1][-1] = min(frame_chunks[-1][-1], total - 1)
+    logger.debug(f"Frame chunks = {frame_chunks}")
 
     logger.debug("Using multiprocessing for frames")
     # execute across multiple cpu cores to speed up processing, get the count automatically
     with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
 
-        futures = [executor.submit(extract_frames, video_path, output, sub_area, f[0], f[1], every)
+        futures = [executor.submit(extract_frames, video_path, output, sub_area, overwrite, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)
 
         for i, f in enumerate(as_completed(futures)):  # as each process completes
-            print_progress(i, len(frame_chunks)-1)  # print it's progress
-        print("")
+            print_progress(i, len(frame_chunks) - 1)  # print it's progress
+        print("")  # prevent next line from joining previous progress bar
