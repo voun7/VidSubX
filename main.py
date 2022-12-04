@@ -8,7 +8,6 @@ import numpy as np
 from logger_setup import get_log
 from video_to_frames import video_to_frames
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -24,9 +23,9 @@ class SubtitleExtractor:
         self.sub_area = self.__subtitle_area(sub_area)
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
-        self.frame_output = self.vd_output_dir / "frames"
+        self.frame_output = self.vd_output_dir / "frames numpy array"
         # Extracted text file storage directory
-        self.text_output = self.vd_output_dir / "texts"
+        self.text_output = self.vd_output_dir / "extracted texts"
         # If the directory does not exist, create the folder
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
