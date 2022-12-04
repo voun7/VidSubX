@@ -23,12 +23,12 @@ class SubtitleExtractor:
         self.sub_area = self.__subtitle_area(sub_area)
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
-        # self.frame_output = self.vd_output_dir / "frames"
-        # Extracted subtitle file storage directory
+        self.frame_output = self.vd_output_dir / "frames"
+        # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "texts"
         # If the directory does not exist, create the folder
-        # if not self.frame_output.exists():
-        #     self.frame_output.mkdir(parents=True)
+        if not self.frame_output.exists():
+            self.frame_output.mkdir(parents=True)
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
 
@@ -95,7 +95,7 @@ class SubtitleExtractor:
 
         logger.info("Start to extracting video keyframes...")
         # self.view_frames()
-        video_frames_to_text(self.video_path, self.text_output, self.sub_area, every=1)
+        video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=2, chunk_size=500)
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
