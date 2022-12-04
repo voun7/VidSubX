@@ -111,7 +111,7 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
 
     logger.debug(f"Video has {total} frames and is being asked to be split into {chunk_size}. "
                  f"Will split? {total > chunk_size}")
-    chunk_size = chunk_size if total > chunk_size else total - 1
+    chunk_size = chunk_size if total > chunk_size else total - 1  # ignore chunk size if it's greater than frame count
 
     if total < 1:  # if video has no frames, might be and opencv error
         logger.error("Video has no frames. Check your OpenCV installation")
