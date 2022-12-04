@@ -6,7 +6,7 @@ import cv2 as cv
 import numpy as np
 
 from logger_setup import get_log
-from video_frames_ocr import video_frames_to_text
+from video_to_frames import video_to_frames
 
 
 get_log()
