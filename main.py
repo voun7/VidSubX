@@ -89,6 +89,12 @@ class SubtitleExtractor:
                 text = result[0][0][1][0]
                 with open(name, 'w', encoding="utf-8") as text_file:
                     text_file.write(text)
+        logger.info("Done extracting texts!")
+
+    def subtitle_generator(self):
+        for file in self.text_output.iterdir():
+            print(file)
+        logger.info("Subtitle generated!")
 
     def empty_cache(self) -> None:
         """
