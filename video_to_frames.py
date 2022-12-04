@@ -9,6 +9,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import cv2 as cv
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -78,10 +79,11 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
         if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
             while_safety = 0  # reset the safety count
             frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
-            save_path = f"{output}/{frame_position}.jpg"  # create the save path
-            if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
+            file_name = f"{output}/{frame_position}"  # create the file name save path
+            if not Path(file_name).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
                 cropped_frame = image[y1:y2, x1:x2]  # crop the subtitle area
-                cv.imwrite(save_path, cropped_frame)  # save the extracted image
+                np.save(file_name, cropped_frame)  # save the extracted image as np array
+                # cv.imwrite(file_name, cropped_frame)  # save the extracted image as image
                 saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
