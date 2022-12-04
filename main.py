@@ -108,10 +108,12 @@ class SubtitleExtractor:
         logger.info(f"Subtitle Area: {self.sub_area}")
 
         # self.view_frames()
-        logger.info("Start to extracting video keyframes...")
-        # video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=1, chunk_size=250)
-        logger.info("Extracting text from frames...")
-        # self.extract_and_save_text()
+        logger.info("Starting to extracting video keyframes...")
+        video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=1, chunk_size=250)
+        logger.info("Starting to extracting text from frames...")
+        self.extract_and_save_text()
+        logger.info("Generating subtitles...")
+        self.subtitle_generator()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
