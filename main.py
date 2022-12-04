@@ -76,6 +76,19 @@ class SubtitleExtractor:
         self.video_cap.release()
         cv.destroyAllWindows()
 
+    def extract_and_save_text(self) -> None:
+        logger.info("Loading Paddle OCR...")
+        from paddleocr import PaddleOCR
+        ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
+        for file in self.frame_output.iterdir():
+            frame = np.load(file)
+            name = Path(f"{self.text_output}/{file.stem}.txt")
+            result = ocr.ocr(frame, cls=True)
+            if result[0]:
+                text = result[0][0][1][0]
+                with open(name, 'w', encoding="utf-8") as text_file:
+                    text_file.write(text)
+
     def empty_cache(self) -> None:
         """
         Delete all cache files produced during subtitle extraction.
@@ -93,9 +106,11 @@ class SubtitleExtractor:
         logger.info(f"Resolution: {self.frame_width} X {self.frame_height}")
         logger.info(f"Subtitle Area: {self.sub_area}")
 
-        logger.info("Start to extracting video keyframes...")
         # self.view_frames()
-        video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=2, chunk_size=500)
+        logger.info("Start to extracting video keyframes...")
+        # video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=1, chunk_size=250)
+        logger.info("Extracting text from frames...")
+        # self.extract_and_save_text()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
