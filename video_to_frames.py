@@ -134,3 +134,4 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
         for i, f in enumerate(as_completed(futures)):  # as each process completes
             print_progress(i, len(frame_chunks) - 1)  # print it's progress
         print("")  # prevent next line from joining previous progress bar
+    logger.info("Done extracting frames from video!")
