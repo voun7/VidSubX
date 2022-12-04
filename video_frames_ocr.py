@@ -1,5 +1,5 @@
 """
-@FileName: video_to_frames.py
+@FileName: video_frames_ocr.py
 @desc: Fast frame extraction from videos using Python and OpenCV
 """
 import logging
@@ -9,10 +9,22 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import cv2 as cv
+import numpy as np
+from paddleocr import PaddleOCR
 
-from frame_ocr import text_detected
 
 logger = logging.getLogger(__name__)
+
+ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
+
+
+def extract_and_save_text(save_path: Path, frame_name: float, frame: np.array) -> None:
+    result = ocr.ocr(frame, cls=True)
+    if result[0]:
+        text = result[0][0][1][0]
+        name = Path(f"{save_path}/{frame_name}.txt")
+        with open(name, 'w', encoding="utf-8") as text_file:
+            text_file.write(text)
 
 
 def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
@@ -36,15 +48,13 @@ def print_progress(iteration: int, total: float, decimals: float = 3, bar_length
     sys.stdout.flush()  # flush to stdout
 
 
-def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, start: int, end: int, every: int)\
-        -> int:
+def extract_frames(video_path: Path, output: Path, sub_area: tuple, start: int, end: int, every: int) -> int:
     """
     Extract frames from a video using OpenCVs VideoCapture
 
     :param video_path: path of the video
     :param output: the directory to save the frames
     :param sub_area: coordinates of the frame containing subtitle
-    :param overwrite: to overwrite frames that already exist?
     :param start: start frame
     :param end: end frame
     :param every: frame spacing
@@ -79,14 +89,11 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
 
         if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
             while_safety = 0  # reset the safety count
-            # crop and save subtitle area
+            # crop and send the subtitle area for recognition
             cropped_frame = image[y1:y2, x1:x2]
             frame_position = capture.get(cv.CAP_PROP_POS_MSEC)
-            save_path = f"{output}/{frame_position}.jpg"  # create the save path
-            if text_detected(cropped_frame):
-                if not Path(save_path).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
-                    cv.imwrite(save_path, cropped_frame)  # save the extracted image
-                    saved_count += 1  # increment our counter by one
+            extract_and_save_text(output, frame_position, cropped_frame)
+            saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
 
@@ -95,14 +102,13 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: bool, every: int) -> None:
+def video_frames_to_text(video_path: Path, output: Path, sub_area: tuple, every: int) -> None:
     """
     Extracts the frames from a video using multiprocessing
 
     :param video_path: path to the video
     :param output: directory to save the frames
     :param sub_area: coordinates of the frame containing subtitle
-    :param overwrite: overwrite frames if they exist
     :param every: extract every this many frames
     :return: path to the directory where the frames were saved, or None if fails
     """
@@ -127,7 +133,7 @@ def video_to_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: 
     # execute across multiple cpu cores to speed up processing, get the count automatically
     with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
 
-        futures = [executor.submit(extract_frames, video_path, output, sub_area, overwrite, f[0], f[1], every)
+        futures = [executor.submit(extract_frames, video_path, output, sub_area, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)
 
         for i, f in enumerate(as_completed(futures)):  # as each process completes
