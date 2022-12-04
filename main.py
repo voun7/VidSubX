@@ -8,6 +8,8 @@ import numpy as np
 from logger_setup import get_log
 from video_frames_ocr import video_frames_to_text
 
+
+get_log()
 logger = logging.getLogger(__name__)
 
 
@@ -106,7 +108,6 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    get_log()
     logger.debug("Logging Started")
 
     video = Path("tests/I Can Copy Talents.mp4")
