@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cv2 as cv
 import numpy as np
+from tqdm import tqdm
 
 from logger_setup import get_log
 from video_to_frames import video_to_frames
@@ -80,7 +81,7 @@ class SubtitleExtractor:
         logger.info("Loading Paddle OCR...")
         from paddleocr import PaddleOCR
         ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
-        for file in self.frame_output.iterdir():
+        for file in tqdm(self.frame_output.iterdir(), desc="Extracting texts: "):
             frame = np.load(file)
             name = Path(f"{self.text_output}/{file.stem}.txt")
             result = ocr.ocr(frame, cls=True)
