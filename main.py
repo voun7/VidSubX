@@ -93,6 +93,7 @@ class SubtitleExtractor:
         """
         if self.vd_output_dir.exists():
             shutil.rmtree(self.vd_output_dir.parent)
+            logger.debug("Emptying cache")
 
     def run(self) -> None:
         """
