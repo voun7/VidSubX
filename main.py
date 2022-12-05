@@ -1,11 +1,12 @@
 import logging
 import shutil
+from datetime import timedelta
 from pathlib import Path
 
 import cv2 as cv
 import numpy as np
-from tqdm import tqdm
 
+from frame_ocr import extract_and_save_text
 from logger_setup import get_logger
 from video_to_frames import video_to_frames
 
@@ -77,23 +78,13 @@ class SubtitleExtractor:
         self.video_cap.release()
         cv.destroyAllWindows()
 
-    def extract_and_save_text(self) -> None:
-        logger.info("Loading Paddle OCR...")
-        from paddleocr import PaddleOCR
-        ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
-        for file in tqdm(self.frame_output.iterdir(), desc="Extracting texts: "):
-            frame = np.load(file)
-            name = Path(f"{self.text_output}/{file.stem}.txt")
-            result = ocr.ocr(frame, cls=True)
-            if result[0]:
-                text = result[0][0][1][0]
-                with open(name, 'w', encoding="utf-8") as text_file:
-                    text_file.write(text)
-        logger.info("Done extracting texts!")
-
-    def subtitle_generator(self):
-        for file in self.text_output.iterdir():
-            print(file)
+    def generate_subtitle(self):
+        position = 1
+        for file in sorted(self.text_output.iterdir()):
+            file_text = file.read_text(encoding="utf-8")
+            name_in_seconds = round(float(file.stem) / 1000, 5)
+            print(position, file.name, timedelta(seconds=name_in_seconds), file_text)
+            position += 1
         logger.info("Subtitle generated!")
 
     def empty_cache(self) -> None:
@@ -108,6 +99,7 @@ class SubtitleExtractor:
         Run through the steps of extracting video.
         """
         start = cv.getTickCount()
+        # self.empty_cache()
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
         logger.info(f"Resolution: {self.frame_width} X {self.frame_height}")
@@ -117,9 +109,9 @@ class SubtitleExtractor:
         logger.info("Starting to extracting video keyframes...")
         video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=1, chunk_size=250)
         logger.info("Starting to extracting text from frames...")
-        self.extract_and_save_text()
-        logger.info("Generating subtitles...")
-        self.subtitle_generator()
+        extract_and_save_text(self.frame_output, self.text_output)
+        logger.info("Generating subtitle...")
+        self.generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
