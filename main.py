@@ -6,10 +6,13 @@ import cv2 as cv
 import numpy as np
 from tqdm import tqdm
 
-from logger_setup import get_log
+from logger_setup import get_logger
 from video_to_frames import video_to_frames
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+# print(logger.handlers)
+
+# from paddleocr import PaddleOCR
 
 
 class SubtitleExtractor:
@@ -130,7 +133,6 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    get_log()
     logger.debug("Logging Started")
 
     video = Path("tests/I Can Copy Talents.mp4")

@@ -2,7 +2,6 @@
 @FileName: video_to_frames.py
 @desc: Fast frame extraction from videos using Python and OpenCV
 """
-import logging
 import multiprocessing
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -11,7 +10,9 @@ from pathlib import Path
 import cv2 as cv
 import numpy as np
 
-logger = logging.getLogger(__name__)
+from logger_setup import get_logger
+
+logger = get_logger(__name__)
 
 
 def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
