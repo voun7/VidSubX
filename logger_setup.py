@@ -1,18 +1,17 @@
 import logging
 import sys
-from logging import Logger
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
 
-def get_logger(name) -> Logger:
+def get_logger() -> None:
     # Create folder for file logs
     log_dir = Path(f"{Path.cwd()}/logs")
     if not log_dir.exists():
         log_dir.mkdir()
 
     # Create a custom base_logger
-    base_logger = logging.getLogger(name)
+    base_logger = logging.getLogger()
     base_logger.setLevel(logging.DEBUG)
 
     # Create handlers
@@ -32,7 +31,6 @@ def get_logger(name) -> Logger:
     # Add handlers to the base_logger
     base_logger.addHandler(file_handler)
     base_logger.addHandler(console_handler)
-    return base_logger
 
 
 def my_namer(default_name):
