@@ -11,8 +11,6 @@ from pathlib import Path
 import cv2 as cv
 import numpy as np
 
-from logger_setup import get_logger
-
 logger = logging.getLogger(__name__)
 
 
