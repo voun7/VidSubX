@@ -44,7 +44,7 @@ def my_namer(default_name):
 
 
 # # Use the following to add logger to other modules.
-# import logging
-# logger = logging.getLogger(__name__)
+# from logger_setup import get_logger
+# logger = get_logger(__name__)
 # Do not log this messages unless they are at least warnings
 # logging.getLogger("").setLevel(logging.WARNING)
