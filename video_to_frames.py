@@ -83,7 +83,7 @@ def extract_frames(video_path: Path, output: Path, sub_area: tuple, overwrite: b
             if not Path(file_name).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
                 cropped_frame = image[y1:y2, x1:x2]  # crop the subtitle area
                 np.save(file_name, cropped_frame)  # save the extracted image as np array
-                # cv.imwrite(file_name, cropped_frame)  # save the extracted image as image
+                # cv.imwrite(file_name + ".jpg", cropped_frame)  # save the extracted image as jpg image
                 saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
