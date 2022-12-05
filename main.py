@@ -128,7 +128,6 @@ class SubtitleExtractor:
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
         self.video_cap.release()
-        cv.destroyAllWindows()
         # self.empty_cache()
 
 
