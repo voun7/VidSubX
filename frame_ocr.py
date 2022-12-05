@@ -8,7 +8,7 @@ from tqdm import tqdm
 logger = logging.getLogger(__name__)
 
 
-def extract_and_save_text(frame_output, text_output) -> None:
+def extract_and_save_text(frame_output: Path, text_output: Path) -> None:
     ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
     for file in tqdm(frame_output.iterdir(), desc="Extracting texts: "):
         frame = np.load(file)
