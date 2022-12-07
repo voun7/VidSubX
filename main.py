@@ -54,7 +54,7 @@ class SubtitleExtractor:
     @staticmethod
     def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
         """
-        Call in a loop to create standard out progress bar
+        Call in a loop to create standard out progress bar.
 
         :param iteration: current iteration
         :param total: total iterations
@@ -76,7 +76,7 @@ class SubtitleExtractor:
         """
         Extract frames from a video using OpenCVs VideoCapture.
 
-        :param overwrite: to overwrite frames that already exist?
+        :param overwrite: whether to overwrite frames that already exist
         :param start: start frame
         :param end: end frame
         :param every: frame spacing
