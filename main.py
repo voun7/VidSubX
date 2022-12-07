@@ -215,7 +215,7 @@ class SubtitleExtractor:
 
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
-        self.video_to_frames(overwrite=False, every=1, chunk_size=250)
+        self.video_to_frames(overwrite=False, every=2, chunk_size=250)
         logger.info("Starting to extracting text from frames...")
         # extract_and_save_text(self.frame_output, self.text_output)
         logger.info("Generating subtitle...")
