@@ -7,6 +7,7 @@ from pathlib import Path
 
 import cv2 as cv
 import numpy as np
+from natsort import natsorted
 
 from logger_setup import get_logger
 
@@ -201,6 +202,44 @@ class SubtitleExtractor:
             print("")  # prevent next line from joining previous progress bar
         logger.info("Done extracting frames from video!")
 
+    def merge_similar_frames(self):
+        for file in natsorted(self.frame_output.iterdir()):
+            print(file.name)
+
+    @staticmethod
+    def timecode(frame_no: float) -> str:
+        seconds = frame_no // 1000
+        milliseconds = int(frame_no % 1000)
+        minutes = 0
+        hours = 0
+        if seconds >= 60:
+            minutes = int(seconds // 60)
+            seconds = int(seconds % 60)
+        if minutes >= 60:
+            hours = int(minutes // 60)
+            minutes = int(minutes % 60)
+        smpte_token = ','
+        return "%02d:%02d:%02d%s%03d" % (hours, minutes, seconds, smpte_token, milliseconds)
+
+    def _save_subtitle(self, lines: list) -> None:
+        name = self.video_path.with_suffix(".srt")
+        logger.info(f"Subtitle file successfully generated. Name: {name}")
+        with open(name, 'w', encoding="utf-8") as new_sub:
+            new_sub.writelines(lines)
+
+    def generate_subtitle(self):
+        subtitles = []
+        line_code = 0
+        for file in self.text_output.iterdir():
+            line_code += 1
+            frame_start = ''
+            frame_end = ''
+            file_content = file.read_text(encoding="utf-8")
+            subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n"
+            subtitles.append(subtitle_line)
+        self._save_subtitle(subtitles)
+        logger.info("Subtitle generated!")
+
     def run(self) -> None:
         """
         Run through the steps of extracting video.
@@ -214,7 +253,9 @@ class SubtitleExtractor:
 
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
-        self.video_to_frames(overwrite=False, every=2, chunk_size=250)
+        # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
+        logger.info("Merging similar frames...")
+        self.merge_similar_frames()
         logger.info("Starting to extracting text from frames...")
         # extract_and_save_text(self.frame_output, self.text_output)
         logger.info("Generating subtitle...")
