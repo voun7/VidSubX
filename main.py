@@ -1,14 +1,14 @@
 import logging
+import multiprocessing
 import shutil
-from datetime import timedelta
+import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 import cv2 as cv
 import numpy as np
 
-from frame_ocr import extract_and_save_text
 from logger_setup import get_logger
-from video_to_frames import video_to_frames
 
 logger = logging.getLogger(__name__)
 
@@ -17,15 +17,10 @@ class SubtitleExtractor:
     def __init__(self, video_path: Path, sub_area: tuple = None) -> None:
         self.video_path = video_path
         self.video_name = self.video_path.stem
-        self.video_cap = cv.VideoCapture(str(video_path))
-        self.fps = int(self.video_cap.get(cv.CAP_PROP_FPS))
-        self.frame_count = int(self.video_cap.get(cv.CAP_PROP_FRAME_COUNT))
-        self.frame_height = int(self.video_cap.get(cv.CAP_PROP_FRAME_HEIGHT))
-        self.frame_width = int(self.video_cap.get(cv.CAP_PROP_FRAME_WIDTH))
         self.sub_area = self.__subtitle_area(sub_area)
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
-        self.frame_output = self.vd_output_dir / "frames numpy array"
+        self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
         # If the directory does not exist, create the folder
@@ -33,6 +28,15 @@ class SubtitleExtractor:
             self.frame_output.mkdir(parents=True)
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
+
+    def get_video_details(self):
+        video_cap = cv.VideoCapture(str(self.video_path))
+        fps = video_cap.get(cv.CAP_PROP_FPS)
+        frame_count = int(video_cap.get(cv.CAP_PROP_FRAME_COUNT))
+        frame_height = int(video_cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+        frame_width = int(video_cap.get(cv.CAP_PROP_FRAME_WIDTH))
+        video_cap.release()
+        return fps, frame_count, frame_height, frame_width
 
     def __subtitle_area(self, sub_area: None | tuple) -> tuple:
         """
@@ -42,8 +46,119 @@ class SubtitleExtractor:
         if sub_area:
             return sub_area
         else:
-            x1, y1, x2, y2 = 0, int(self.frame_height * 0.75), self.frame_width, self.frame_height
+            _, _, frame_height, frame_width = self.get_video_details()
+            x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
             return x1, y1, x2, y2
+
+    @staticmethod
+    def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
+        """
+        Call in a loop to create standard out progress bar
+
+        :param iteration: current iteration
+        :param total: total iterations
+        :param decimals: positive number of decimals in percent complete
+        :param bar_length: character length of bar
+        :return: None
+        """
+
+        prefix = "Extracting frames from video: "
+        suffix = "Complete"
+        format_str = "{0:." + str(decimals) + "f}"  # format the % done number string
+        percents = format_str.format(100 * (iteration / float(total)))  # calculate the % done
+        filled_length = int(round(bar_length * iteration / float(total)))  # calculate the filled bar length
+        bar = '#' * filled_length + '-' * (bar_length - filled_length)  # generate the bar string
+        sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percents, '%', suffix)),  # write out the bar
+        sys.stdout.flush()  # flush to stdout
+
+    def extract_frames(self, overwrite: bool, start: int, end: int, every: int) -> int:
+        """
+        Extract frames from a video using OpenCVs VideoCapture
+
+        :param overwrite: to overwrite frames that already exist?
+        :param start: start frame
+        :param end: end frame
+        :param every: frame spacing
+        :return: count of images saved
+        """
+
+        x1, y1, x2, y2 = self.sub_area
+
+        capture = cv.VideoCapture(str(self.video_path))  # open the video using OpenCV
+
+        if start < 0:  # if start isn't specified lets assume 0
+            start = 0
+        if end < 0:  # if end isn't specified assume the end of the video
+            end = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
+
+        capture.set(1, start)  # set the starting frame of the capture
+        frame = start  # keep track of which frame we are up to, starting from start
+        while_safety = 0  # a safety counter to ensure we don't enter an infinite while loop
+        saved_count = 0  # a count of how many frames we have saved
+
+        while frame < end:  # let's loop through the frames until the end
+
+            _, image = capture.read()  # read an image from the capture
+
+            if while_safety > 500:  # break the while if our safety max out at 500
+                break
+
+            # sometimes OpenCV reads Nones during a video, in which case we want to just skip
+            if image is None:  # if we get a bad return flag or the image we read is None, lets not save
+                while_safety += 1  # add 1 to our while safety, since we skip before incrementing our frame variable
+                continue  # skip
+
+            if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
+                while_safety = 0  # reset the safety count
+                frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
+                file_name = f"{self.frame_output}/{frame_position}"  # create the file name save path
+                if not Path(file_name).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
+                    cropped_frame = image[y1:y2, x1:x2]  # crop the subtitle area
+                    # np.save(file_name, cropped_frame)  # save the extracted image as np array
+                    cv.imwrite(file_name + ".jpg", cropped_frame)  # save the extracted image as jpg image
+                    saved_count += 1  # increment our counter by one
+
+            frame += 1  # increment our frame count
+
+        capture.release()  # after the while has finished close the capture
+        return saved_count  # and return the count of the images we saved
+
+    def video_to_frames(self, overwrite: bool, every: int, chunk_size: int) -> None:
+        """
+        Extracts the frames from a video using multiprocessing
+
+        :param overwrite: overwrite frames if they exist
+        :param every: extract every this many frames
+        :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
+        :return: path to the directory where the frames were saved, or None if fails
+        """
+
+        capture = cv.VideoCapture(str(self.video_path))  # load the video
+        total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
+        capture.release()  # release the capture straight away
+
+        logger.debug(f"Video has {total} frames and is being asked to be split into {chunk_size}. "
+                     f"Will split? {total > chunk_size}")
+        # ignore chunk size if it's greater than frame count
+        chunk_size = chunk_size if total > chunk_size else total - 1
+
+        if total < 1:  # if video has no frames, might be and opencv error
+            logger.error("Video has no frames. Check your OpenCV installation")
+
+        # split the frames into chunk lists
+        frame_chunks = [[i, i + chunk_size] for i in range(0, total, chunk_size)]
+        # make sure last chunk has correct end frame, also handles case chunk_size < total
+        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], total - 1)
+        logger.debug(f"Frame chunks = {frame_chunks}")
+
+        logger.debug("Using multiprocessing for frames")
+        # execute across multiple cpu cores to speed up processing, get the count automatically
+        with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+            futures = [executor.submit(self.extract_frames, overwrite, f[0], f[1], every) for f in frame_chunks]
+            for i, f in enumerate(as_completed(futures)):  # as each process completes
+                self.print_progress(i, len(frame_chunks) - 1)  # print it's progress
+            print("")  # prevent next line from joining previous progress bar
+        logger.info("Done extracting frames from video!")
 
     @staticmethod
     def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
@@ -53,8 +168,9 @@ class SubtitleExtractor:
         return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
     def view_frames(self) -> None:
-        while self.video_cap.isOpened():
-            success, frame = self.video_cap.read()
+        video_cap = cv.VideoCapture(str(self.video_path))
+        while True:
+            success, frame = video_cap.read()
             if not success:
                 logger.warning(f"Video has ended!")  # or failed to read
                 break
@@ -75,17 +191,8 @@ class SubtitleExtractor:
 
             if cv.waitKey(1) == ord('q'):
                 break
-        self.video_cap.release()
+        video_cap.release()
         cv.destroyAllWindows()
-
-    def generate_subtitle(self):
-        position = 1
-        for file in sorted(self.text_output.iterdir()):
-            file_text = file.read_text(encoding="utf-8")
-            name_in_seconds = round(float(file.stem) / 1000, 5)
-            print(position, file.name, timedelta(seconds=name_in_seconds), file_text)
-            position += 1
-        logger.info("Subtitle generated!")
 
     def empty_cache(self) -> None:
         """
@@ -101,23 +208,23 @@ class SubtitleExtractor:
         """
         start = cv.getTickCount()
         # self.empty_cache()
+        fps, frame_count, frame_height, frame_width = self.get_video_details()
         logger.info(f"File Path: {self.video_path}")
-        logger.info(f"Frame Rate: {self.fps}, Frame Count: {self.frame_count}")
-        logger.info(f"Resolution: {self.frame_width} X {self.frame_height}")
+        logger.info(f"Frame Rate: {fps}, Frame Count: {frame_count}")
+        logger.info(f"Resolution: {frame_width} X {frame_height}")
         logger.info(f"Subtitle Area: {self.sub_area}")
 
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
-        video_to_frames(self.video_path, self.frame_output, self.sub_area, overwrite=False, every=1, chunk_size=250)
+        self.video_to_frames(overwrite=False, every=1, chunk_size=250)
         logger.info("Starting to extracting text from frames...")
-        extract_and_save_text(self.frame_output, self.text_output)
+        # extract_and_save_text(self.frame_output, self.text_output)
         logger.info("Generating subtitle...")
-        self.generate_subtitle()
+        # self.generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        self.video_cap.release()
         # self.empty_cache()
 
 
