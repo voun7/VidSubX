@@ -114,9 +114,9 @@ class SubtitleExtractor:
                 frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
                 file_name = f"{self.frame_output}/{frame_position}"  # create the file name save path
                 if not Path(file_name).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
-                    cropped_frame = image[y1:y2, x1:x2]  # crop the subtitle area
-                    # np.save(file_name, cropped_frame)  # save the extracted image as np array
-                    cv.imwrite(file_name + ".jpg", cropped_frame)  # save the extracted image as jpg image
+                    subtitle_area = image[y1:y2, x1:x2]  # crop the subtitle area
+                    rescaled_sub_area = self.rescale_frame(subtitle_area)
+                    cv.imwrite(file_name + ".jpg", rescaled_sub_area)  # save the extracted image as jpg image
                     saved_count += 1  # increment our counter by one
 
             frame += 1  # increment our frame count
@@ -181,8 +181,8 @@ class SubtitleExtractor:
             cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
 
             # crop and show subtitle area
-            cropped_frame = frame[y1:y2, x1:x2]
-            resized_cropped_frame = self.rescale_frame(cropped_frame)
+            subtitle_area = frame[y1:y2, x1:x2]
+            resized_cropped_frame = self.rescale_frame(subtitle_area)
             cv.imshow("Cropped frame", resized_cropped_frame)
 
             frame_resized = self.rescale_frame(frame)
