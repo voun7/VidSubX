@@ -74,7 +74,7 @@ class SubtitleExtractor:
 
     def extract_frames(self, overwrite: bool, start: int, end: int, every: int) -> int:
         """
-        Extract frames from a video using OpenCVs VideoCapture
+        Extract frames from a video using OpenCVs VideoCapture.
 
         :param overwrite: to overwrite frames that already exist?
         :param start: start frame
@@ -126,7 +126,7 @@ class SubtitleExtractor:
 
     def video_to_frames(self, overwrite: bool, every: int, chunk_size: int) -> None:
         """
-        Extracts the frames from a video using multiprocessing
+        Extracts the frames from a video using multiprocessing.
 
         :param overwrite: overwrite frames if they exist
         :param every: extract every this many frames
