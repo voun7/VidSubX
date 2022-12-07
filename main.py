@@ -17,6 +17,7 @@ class SubtitleExtractor:
     def __init__(self, video_path: Path, sub_area: tuple = None) -> None:
         self.video_path = video_path
         self.video_name = self.video_path.stem
+        self.video_details = self.__get_video_details()
         self.sub_area = self.__subtitle_area(sub_area)
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
@@ -29,13 +30,13 @@ class SubtitleExtractor:
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
 
-    def get_video_details(self):
-        video_cap = cv.VideoCapture(str(self.video_path))
-        fps = video_cap.get(cv.CAP_PROP_FPS)
-        frame_count = int(video_cap.get(cv.CAP_PROP_FRAME_COUNT))
-        frame_height = int(video_cap.get(cv.CAP_PROP_FRAME_HEIGHT))
-        frame_width = int(video_cap.get(cv.CAP_PROP_FRAME_WIDTH))
-        video_cap.release()
+    def __get_video_details(self) -> tuple:
+        capture = cv.VideoCapture(str(self.video_path))
+        fps = capture.get(cv.CAP_PROP_FPS)
+        frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
+        frame_height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
+        frame_width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
+        capture.release()
         return fps, frame_count, frame_height, frame_width
 
     def __subtitle_area(self, sub_area: None | tuple) -> tuple:
@@ -46,7 +47,7 @@ class SubtitleExtractor:
         if sub_area:
             return sub_area
         else:
-            _, _, frame_height, frame_width = self.get_video_details()
+            _, _, frame_height, frame_width = self.video_details
             x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
             return x1, y1, x2, y2
 
@@ -133,22 +134,20 @@ class SubtitleExtractor:
         :return: path to the directory where the frames were saved, or None if fails
         """
 
-        capture = cv.VideoCapture(str(self.video_path))  # load the video
-        total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
-        capture.release()  # release the capture straight away
+        frame_count = self.video_details[1]
 
-        logger.debug(f"Video has {total} frames and is being asked to be split into {chunk_size}. "
-                     f"Will split? {total > chunk_size}")
+        logger.debug(f"Video has {frame_count} frames and is being asked to be split into {chunk_size}. "
+                     f"Will split? {frame_count > chunk_size}")
         # ignore chunk size if it's greater than frame count
-        chunk_size = chunk_size if total > chunk_size else total - 1
+        chunk_size = chunk_size if frame_count > chunk_size else frame_count - 1
 
-        if total < 1:  # if video has no frames, might be and opencv error
+        if frame_count < 1:  # if video has no frames, might be and opencv error
             logger.error("Video has no frames. Check your OpenCV installation")
 
         # split the frames into chunk lists
-        frame_chunks = [[i, i + chunk_size] for i in range(0, total, chunk_size)]
-        # make sure last chunk has correct end frame, also handles case chunk_size < total
-        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], total - 1)
+        frame_chunks = [[i, i + chunk_size] for i in range(0, frame_count, chunk_size)]
+        # make sure last chunk has correct end frame, also handles case chunk_size < frame count
+        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
 
         logger.debug("Using multiprocessing for frames")
@@ -208,7 +207,7 @@ class SubtitleExtractor:
         """
         start = cv.getTickCount()
         # self.empty_cache()
-        fps, frame_count, frame_height, frame_width = self.get_video_details()
+        fps, frame_count, frame_height, frame_width = self.video_details
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Rate: {fps}, Frame Count: {frame_count}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
