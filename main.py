@@ -52,6 +52,48 @@ class SubtitleExtractor:
             return x1, y1, x2, y2
 
     @staticmethod
+    def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
+        height = int(frame.shape[0] * scale)
+        width = int(frame.shape[1] * scale)
+        dimensions = (width, height)
+        return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
+
+    def view_frames(self) -> None:
+        video_cap = cv.VideoCapture(str(self.video_path))
+        while True:
+            success, frame = video_cap.read()
+            if not success:
+                logger.warning(f"Video has ended!")  # or failed to read
+                break
+            x1, y1, x2, y2 = self.sub_area
+            # draw rectangle over subtitle area
+            top_left_corner = (x1, y1)
+            bottom_right_corner = (x2, y2)
+            color_red = (0, 0, 255)
+            cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
+
+            # crop and show subtitle area
+            subtitle_area = frame[y1:y2, x1:x2]
+            resized_cropped_frame = self.rescale_frame(subtitle_area)
+            cv.imshow("Cropped frame", resized_cropped_frame)
+
+            frame_resized = self.rescale_frame(frame)
+            cv.imshow("Video Output", frame_resized)
+
+            if cv.waitKey(1) == ord('q'):
+                break
+        video_cap.release()
+        cv.destroyAllWindows()
+
+    def empty_cache(self) -> None:
+        """
+        Delete all cache files produced during subtitle extraction.
+        """
+        if self.vd_output_dir.exists():
+            shutil.rmtree(self.vd_output_dir.parent)
+            logger.debug("Emptying cache")
+
+    @staticmethod
     def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
         """
         Call in a loop to create standard out progress bar.
@@ -159,54 +201,11 @@ class SubtitleExtractor:
             print("")  # prevent next line from joining previous progress bar
         logger.info("Done extracting frames from video!")
 
-    @staticmethod
-    def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
-        height = int(frame.shape[0] * scale)
-        width = int(frame.shape[1] * scale)
-        dimensions = (width, height)
-        return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
-
-    def view_frames(self) -> None:
-        video_cap = cv.VideoCapture(str(self.video_path))
-        while True:
-            success, frame = video_cap.read()
-            if not success:
-                logger.warning(f"Video has ended!")  # or failed to read
-                break
-            x1, y1, x2, y2 = self.sub_area
-            # draw rectangle over subtitle area
-            top_left_corner = (x1, y1)
-            bottom_right_corner = (x2, y2)
-            color_red = (0, 0, 255)
-            cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
-
-            # crop and show subtitle area
-            subtitle_area = frame[y1:y2, x1:x2]
-            resized_cropped_frame = self.rescale_frame(subtitle_area)
-            cv.imshow("Cropped frame", resized_cropped_frame)
-
-            frame_resized = self.rescale_frame(frame)
-            cv.imshow("Video Output", frame_resized)
-
-            if cv.waitKey(1) == ord('q'):
-                break
-        video_cap.release()
-        cv.destroyAllWindows()
-
-    def empty_cache(self) -> None:
-        """
-        Delete all cache files produced during subtitle extraction.
-        """
-        if self.vd_output_dir.exists():
-            shutil.rmtree(self.vd_output_dir.parent)
-            logger.debug("Emptying cache")
-
     def run(self) -> None:
         """
         Run through the steps of extracting video.
         """
         start = cv.getTickCount()
-        # self.empty_cache()
         fps, frame_count, frame_height, frame_width = self.video_details
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Rate: {fps}, Frame Count: {frame_count}")
