@@ -231,10 +231,7 @@ if __name__ == '__main__':
     get_logger()
     logger.debug("Logging Started")
 
-    video = Path("tests/I Can Copy Talents.mp4")
-    # video = Path("tests/40,000 Years of the Stars.mp4")
-    # video = Path("tests/anime video-cut.mp4")
-    # video = Path("tests/anime video.mp4")
+    video = Path("tests/anime video.mp4")
     se = SubtitleExtractor(video)
     se.run()
 
