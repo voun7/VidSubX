@@ -3,6 +3,7 @@ import multiprocessing
 import shutil
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from itertools import pairwise
 from pathlib import Path
 
 import cv2 as cv
@@ -202,9 +203,22 @@ class SubtitleExtractor:
             print("")  # prevent next line from joining previous progress bar
         logger.info("Done extracting frames from video!")
 
+    @staticmethod
+    def similar(image1, image2):
+        return True
+
     def merge_similar_frames(self):
-        for file in natsorted(self.frame_output.iterdir()):
-            print(file.name)
+        for file1, file2 in pairwise(natsorted(self.frame_output.iterdir())):
+            starting_file = None
+            ending_file = None
+            if starting_file:
+                print("not none")
+            if self.similar(file1, file2):
+                starting_file = file1
+                print(file1.name, file2.name)
+            else:
+                ending_file = file1
+            new_file_name = f"{starting_file.stem}-{ending_file.stem}"
 
     @staticmethod
     def timecode(frame_no: float) -> str:
