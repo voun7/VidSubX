@@ -7,6 +7,7 @@ from pathlib import Path
 
 import cv2 as cv
 import numpy as np
+import keras_ocr
 from natsort import natsorted
 
 from logger_setup import get_logger
@@ -205,24 +206,13 @@ class SubtitleExtractor:
             print("")  # prevent next line from joining previous progress bar
         logger.info("Done extracting frames from video!")
 
-    @staticmethod
-    def image_similarity(image1: Path, image2: Path) -> float:
-        frame1 = cv.imread(str(image1))
-        frame2 = cv.imread(str(image2))
-        # take the absolute difference of the images
-        difference = cv.absdiff(frame1, frame2)
-        # convert the result to integer type
-        difference = difference.astype(np.uint8)
-        # find percentage difference based on number of pixels that are not zero
-        percentage = (np.count_nonzero(difference) * 100) / difference.size
-        return percentage
+    def extract_text(self, image):
 
-    def merge_similar_frames(self, threshold: int = 90):
-        for file1, file2 in pairwise(natsorted(self.frame_output.iterdir())):
-            similarity = self.image_similarity(file1, file2)
-            if similarity > threshold:
-                print(file1.name, file2.name)
-            # new_file_name = f"{starting_file.stem}-{ending_file.stem}"
+        pass
+
+    def frames_to_text(self):
+        for files in self.frame_output.iterdir():
+            print(files)
 
     @staticmethod
     def timecode(frame_no: float) -> str:
@@ -272,10 +262,8 @@ class SubtitleExtractor:
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
         # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
-        logger.info("Merging similar frames...")
-        self.merge_similar_frames()
         logger.info("Starting to extracting text from frames...")
-        # extract_and_save_text(self.frame_output, self.text_output)
+        # self.frames_to_text()
         logger.info("Generating subtitle...")
         # self.generate_subtitle()
 
