@@ -95,6 +95,13 @@ class SubtitleExtractor:
             shutil.rmtree(self.vd_output_dir.parent)
             logger.debug("Emptying cache")
 
+    def preprocess_sub_frame(self, frame: np.ndarray) -> np.ndarray:
+        x1, y1, x2, y2 = self.sub_area
+        subtitle_area = frame[y1:y2, x1:x2]  # crop the subtitle area
+        rescaled_sub_area = self.rescale_frame(subtitle_area)
+        preprocessed_frame = rescaled_sub_area
+        return preprocessed_frame
+
     @staticmethod
     def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
         """
@@ -127,8 +134,6 @@ class SubtitleExtractor:
         :return: count of images saved
         """
 
-        x1, y1, x2, y2 = self.sub_area
-
         capture = cv.VideoCapture(str(self.video_path))  # open the video using OpenCV
 
         if start < 0:  # if start isn't specified lets assume 0
@@ -158,9 +163,8 @@ class SubtitleExtractor:
                 frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
                 file_name = f"{self.frame_output}/{frame_position}"  # create the file name save path
                 if not Path(file_name).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
-                    subtitle_area = image[y1:y2, x1:x2]  # crop the subtitle area
-                    rescaled_sub_area = self.rescale_frame(subtitle_area)
-                    cv.imwrite(file_name + ".jpg", rescaled_sub_area)  # save the extracted image as jpg image
+                    preprocessed_frame = self.preprocess_sub_frame(image)
+                    cv.imwrite(file_name + ".jpg", preprocessed_frame)  # save the extracted image as jpg image
                     saved_count += 1  # increment our counter by one
 
             frame += 1  # increment our frame count
