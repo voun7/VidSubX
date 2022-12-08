@@ -74,10 +74,9 @@ class SubtitleExtractor:
             color_red = (0, 0, 255)
             cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
 
-            # crop and show subtitle area
-            subtitle_area = frame[y1:y2, x1:x2]
-            resized_cropped_frame = self.rescale_frame(subtitle_area)
-            cv.imshow("Cropped frame", resized_cropped_frame)
+            # show preprocessed subtitle area
+            preprocessed_sub = self.preprocess_sub_frame(frame)
+            cv.imshow("Preprocessed Sub", preprocessed_sub)
 
             frame_resized = self.rescale_frame(frame)
             cv.imshow("Video Output", frame_resized)
