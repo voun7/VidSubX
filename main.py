@@ -1,5 +1,4 @@
 import logging
-import multiprocessing
 import shutil
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -199,7 +198,7 @@ class SubtitleExtractor:
 
         logger.debug("Using multiprocessing for frames")
         # execute across multiple cpu cores to speed up processing, get the count automatically
-        with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+        with ProcessPoolExecutor() as executor:
             futures = [executor.submit(self.extract_frames, overwrite, f[0], f[1], every) for f in frame_chunks]
             for i, f in enumerate(as_completed(futures)):  # as each process completes
                 self.print_progress(i, len(frame_chunks) - 1)  # print it's progress
