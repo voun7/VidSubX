@@ -7,8 +7,9 @@ from pathlib import Path
 
 import cv2 as cv
 import numpy as np
-import keras_ocr
 from natsort import natsorted
+from paddleocr import PaddleOCR
+from tqdm import tqdm
 
 from logger_setup import get_logger
 
@@ -206,13 +207,43 @@ class SubtitleExtractor:
             print("")  # prevent next line from joining previous progress bar
         logger.info("Done extracting frames from video!")
 
-    def extract_text(self, image):
+    @staticmethod
+    def image_similarity(image1: Path, image2: Path) -> float:
+        frame1 = cv.imread(str(image1))
+        frame2 = cv.imread(str(image2))
+        # take the absolute difference of the images
+        difference = cv.absdiff(frame1, frame2)
+        # convert the result to integer type
+        difference = difference.astype(np.uint8)
+        # find percentage difference based on number of pixels that are not zero
+        percentage = (np.count_nonzero(difference) * 100) / difference.size
+        return percentage
 
-        pass
+    def remove_excess_similar_frames(self, threshold: int):
+        for file1, file2 in pairwise(natsorted(self.frame_output.iterdir())):
+            similarity = self.image_similarity(file1, file2)
+            print(file1.name, file2.name, similarity)
+            if similarity < threshold:
+                print("files don't match\n")
+
+    def merge_similar_frames(self, threshold: int = 90):
+        self.remove_excess_similar_frames(threshold)
+        # for file1, file2 in pairwise(natsorted(self.frame_output.iterdir())):
+        #     similarity = self.image_similarity(file1, file2)
+        #     if similarity > threshold:
+        #         print(file1.name, file2.name)
+        #     new_file_name = f"{starting_file.stem}-{ending_file.stem}"
 
     def frames_to_text(self):
-        for files in self.frame_output.iterdir():
-            print(files)
+        ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
+        for file in tqdm(self.frame_output.iterdir(), desc="Extracting texts: "):
+            name = Path(f"{self.text_output}/{file.stem}.txt")
+            result = ocr.ocr(str(file), cls=True)
+            if result[0]:
+                text = result[0][0][1][0]
+                with open(name, 'w', encoding="utf-8") as text_file:
+                    text_file.write(text)
+        logger.info("Done extracting texts!")
 
     @staticmethod
     def timecode(frame_no: float) -> str:
@@ -262,8 +293,10 @@ class SubtitleExtractor:
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
         # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
+        logger.info("Merging similar frames...")
+        # self.merge_similar_frames()
         logger.info("Starting to extracting text from frames...")
-        # self.frames_to_text()
+        self.frames_to_text()
         logger.info("Generating subtitle...")
         # self.generate_subtitle()
 
