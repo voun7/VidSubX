@@ -207,21 +207,23 @@ class SubtitleExtractor:
         logger.info("Done extracting frames from video!")
 
     @staticmethod
-    def similar(image1, image2):
-        return True
+    def image_similarity(image1: Path, image2: Path) -> float:
+        frame1 = cv.imread(str(image1))
+        frame2 = cv.imread(str(image2))
+        # take the absolute difference of the images
+        difference = cv.absdiff(frame1, frame2)
+        # convert the result to integer type
+        difference = difference.astype(np.uint8)
+        # find percentage difference based on number of pixels that are not zero
+        percentage = (np.count_nonzero(difference) * 100) / difference.size
+        return percentage
 
-    def merge_similar_frames(self):
+    def merge_similar_frames(self, threshold: int = 90):
         for file1, file2 in pairwise(natsorted(self.frame_output.iterdir())):
-            starting_file = None
-            ending_file = None
-            if starting_file:
-                print("not none")
-            if self.similar(file1, file2):
-                starting_file = file1
+            similarity = self.image_similarity(file1, file2)
+            if similarity > threshold:
                 print(file1.name, file2.name)
-            else:
-                ending_file = file1
-            new_file_name = f"{starting_file.stem}-{ending_file.stem}"
+            # new_file_name = f"{starting_file.stem}-{ending_file.stem}"
 
     @staticmethod
     def timecode(frame_no: float) -> str:
