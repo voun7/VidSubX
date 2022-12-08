@@ -97,8 +97,8 @@ class SubtitleExtractor:
         x1, y1, x2, y2 = self.sub_area
         subtitle_area = frame[y1:y2, x1:x2]  # crop the subtitle area
         rescaled_sub_area = self.rescale_frame(subtitle_area)
-        preprocessed_frame = rescaled_sub_area
-        return preprocessed_frame
+        gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
+        return gray_image
 
     @staticmethod
     def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
