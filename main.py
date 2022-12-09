@@ -23,11 +23,14 @@ class SubtitleExtractor:
         self.video_name = self.video_path.stem
         self.video_details = self.__get_video_details()
         self.sub_area = self.__subtitle_area(sub_area)
+        # Create cache directory
         self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
+        # Empty cache at the beginning of program run before recreating it
+        # self.empty_cache()
         # If the directory does not exist, create the folder
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
