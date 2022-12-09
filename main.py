@@ -217,27 +217,45 @@ class SubtitleExtractor:
         score = structural_similarity(frame1, frame2, channel_axis=-1)
         return score
 
-    def remove_excess_similar_frames(self, threshold: float):
-        for file1 in natsorted(self.frame_output.iterdir()):
-            for file2 in natsorted(self.frame_output.iterdir()):
-                similarity = self.image_similarity(file1, file2)
-                if similarity > threshold:
-                    print(file1.name, file2.name, similarity)
-                    print("images are similar\n")
-                    if not file1.name == file2.name:
-                        file2.unlink()
-                else:
-                    print(file1.name, file2.name, similarity)
-                    print("images are not similar\n")
-                    break
+    def frame_merger(self, files: list, threshold: float) -> int:
+        saved_count = 0
+        starting_file = None
+        for file1, file2 in pairwise(files):
+            saved_count += 1
+            similarity = self.image_similarity(file1, file2)
+            if similarity > threshold:
+                # print(file1.name, file2.name, similarity)
+                if not starting_file:
+                    starting_file = file1
+            else:
+                # print(file1.name, file2.name, similarity)
+                if not starting_file:
+                    starting_file = file1
+                ending_file = file1
+                if starting_file == ending_file:
+                    ending_file = file2
+                new_file_name = f"{starting_file.stem}--{ending_file.stem}.jpg"
+                starting_file.rename(f"{starting_file.parent}/{new_file_name}")
+                starting_file = None
+        return saved_count
 
-    def merge_similar_frames(self, threshold: float = 0.8):
-        self.remove_excess_similar_frames(threshold)
-        # for file1, file2 in pairwise(natsorted(self.frame_output.iterdir())):
-        #     similarity = self.image_similarity(file1, file2)
-        #     if similarity > threshold:
-        #         print(file1.name, file2.name)
-        #     new_file_name = f"{starting_file.stem}-{ending_file.stem}"
+    def merge_similar_frames(self, chunk_size: int, threshold: float) -> None:
+        files = [file for file in natsorted(self.frame_output.iterdir())]
+        file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
+
+        logger.debug("Using multiprocessing for merging frames")
+        prefix = "Merging similar frames from video: "
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(self.frame_merger, files, threshold) for files in file_chunks]
+            for i, f in enumerate(as_completed(futures)):
+                self.print_progress(i, len(file_chunks), prefix)
+            print("")
+        logger.info("Done merging frames from video!")
+
+        logger.debug("Deleting excess frames...")
+        for file in self.frame_output.iterdir():
+            if "--" not in file.name:
+                file.unlink()
 
     # def frames_to_text(self):
     #     from paddleocr import PaddleOCR
@@ -300,7 +318,7 @@ class SubtitleExtractor:
         logger.info("Starting to extracting video keyframes...")
         # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
         logger.info("Merging similar frames...")
-        self.merge_similar_frames()
+        self.merge_similar_frames(chunk_size=100, threshold=0.75)
         logger.info("Starting to extracting text from frames...")
         # self.frames_to_text()
         logger.info("Generating subtitle...")
