@@ -203,7 +203,7 @@ class SubtitleExtractor:
         logger.debug(f"Frame chunks = {frame_chunks}")
 
         logger.debug("Using multiprocessing for extracting frames")
-        prefix = "Extracting frames from video: "
+        prefix = "Extracting frames from video:"
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(self.extract_frames, overwrite, f[0], f[1], every) for f in frame_chunks]
@@ -224,7 +224,7 @@ class SubtitleExtractor:
         saved_count = 0
         starting_file = None
         for file1, file2 in pairwise(files):
-            saved_count += 1
+            saved_count += 2
             similarity = self.image_similarity(file1, file2)
             if similarity > threshold:
                 # print(file1.name, file2.name, similarity)
@@ -247,7 +247,7 @@ class SubtitleExtractor:
         file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
         logger.debug("Using multiprocessing for merging frames")
-        prefix = "Merging similar frames from video: "
+        prefix = "Merging similar frames from video:"
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(self.frame_merger, files, threshold) for files in file_chunks]
             for i, f in enumerate(as_completed(futures)):
@@ -320,7 +320,7 @@ class SubtitleExtractor:
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
         # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
-        logger.info("Merging similar frames...")
+        logger.info("Starting to merge similar frames...")
         self.merge_similar_frames(chunk_size=100, threshold=0.75)
         logger.info("Starting to extracting text from frames...")
         # self.frames_to_text()
