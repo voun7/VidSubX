@@ -104,18 +104,18 @@ class SubtitleExtractor:
         return gray_image
 
     @staticmethod
-    def print_progress(iteration: int, total: float, decimals: float = 3, bar_length: int = 50) -> None:
+    def print_progress(iteration: int, total: float, prefix: str, decimals: float = 3, bar_length: int = 50) -> None:
         """
         Call in a loop to create standard out progress bar.
 
         :param iteration: current iteration
         :param total: total iterations
+        :param prefix: prefix string
         :param decimals: positive number of decimals in percent complete
         :param bar_length: character length of bar
         :return: None
         """
 
-        prefix = "Extracting frames from video: "
         suffix = "Complete"
         format_str = "{0:." + str(decimals) + "f}"  # format the % done number string
         percents = format_str.format(100 * (iteration / float(total)))  # calculate the % done
@@ -199,12 +199,13 @@ class SubtitleExtractor:
         frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
 
-        logger.debug("Using multiprocessing for frames")
+        logger.debug("Using multiprocessing for extracting frames")
+        prefix = "Extracting frames from video: "
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(self.extract_frames, overwrite, f[0], f[1], every) for f in frame_chunks]
             for i, f in enumerate(as_completed(futures)):  # as each process completes
-                self.print_progress(i, len(frame_chunks) - 1)  # print it's progress
+                self.print_progress(i, len(frame_chunks) - 1, prefix)  # print it's progress
             print("")  # prevent next line from joining previous progress bar
         logger.info("Done extracting frames from video!")
 
