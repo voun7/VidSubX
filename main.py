@@ -1,9 +1,9 @@
 import shutil
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from difflib import SequenceMatcher
 from itertools import pairwise
 from pathlib import Path
-from difflib import SequenceMatcher
 
 import cv2 as cv
 import numpy as np
@@ -99,8 +99,8 @@ class SubtitleExtractor:
         x1, y1, x2, y2 = self.sub_area
         subtitle_area = frame[y1:y2, x1:x2]  # crop the subtitle area
         rescaled_sub_area = self.rescale_frame(subtitle_area)
-        gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
-        return gray_image
+        # gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
+        return rescaled_sub_area
 
     @staticmethod
     def print_progress(iteration: int, total: float, prefix: str, decimals: float = 3, bar_length: int = 50) -> None:
@@ -239,7 +239,7 @@ class SubtitleExtractor:
             if "--" not in file.name:
                 file.unlink()
 
-    def merge_similar_subs(self, threshold: float = 0.85) -> None:
+    def merge_similar_texts(self, threshold: float = 0.85) -> None:
         no_of_files = len(list(self.text_output.iterdir())) - 1
         counter = 0
         starting_file = None
@@ -247,11 +247,11 @@ class SubtitleExtractor:
             similarity = self.similarity(file1.read_text(encoding="utf-8"), file2.read_text(encoding="utf-8"))
             counter += 1
             if similarity > threshold and counter != no_of_files:
-                print(file1.name, file2.name, similarity)
+                # print(file1.name, file2.name, similarity)
                 if not starting_file:
                     starting_file = file1
             else:
-                print(file1.name, file2.name, similarity)
+                # print(file1.name, file2.name, similarity)
                 if not starting_file:
                     starting_file = file1
                 ending_file = file1
@@ -283,19 +283,19 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
 
     def generate_subtitle(self):
-        self.merge_similar_subs()
+        self.merge_similar_texts()
         self.remove_duplicate_texts()
         subtitles = []
         line_code = 0
-        # for file in self.text_output.iterdir():
-        #     print(file)
-        #     line_code += 1
-        #     frame_start = ''
-        #     frame_end = ''
-        #     file_content = file.read_text(encoding="utf-8")
-        #     subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n"
-        #     subtitles.append(subtitle_line)
-        # self._save_subtitle(subtitles)
+        for file in natsorted(self.text_output.iterdir()):
+            file_name = file.stem.split("--")
+            line_code += 1
+            frame_start = self.timecode(float(file_name[0]))
+            frame_end = self.timecode(float(file_name[1]))
+            file_content = file.read_text(encoding="utf-8")
+            subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n\n"
+            subtitles.append(subtitle_line)
+        self._save_subtitle(subtitles)
         print("Subtitle generated!")
 
     def run(self) -> None:
@@ -311,9 +311,9 @@ class SubtitleExtractor:
 
         # self.view_frames()
         print("Starting to extracting video keyframes...")
-        # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
+        self.video_to_frames(overwrite=False, every=2, chunk_size=250)
         print("Starting to extracting text from frames...")
-        # self.frames_to_text(chunk_size=150)
+        self.frames_to_text(chunk_size=150)
         print("Generating subtitle...")
         self.generate_subtitle()
 
