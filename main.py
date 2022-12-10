@@ -25,13 +25,6 @@ class SubtitleExtractor:
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
-        # Empty cache at the beginning of program run before it recreates itself
-        # self.empty_cache()
-        # If the directory does not exist, create the folder
-        if not self.frame_output.exists():
-            self.frame_output.mkdir(parents=True)
-        if not self.text_output.exists():
-            self.text_output.mkdir(parents=True)
 
     def __get_video_details(self) -> tuple:
         if "mp4" not in self.video_path.suffix:
@@ -95,8 +88,8 @@ class SubtitleExtractor:
         Delete all cache files produced during subtitle extraction.
         """
         if self.vd_output_dir.exists():
-            shutil.rmtree(self.vd_output_dir.parent)
-            print("Emptying cache")
+            shutil.rmtree(self.vd_output_dir)
+            print("Emptying cache...")
 
     def preprocess_sub_frame(self, frame: np.ndarray) -> np.ndarray:
         x1, y1, x2, y2 = self.sub_area
@@ -308,6 +301,13 @@ class SubtitleExtractor:
         Run through the steps of extracting video.
         """
         start = cv.getTickCount()
+        # Empty cache at the beginning of program run before it recreates itself
+        self.empty_cache()
+        # If the directory does not exist, create the folder
+        if not self.frame_output.exists():
+            self.frame_output.mkdir(parents=True)
+        if not self.text_output.exists():
+            self.text_output.mkdir(parents=True)
         fps, frame_count, frame_height, frame_width = self.video_details
         print(f"File Path: {self.video_path}")
         print(f"Frame Rate: {fps}, Frame Count: {frame_count}")
@@ -325,7 +325,7 @@ class SubtitleExtractor:
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         print(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        # self.empty_cache()
+        self.empty_cache()
 
 
 if __name__ == '__main__':
