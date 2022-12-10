@@ -217,7 +217,7 @@ class SubtitleExtractor:
                     text_file.write(text)
         return saved_count
 
-    def frames_to_text(self, chunk_size, max_processes):
+    def frames_to_text(self, chunk_size: int, max_processes: int) -> None:
         files = [file for file in self.frame_output.iterdir()]
         file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
@@ -233,13 +233,13 @@ class SubtitleExtractor:
     def similarity(text1: str, text2: str) -> float:
         return SequenceMatcher(a=text1, b=text2).quick_ratio()
 
-    def remove_duplicate_texts(self):
+    def remove_duplicate_texts(self) -> None:
         print("Deleting duplicate texts...")
         for file in self.text_output.iterdir():
             if "--" not in file.name:
                 file.unlink()
 
-    def merge_similar_texts(self, threshold: float = 0.85) -> None:
+    def merge_similar_texts(self, threshold: float) -> None:
         no_of_files = len(list(self.text_output.iterdir())) - 1
         counter = 0
         starting_file = None
@@ -282,8 +282,8 @@ class SubtitleExtractor:
         with open(name, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
 
-    def generate_subtitle(self):
-        self.merge_similar_texts()
+    def generate_subtitle(self) -> None:
+        self.merge_similar_texts(threshold=0.8)
         self.remove_duplicate_texts()
         subtitles = []
         line_code = 0
@@ -320,7 +320,7 @@ class SubtitleExtractor:
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         print(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        # self.empty_cache()
+        self.empty_cache()
 
 
 if __name__ == '__main__':
