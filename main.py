@@ -164,10 +164,10 @@ class SubtitleExtractor:
             if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
                 while_safety = 0  # reset the safety count
                 frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
-                file_name = f"{self.frame_output}/{frame_position}.jpg"  # create the file name save path and format
-                if not Path(file_name).exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
+                file_name = Path(f"{self.frame_output}/{frame_position}.jpg")  # create the file save path and format
+                if not file_name.exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
                     preprocessed_frame = self.preprocess_sub_frame(image)
-                    cv.imwrite(file_name, preprocessed_frame)  # save the extracted image
+                    cv.imwrite(str(file_name), preprocessed_frame)  # save the extracted image
                     saved_count += 1  # increment our counter by one
 
             frame += 1  # increment our frame count
