@@ -326,6 +326,6 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    video = Path("tests/anime video.mp4")
+    video = Path("")
     se = SubtitleExtractor(video)
     se.run()
