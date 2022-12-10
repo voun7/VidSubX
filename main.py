@@ -278,6 +278,8 @@ class SubtitleExtractor:
 
     def _save_subtitle(self, lines: list) -> None:
         name = self.video_path.with_suffix(".srt")
+        if name.exists():
+            name = f"{name.parent}/{name.stem} (new copy).srt"
         print(f"Subtitle file successfully generated. Name: {name}")
         with open(name, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
