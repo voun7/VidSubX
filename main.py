@@ -3,6 +3,7 @@ import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from itertools import pairwise
 from pathlib import Path
+from difflib import SequenceMatcher
 
 import cv2 as cv
 import numpy as np
@@ -204,53 +205,6 @@ class SubtitleExtractor:
             print("")  # prevent next line from joining previous progress bar
         print("Done extracting frames from video!")
 
-    @staticmethod
-    def image_similarity(image1: Path, image2: Path) -> float:
-        frame1 = cv.imread(str(image1))
-        frame2 = cv.imread(str(image2))
-        # Compute SSIM between two images
-        score = structural_similarity(frame1, frame2, channel_axis=-1)
-        return score
-
-    def frame_merger(self, files: list, threshold: float) -> int:
-        saved_count = 0
-        starting_file = None
-        for file1, file2 in pairwise(files):
-            saved_count += 2
-            similarity = self.image_similarity(file1, file2)
-            if similarity > threshold:
-                # print(file1.name, file2.name, similarity)
-                if not starting_file:
-                    starting_file = file1
-            else:
-                # print(file1.name, file2.name, similarity)
-                if not starting_file:
-                    starting_file = file1
-                ending_file = file1
-                if starting_file == ending_file:
-                    ending_file = file2
-                new_file_name = f"{starting_file.stem}--{ending_file.stem}.jpg"
-                starting_file.rename(f"{starting_file.parent}/{new_file_name}")
-                starting_file = None
-        return saved_count
-
-    def merge_similar_frames(self, chunk_size: int, threshold: float) -> None:
-        files = [file for file in natsorted(self.frame_output.iterdir())]
-        file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
-
-        prefix = "Merging similar frames from video:"
-        with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(self.frame_merger, files, threshold) for files in file_chunks]
-            for i, f in enumerate(as_completed(futures)):
-                self.print_progress(i, len(file_chunks), prefix)
-            print("")
-        print("Done merging frames from video!")
-
-        print("Deleting excess frames...")
-        for file in self.frame_output.iterdir():
-            if "--" not in file.name:
-                file.unlink()
-
     def extract_text(self, files: list) -> int:
         saved_count = 0
         for file in files:
@@ -264,7 +218,6 @@ class SubtitleExtractor:
         return saved_count
 
     def frames_to_text(self, chunk_size):
-        # ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
         files = [file for file in self.frame_output.iterdir()]
         file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
@@ -275,6 +228,38 @@ class SubtitleExtractor:
                 self.print_progress(i, len(file_chunks) - 1, prefix)
             print("")
         print("Done extracting texts!")
+
+    @staticmethod
+    def similarity(text1: str, text2: str) -> float:
+        return SequenceMatcher(a=text1, b=text2).quick_ratio()
+
+    def remove_duplicate_texts(self):
+        print("Deleting duplicate texts...")
+        for file in self.text_output.iterdir():
+            if "--" not in file.name:
+                file.unlink()
+
+    def merge_similar_subs(self, threshold: float = 0.85) -> None:
+        no_of_files = len(list(self.text_output.iterdir())) - 1
+        counter = 0
+        starting_file = None
+        for file1, file2 in pairwise(natsorted(self.text_output.iterdir())):
+            similarity = self.similarity(file1.read_text(encoding="utf-8"), file2.read_text(encoding="utf-8"))
+            counter += 1
+            if similarity > threshold and counter != no_of_files:
+                print(file1.name, file2.name, similarity)
+                if not starting_file:
+                    starting_file = file1
+            else:
+                print(file1.name, file2.name, similarity)
+                if not starting_file:
+                    starting_file = file1
+                ending_file = file1
+                if starting_file == ending_file:
+                    ending_file = file2
+                new_file_name = f"{starting_file.stem}--{ending_file.stem}.txt"
+                starting_file.rename(f"{starting_file.parent}/{new_file_name}")
+                starting_file = None
 
     @staticmethod
     def timecode(frame_no: float) -> str:
@@ -298,16 +283,19 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
 
     def generate_subtitle(self):
+        self.merge_similar_subs()
+        self.remove_duplicate_texts()
         subtitles = []
         line_code = 0
-        for file in self.text_output.iterdir():
-            line_code += 1
-            frame_start = ''
-            frame_end = ''
-            file_content = file.read_text(encoding="utf-8")
-            subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n"
-            subtitles.append(subtitle_line)
-        self._save_subtitle(subtitles)
+        # for file in self.text_output.iterdir():
+        #     print(file)
+        #     line_code += 1
+        #     frame_start = ''
+        #     frame_end = ''
+        #     file_content = file.read_text(encoding="utf-8")
+        #     subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n"
+        #     subtitles.append(subtitle_line)
+        # self._save_subtitle(subtitles)
         print("Subtitle generated!")
 
     def run(self) -> None:
@@ -324,12 +312,10 @@ class SubtitleExtractor:
         # self.view_frames()
         print("Starting to extracting video keyframes...")
         # self.video_to_frames(overwrite=False, every=2, chunk_size=250)
-        print("Starting to merge similar frames...")
-        # self.merge_similar_frames(chunk_size=100, threshold=0.75)
         print("Starting to extracting text from frames...")
-        self.frames_to_text(chunk_size=150)
+        # self.frames_to_text(chunk_size=150)
         print("Generating subtitle...")
-        # self.generate_subtitle()
+        self.generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
