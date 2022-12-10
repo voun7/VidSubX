@@ -8,7 +8,8 @@ import cv2 as cv
 import numpy as np
 from natsort import natsorted
 from paddleocr import PaddleOCR
-# from skimage.metrics import structural_similarity
+
+ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
 
 
 class SubtitleExtractor:
@@ -250,17 +251,30 @@ class SubtitleExtractor:
             if "--" not in file.name:
                 file.unlink()
 
-    # def frames_to_text(self):
-    #     from paddleocr import PaddleOCR
-    #     ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
-    #     for file in tqdm(self.frame_output.iterdir(), desc="Extracting texts: "):
-    #         name = Path(f"{self.text_output}/{file.stem}.txt")
-    #         result = ocr.ocr(str(file), cls=True)
-    #         if result[0]:
-    #             text = result[0][0][1][0]
-    #             with open(name, 'w', encoding="utf-8") as text_file:
-    #                 text_file.write(text)
-    #     logger.info("Done extracting texts!")
+    def extract_text(self, files: list) -> int:
+        saved_count = 0
+        for file in files:
+            saved_count += 1
+            name = Path(f"{self.text_output}/{file.stem}.txt")
+            result = ocr.ocr(str(file), cls=True)
+            if result[0]:
+                text = result[0][0][1][0]
+                with open(name, 'w', encoding="utf-8") as text_file:
+                    text_file.write(text)
+        return saved_count
+
+    def frames_to_text(self, chunk_size):
+        # ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
+        files = [file for file in self.frame_output.iterdir()]
+        file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
+
+        prefix = "Extracting text from frames:"
+        with ProcessPoolExecutor(max_workers=4) as executor:
+            futures = [executor.submit(self.extract_text, files) for files in file_chunks]
+            for i, f in enumerate(as_completed(futures)):
+                self.print_progress(i, len(file_chunks) - 1, prefix)
+            print("")
+        print("Done extracting texts!")
 
     @staticmethod
     def timecode(frame_no: float) -> str:
@@ -313,7 +327,7 @@ class SubtitleExtractor:
         print("Starting to merge similar frames...")
         # self.merge_similar_frames(chunk_size=100, threshold=0.75)
         print("Starting to extracting text from frames...")
-        self.frames_to_text(chunk_size=250)
+        self.frames_to_text(chunk_size=150)
         print("Generating subtitle...")
         # self.generate_subtitle()
 
