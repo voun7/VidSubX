@@ -24,7 +24,7 @@ class SubtitleExtractor:
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
-        # Empty cache at the beginning of program run before recreating it
+        # Empty cache at the beginning of program run before it recreates itself
         # self.empty_cache()
         # If the directory does not exist, create the folder
         if not self.frame_output.exists():
