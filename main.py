@@ -20,7 +20,7 @@ class SubtitleExtractor:
         self.video_details = self.__get_video_details()
         self.sub_area = self.__subtitle_area(sub_area)
         # Create cache directory
-        self.vd_output_dir = Path(f"{Path.cwd()}/output/{self.video_name}")
+        self.vd_output_dir = Path(f"{Path.cwd()}/output")
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
@@ -325,10 +325,10 @@ class SubtitleExtractor:
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         print(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
-        self.empty_cache()
+        # self.empty_cache()
 
 
 if __name__ == '__main__':
-    video = Path("")
+    video = Path(r"C:\Users\VOUN-XPS\Downloads\test videos\All Apprentices Are Big Brothers (徒弟个个是大佬) EP4.mp4")
     se = SubtitleExtractor(video)
     se.run()
