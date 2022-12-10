@@ -192,6 +192,7 @@ class SubtitleExtractor:
         frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
         # print(f"Frame chunks = {frame_chunks}")
 
+        start = cv.getTickCount()
         prefix = "Extracting frames from video:"
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
@@ -199,7 +200,9 @@ class SubtitleExtractor:
             for i, f in enumerate(as_completed(futures)):  # as each process completes
                 self.print_progress(i, len(frame_chunks) - 1, prefix)  # print it's progress
             print("")  # prevent next line from joining previous progress bar
-        print("Done extracting frames from video!")
+        end = cv.getTickCount()
+        total_time = (end - start) / cv.getTickFrequency()
+        print(f"Done extracting frames from video! Time: {round(total_time, 3)}s")
 
     def extract_text(self, files: list) -> int:
         saved_count = 0
@@ -217,13 +220,16 @@ class SubtitleExtractor:
         files = [file for file in self.frame_output.iterdir()]
         file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
+        start = cv.getTickCount()
         prefix = "Extracting text from frames:"
         with ProcessPoolExecutor(max_workers=max_processes) as executor:
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
             for i, f in enumerate(as_completed(futures)):
                 self.print_progress(i, len(file_chunks) - 1, prefix)
             print("")
-        print("Done extracting texts!")
+        end = cv.getTickCount()
+        total_time = (end - start) / cv.getTickFrequency()
+        print(f"Done extracting texts! Time: {round(total_time, 3)}s")
 
     @staticmethod
     def similarity(text1: str, text2: str) -> float:
