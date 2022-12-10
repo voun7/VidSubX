@@ -217,12 +217,12 @@ class SubtitleExtractor:
                     text_file.write(text)
         return saved_count
 
-    def frames_to_text(self, chunk_size):
+    def frames_to_text(self, chunk_size, max_processes):
         files = [file for file in self.frame_output.iterdir()]
         file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
         prefix = "Extracting text from frames:"
-        with ProcessPoolExecutor(max_workers=4) as executor:
+        with ProcessPoolExecutor(max_workers=max_processes) as executor:
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
             for i, f in enumerate(as_completed(futures)):
                 self.print_progress(i, len(file_chunks) - 1, prefix)
@@ -313,7 +313,7 @@ class SubtitleExtractor:
         print("Starting to extracting video keyframes...")
         self.video_to_frames(overwrite=False, every=2, chunk_size=250)
         print("Starting to extracting text from frames...")
-        self.frames_to_text(chunk_size=150)
+        self.frames_to_text(chunk_size=150, max_processes=4)
         print("Generating subtitle...")
         self.generate_subtitle()
 
