@@ -34,6 +34,9 @@ class SubtitleExtractor:
             self.text_output.mkdir(parents=True)
 
     def __get_video_details(self) -> tuple:
+        if "mp4" not in self.video_path.suffix:
+            print("File path does not contain video!")
+            exit()
         capture = cv.VideoCapture(str(self.video_path))
         fps = capture.get(cv.CAP_PROP_FPS)
         frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
