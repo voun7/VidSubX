@@ -14,17 +14,39 @@ ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
 
 
 class SubtitleExtractor:
-    def __init__(self, video_path: Path, sub_area: tuple = None) -> None:
-        self.video_path = video_path
-        self.video_name = self.video_path.stem
-        self.video_details = self.__get_video_details()
-        self.sub_area = self.__subtitle_area(sub_area)
+    def __init__(self, extract_frequency: int = 2, frame_chunk_size: int = 250, ocr_chunk_size: int = 150,
+                 ocr_max_processes: int = 4,
+                 text_similarity_threshold: float = 0.8) -> None:
+        """
+        Extracts hardcoded subtitles from video.
+
+        :param extract_frequency: extract every this many frames
+        :param frame_chunk_size: how many frames to split into chunks (one chunk per cpu core process)
+        :param ocr_chunk_size:
+        :param ocr_max_processes:
+        :param text_similarity_threshold:
+        """
+        self.extract_frequency = extract_frequency
+        self.frame_chunk_size = frame_chunk_size
+        self.ocr_chunk_size = ocr_chunk_size
+        self.ocr_max_processes = ocr_max_processes
+        self.text_similarity_threshold = text_similarity_threshold
+        self.video_path = None
+        self.video_details = None
+        self.sub_area = None
         # Create cache directory
         self.vd_output_dir = Path(f"{Path.cwd()}/output")
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
+        # Empty cache at the beginning of program run before it recreates itself
+        self.empty_cache()
+        # If the directory does not exist, create the folder
+        if not self.frame_output.exists():
+            self.frame_output.mkdir(parents=True)
+        if not self.text_output.exists():
+            self.text_output.mkdir(parents=True)
 
     def __get_video_details(self) -> tuple:
         if "mp4" not in self.video_path.suffix:
@@ -57,7 +79,7 @@ class SubtitleExtractor:
         dimensions = (width, height)
         return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
-    def view_frames(self) -> None:
+    def _view_frames(self) -> None:
         video_cap = cv.VideoCapture(str(self.video_path))
         while True:
             success, frame = video_cap.read()
@@ -119,14 +141,12 @@ class SubtitleExtractor:
         sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percents, '%', suffix)),  # write out the bar
         sys.stdout.flush()  # flush to stdout
 
-    def extract_frames(self, overwrite: bool, start: int, end: int, every: int) -> int:
+    def extract_frames(self, start: int, end: int) -> int:
         """
         Extract frames from a video using OpenCVs VideoCapture.
 
-        :param overwrite: whether to overwrite frames that already exist
         :param start: start frame
         :param end: end frame
-        :param every: frame spacing
         :return: count of images saved
         """
 
@@ -154,40 +174,34 @@ class SubtitleExtractor:
                 while_safety += 1  # add 1 to our while safety, since we skip before incrementing our frame variable
                 continue  # skip
 
-            if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
+            if frame % self.extract_frequency == 0:  # if this is a frame we want to write out
                 while_safety = 0  # reset the safety count
                 frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
                 file_name = Path(f"{self.frame_output}/{frame_position}.jpg")  # create the file save path and format
-                if not file_name.exists() or overwrite:  # if it doesn't exist, or we want to overwrite anyway
-                    preprocessed_frame = self.preprocess_sub_frame(image)
-                    cv.imwrite(str(file_name), preprocessed_frame)  # save the extracted image
-                    saved_count += 1  # increment our counter by one
+                preprocessed_frame = self.preprocess_sub_frame(image)
+                cv.imwrite(str(file_name), preprocessed_frame)  # save the extracted image
+                saved_count += 1  # increment our counter by one
 
             frame += 1  # increment our frame count
 
         capture.release()  # after the while has finished close the capture
         return saved_count  # and return the count of the images we saved
 
-    def video_to_frames(self, overwrite: bool, every: int, chunk_size: int) -> None:
+    def video_to_frames(self) -> None:
         """
         Extracts the frames from a video using multiprocessing.
-
-        :param overwrite: overwrite frames if they exist
-        :param every: extract every this many frames
-        :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
-        :return: path to the directory where the frames were saved, or None if fails
         """
 
         frame_count = self.video_details[1]
 
         # ignore chunk size if it's greater than frame count
-        chunk_size = chunk_size if frame_count > chunk_size else frame_count - 1
+        self.frame_chunk_size = self.frame_chunk_size if frame_count > self.frame_chunk_size else frame_count - 1
 
         if frame_count < 1:  # if video has no frames, might be and opencv error
             print("Video has no frames. Check your OpenCV installation")
 
         # split the frames into chunk lists
-        frame_chunks = [[i, i + chunk_size] for i in range(0, frame_count, chunk_size)]
+        frame_chunks = [[i, i + self.frame_chunk_size] for i in range(0, frame_count, self.frame_chunk_size)]
         # make sure last chunk has correct end frame, also handles case chunk_size < frame count
         frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
         # print(f"Frame chunks = {frame_chunks}")
@@ -196,7 +210,7 @@ class SubtitleExtractor:
         prefix = "Extracting frames from video:"
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(self.extract_frames, overwrite, f[0], f[1], every) for f in frame_chunks]
+            futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
             for i, f in enumerate(as_completed(futures)):  # as each process completes
                 self.print_progress(i, len(frame_chunks) - 1, prefix)  # print it's progress
             print("")  # prevent next line from joining previous progress bar
@@ -216,13 +230,13 @@ class SubtitleExtractor:
                     text_file.write(text)
         return saved_count
 
-    def frames_to_text(self, chunk_size: int, max_processes: int) -> None:
+    def frames_to_text(self) -> None:
         files = [file for file in self.frame_output.iterdir()]
-        file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
+        file_chunks = [files[i:i + self.ocr_chunk_size] for i in range(0, len(files), self.ocr_chunk_size)]
 
         start = cv.getTickCount()
         prefix = "Extracting text from frames:"
-        with ProcessPoolExecutor(max_workers=max_processes) as executor:
+        with ProcessPoolExecutor(max_workers=self.ocr_max_processes) as executor:
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
             for i, f in enumerate(as_completed(futures)):
                 self.print_progress(i, len(file_chunks) - 1, prefix)
@@ -241,14 +255,14 @@ class SubtitleExtractor:
             if "--" not in file.name:
                 file.unlink()
 
-    def merge_similar_texts(self, threshold: float) -> None:
+    def merge_similar_texts(self) -> None:
         no_of_files = len(list(self.text_output.iterdir())) - 1
         counter = 0
         starting_file = None
         for file1, file2 in pairwise(natsorted(self.text_output.iterdir())):
             similarity = self.similarity(file1.read_text(encoding="utf-8"), file2.read_text(encoding="utf-8"))
             counter += 1
-            if similarity > threshold and counter != no_of_files:
+            if similarity > self.text_similarity_threshold and counter != no_of_files:
                 # print(file1.name, file2.name, similarity)
                 if not starting_file:
                     starting_file = file1
@@ -287,7 +301,7 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
 
     def generate_subtitle(self) -> None:
-        self.merge_similar_texts(threshold=0.8)
+        self.merge_similar_texts()
         self.remove_duplicate_texts()
         subtitles = []
         line_code = 0
@@ -302,29 +316,26 @@ class SubtitleExtractor:
         self._save_subtitle(subtitles)
         print("Subtitle generated!")
 
-    def run(self) -> None:
+    def run(self, video_path: Path, sub_area: tuple = None) -> None:
         """
         Run through the steps of extracting video.
         """
         start = cv.getTickCount()
-        # Empty cache at the beginning of program run before it recreates itself
-        self.empty_cache()
-        # If the directory does not exist, create the folder
-        if not self.frame_output.exists():
-            self.frame_output.mkdir(parents=True)
-        if not self.text_output.exists():
-            self.text_output.mkdir(parents=True)
+        self.video_path = video_path
+        self.video_details = self.__get_video_details()
+        self.sub_area = self.__subtitle_area(sub_area)
+
         fps, frame_count, frame_height, frame_width = self.video_details
         print(f"File Path: {self.video_path}")
         print(f"Frame Rate: {fps}, Frame Count: {frame_count}")
         print(f"Resolution: {frame_width} X {frame_height}")
         print(f"Subtitle Area: {self.sub_area}")
 
-        # self.view_frames()
+        # self._view_frames()
         print("Starting to extracting video keyframes...")
-        self.video_to_frames(overwrite=False, every=2, chunk_size=250)
+        self.video_to_frames()
         print("Starting to extracting text from frames...")
-        self.frames_to_text(chunk_size=150, max_processes=4)
+        self.frames_to_text()
         print("Generating subtitle...")
         self.generate_subtitle()
 
@@ -337,5 +348,5 @@ class SubtitleExtractor:
 if __name__ == '__main__':
     test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
     for video in test_videos.glob("*.mp4"):
-        se = SubtitleExtractor(video)
-        se.run()
+        se = SubtitleExtractor()
+        se.run(video)
