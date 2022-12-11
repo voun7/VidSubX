@@ -335,6 +335,7 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    video = Path(r"C:\Users\VOUN-XPS\Downloads\test videos\All Apprentices Are Big Brothers (徒弟个个是大佬) EP4.mp4")
-    se = SubtitleExtractor(video)
-    se.run()
+    test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
+    for video in test_videos.glob("*.mp4"):
+        se = SubtitleExtractor(video)
+        se.run()
