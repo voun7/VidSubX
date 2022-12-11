@@ -48,7 +48,7 @@ class SubtitleExtractor:
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
 
-    def __get_video_details(self) -> tuple:
+    def get_video_details(self) -> tuple:
         if "mp4" not in self.video_path.suffix:
             print("File path does not contain video!")
             exit()
@@ -79,7 +79,7 @@ class SubtitleExtractor:
         dimensions = (width, height)
         return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
-    def _view_frames(self) -> None:
+    def view_frames(self) -> None:
         video_cap = cv.VideoCapture(str(self.video_path))
         while True:
             success, frame = video_cap.read()
@@ -322,7 +322,7 @@ class SubtitleExtractor:
         """
         start = cv.getTickCount()
         self.video_path = video_path
-        self.video_details = self.__get_video_details()
+        self.video_details = self.get_video_details()
         self.sub_area = self.__subtitle_area(sub_area)
 
         fps, frame_count, frame_height, frame_width = self.video_details
@@ -331,7 +331,7 @@ class SubtitleExtractor:
         print(f"Resolution: {frame_width} X {frame_height}")
         print(f"Subtitle Area: {self.sub_area}")
 
-        # self._view_frames()
+        # self.view_frames()
         print("Starting to extracting video keyframes...")
         self.video_to_frames()
         print("Starting to extracting text from frames...")
