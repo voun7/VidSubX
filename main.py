@@ -1,3 +1,4 @@
+import logging
 import shutil
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -8,7 +9,11 @@ from pathlib import Path
 import cv2 as cv
 import numpy as np
 from natsort import natsorted
+
+from logger_setup import get_log
 from paddleocr import PaddleOCR
+
+logger = logging.getLogger(__name__)
 
 ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
 
@@ -50,7 +55,7 @@ class SubtitleExtractor:
 
     def get_video_details(self) -> tuple:
         if "mp4" not in self.video_path.suffix:
-            print("File path does not contain video!")
+            logger.error("File path does not contain video!")
             exit()
         capture = cv.VideoCapture(str(self.video_path))
         fps = capture.get(cv.CAP_PROP_FPS)
@@ -84,7 +89,7 @@ class SubtitleExtractor:
         while True:
             success, frame = video_cap.read()
             if not success:
-                print(f"Video has ended!")  # or failed to read
+                logger.warning(f"Video has ended!")  # or failed to read
                 break
             x1, y1, x2, y2 = self.sub_area
             # draw rectangle over subtitle area
@@ -111,7 +116,7 @@ class SubtitleExtractor:
         """
         if self.vd_output_dir.exists():
             shutil.rmtree(self.vd_output_dir)
-            print("Emptying cache...")
+            logger.debug("Emptying cache...")
 
     def preprocess_sub_frame(self, frame: np.ndarray) -> np.ndarray:
         x1, y1, x2, y2 = self.sub_area
@@ -198,25 +203,26 @@ class SubtitleExtractor:
         self.frame_chunk_size = self.frame_chunk_size if frame_count > self.frame_chunk_size else frame_count - 1
 
         if frame_count < 1:  # if video has no frames, might be and opencv error
-            print("Video has no frames. Check your OpenCV installation")
+            logger.error("Video has no frames. Check your OpenCV installation")
 
         # split the frames into chunk lists
         frame_chunks = [[i, i + self.frame_chunk_size] for i in range(0, frame_count, self.frame_chunk_size)]
         # make sure last chunk has correct end frame, also handles case chunk_size < frame count
         frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
-        # print(f"Frame chunks = {frame_chunks}")
+        logger.debug(f"Frame chunks = {frame_chunks}")
 
         start = cv.getTickCount()
         prefix = "Extracting frames from video:"
+        logger.debug("Using multiprocessing for extracting frames")
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
             for i, f in enumerate(as_completed(futures)):  # as each process completes
-                self.print_progress(i, len(frame_chunks) - 1, prefix)  # print it's progress
-            print("")  # prevent next line from joining previous progress bar
+                self.print_progress(i, len(frame_chunks) - 1, prefix)  # logger.info it's progress
+            logger.info("")  # prevent next line from joining previous progress bar
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        print(f"Done extracting frames from video! Time: {round(total_time, 3)}s")
+        logger.info(f"Done extracting frames from video! Time: {round(total_time, 3)}s")
 
     def extract_text(self, files: list) -> int:
         saved_count = 0
@@ -240,17 +246,17 @@ class SubtitleExtractor:
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
             for i, f in enumerate(as_completed(futures)):
                 self.print_progress(i, len(file_chunks) - 1, prefix)
-            print("")
+            logger.info("")
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        print(f"Done extracting texts! Time: {round(total_time, 3)}s")
+        logger.info(f"Done extracting texts! Time: {round(total_time, 3)}s")
 
     @staticmethod
     def similarity(text1: str, text2: str) -> float:
         return SequenceMatcher(a=text1, b=text2).quick_ratio()
 
     def remove_duplicate_texts(self) -> None:
-        print("Deleting duplicate texts...")
+        logger.info("Deleting duplicate texts...")
         for file in self.text_output.iterdir():
             if "--" not in file.name:
                 file.unlink()
@@ -296,7 +302,7 @@ class SubtitleExtractor:
         name = self.video_path.with_suffix(".srt")
         if name.exists():
             name = f"{name.parent}/{name.stem} (new copy).srt"
-        print(f"Subtitle file successfully generated. Name: {name}")
+        logger.info(f"Subtitle file successfully generated. Name: {name}")
         with open(name, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
 
@@ -314,7 +320,7 @@ class SubtitleExtractor:
             subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n\n"
             subtitles.append(subtitle_line)
         self._save_subtitle(subtitles)
-        print("Subtitle generated!")
+        logger.info("Subtitle generated!")
 
     def run(self, video_path: Path, sub_area: tuple = None) -> None:
         """
@@ -326,27 +332,31 @@ class SubtitleExtractor:
         self.sub_area = self.__subtitle_area(sub_area)
 
         fps, frame_count, frame_height, frame_width = self.video_details
-        print(f"File Path: {self.video_path}")
-        print(f"Frame Rate: {fps}, Frame Count: {frame_count}")
-        print(f"Resolution: {frame_width} X {frame_height}")
-        print(f"Subtitle Area: {self.sub_area}")
+        logger.info(f"File Path: {self.video_path}")
+        logger.info(f"Frame Count: {frame_count}, Frame Rate: {fps}")
+        logger.info(f"Resolution: {frame_width} X {frame_height}")
+        logger.info(f"Subtitle Area: {self.sub_area}")
 
         # self.view_frames()
-        print("Starting to extracting video keyframes...")
+        logger.info("Starting to extracting video keyframes...")
         self.video_to_frames()
-        print("Starting to extracting text from frames...")
+        logger.info("Starting to extracting text from frames...")
         self.frames_to_text()
-        print("Generating subtitle...")
+        logger.info("Generating subtitle...")
         self.generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        print(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
+        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
         self.empty_cache()
 
 
 if __name__ == '__main__':
+    get_log()
+    logger.debug("Logging Started")
     test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
     se = SubtitleExtractor()
     for video in test_videos.glob("*.mp4"):
         se.run(video)
+
+    logger.debug("Logging Ended\n")
