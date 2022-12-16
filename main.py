@@ -212,7 +212,7 @@ class SubtitleExtractor:
             futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
             for i, f in enumerate(as_completed(futures)):  # as each process completes
                 self.print_progress(i, len(frame_chunks) - 1, prefix)  # logger.info it's progress
-            logger.info("")  # prevent next line from joining previous progress bar
+            print("")  # prevent next line from joining previous progress bar
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Done extracting frames from video! Time: {round(total_time, 3)}s")
@@ -239,7 +239,7 @@ class SubtitleExtractor:
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
             for i, f in enumerate(as_completed(futures)):
                 self.print_progress(i, len(file_chunks) - 1, prefix)
-            logger.info("")
+            print("")
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Done extracting texts! Time: {round(total_time, 3)}s")
