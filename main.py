@@ -9,9 +9,9 @@ from pathlib import Path
 import cv2 as cv
 import numpy as np
 from natsort import natsorted
+from paddleocr import PaddleOCR
 
 from logger_setup import get_log
-from paddleocr import PaddleOCR
 
 logger = logging.getLogger(__name__)
 
