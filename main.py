@@ -7,9 +7,9 @@ from itertools import pairwise
 from pathlib import Path
 
 import cv2 as cv
-import easyocr
 import numpy as np
 from natsort import natsorted
+from paddleocr import PaddleOCR
 
 from logger_setup import get_log
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class SubtitleExtractor:
-    reader = easyocr.Reader(['ch_sim'])  # this needs to run only once to load the model into memory
+    ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
 
     def __init__(self, extract_frequency: int = 2, frame_chunk_size: int = 250, ocr_chunk_size: int = 150,
                  ocr_max_processes: int = 4,
@@ -229,10 +229,11 @@ class SubtitleExtractor:
         for file in files:
             saved_count += 1
             name = Path(f"{self.text_output}/{file.stem}.txt")
-            result = self.reader.readtext(str(file), detail=0, paragraph=True)
-            if result:
+            result = self.ocr.ocr(str(file), cls=True)
+            if result[0]:
+                text = result[0][0][1][0]
                 with open(name, 'w', encoding="utf-8") as text_file:
-                    text_file.write(str(result))
+                    text_file.write(text)
         return saved_count
 
     def frames_to_text(self) -> None:
