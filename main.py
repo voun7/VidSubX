@@ -45,13 +45,6 @@ class SubtitleExtractor:
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
-        # Empty cache at the beginning of program run before it recreates itself
-        self.empty_cache()
-        # If the directory does not exist, create the folder
-        if not self.frame_output.exists():
-            self.frame_output.mkdir(parents=True)
-        if not self.text_output.exists():
-            self.text_output.mkdir(parents=True)
 
     def get_video_details(self) -> tuple:
         if "mp4" not in self.video_path.suffix:
@@ -327,6 +320,13 @@ class SubtitleExtractor:
         Run through the steps of extracting video.
         """
         start = cv.getTickCount()
+        # Empty cache at the beginning of program run before it recreates itself
+        self.empty_cache()
+        # If the directory does not exist, create the folder
+        if not self.frame_output.exists():
+            self.frame_output.mkdir(parents=True)
+        if not self.text_output.exists():
+            self.text_output.mkdir(parents=True)
         self.video_path = video_path
         self.video_details = self.get_video_details()
         self.sub_area = self.__subtitle_area(sub_area)
