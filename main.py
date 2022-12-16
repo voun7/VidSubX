@@ -121,9 +121,9 @@ class SubtitleExtractor:
     def preprocess_sub_frame(self, frame: np.ndarray) -> np.ndarray:
         x1, y1, x2, y2 = self.sub_area
         subtitle_area = frame[y1:y2, x1:x2]  # crop the subtitle area
-        rescaled_sub_area = self.rescale_frame(subtitle_area)
+        # rescaled_sub_area = self.rescale_frame(subtitle_area)
         # gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
-        return rescaled_sub_area
+        return subtitle_area
 
     @staticmethod
     def print_progress(iteration: int, total: float, prefix: str, decimals: float = 3, bar_length: int = 50) -> None:
