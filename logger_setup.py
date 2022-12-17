@@ -46,3 +46,7 @@ def my_namer(default_name):
 # logger = logging.getLogger(__name__)
 # Do not log this messages unless they are at least warnings
 # logging.getLogger("").setLevel(logging.WARNING)
+
+# Go to C:\Users\VOUN-XPS\miniconda3\envs\VSE\Lib\site-packages\paddle\distributed\utils\log_utils.py
+# Change the get_logger function's logging.getLogger(name) to logging.getLogger(__name__)
+# This prevents duplicate logs from paddle
