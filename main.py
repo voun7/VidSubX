@@ -214,6 +214,7 @@ class SubtitleExtractor:
         file_chunks = [files[i:i + self.ocr_chunk_size] for i in range(0, len(files), self.ocr_chunk_size)]
 
         prefix = "Extracting text from frame chunks"
+        logger.debug("Using multiprocessing for extracting text")
         with ProcessPoolExecutor(max_workers=self.ocr_max_processes) as executor:
             pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
