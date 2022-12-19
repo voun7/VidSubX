@@ -329,7 +329,7 @@ class SubtitleExtractor:
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s")
+        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s\n")
         self.empty_cache()
 
 
@@ -341,4 +341,4 @@ if __name__ == '__main__':
     for video in test_videos.glob("*.mp4"):
         se.run(video)
 
-    logger.debug("Logging Ended\n")
+    logger.debug("Logging Ended\n\n")
