@@ -1,6 +1,5 @@
 import logging
 import shutil
-import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from difflib import SequenceMatcher
 from itertools import pairwise
@@ -9,6 +8,7 @@ from pathlib import Path
 import cv2 as cv
 import numpy as np
 from natsort import natsorted
+from tqdm import tqdm
 
 from logger_setup import get_log
 from paddleocr import PaddleOCR
@@ -118,27 +118,6 @@ class SubtitleExtractor:
         # gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
         return subtitle_area
 
-    @staticmethod
-    def print_progress(iteration: int, total: float, prefix: str, decimals: float = 3, bar_length: int = 50) -> None:
-        """
-        Call in a loop to create standard out progress bar.
-
-        :param iteration: current iteration
-        :param total: total iterations
-        :param prefix: prefix string
-        :param decimals: positive number of decimals in percent complete
-        :param bar_length: character length of bar
-        :return: None
-        """
-
-        suffix = "Complete"
-        format_str = "{0:." + str(decimals) + "f}"  # format the % done number string
-        percents = format_str.format(100 * (iteration / float(total)))  # calculate the % done
-        filled_length = int(round(bar_length * iteration / float(total)))  # calculate the filled bar length
-        bar = '#' * filled_length + '-' * (bar_length - filled_length)  # generate the bar string
-        sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percents, '%', suffix)),  # write out the bar
-        sys.stdout.flush()  # flush to stdout
-
     def extract_frames(self, start: int, end: int) -> int:
         """
         Extract frames from a video using OpenCVs VideoCapture.
@@ -204,18 +183,17 @@ class SubtitleExtractor:
         frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
 
-        start = cv.getTickCount()
-        prefix = "Extracting frames from video:"
+        prefix = "Extracting frames from video chunks"
         logger.debug("Using multiprocessing for extracting frames")
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
+            pbar = tqdm(total=len(frame_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
-            for i, f in enumerate(as_completed(futures)):  # as each process completes
-                self.print_progress(i, len(frame_chunks) - 1, prefix)  # logger.info it's progress
-            print("")  # prevent next line from joining previous progress bar
-        end = cv.getTickCount()
-        total_time = (end - start) / cv.getTickFrequency()
-        logger.info(f"Done extracting frames from video! Time: {round(total_time, 3)}s")
+            for f in as_completed(futures):  # as each process completes
+                logger.debug(f)
+                pbar.update()
+            pbar.close()
+        logger.info("Done extracting frames from video!")
 
     def extract_text(self, files: list) -> int:
         saved_count = 0
@@ -233,16 +211,15 @@ class SubtitleExtractor:
         files = [file for file in self.frame_output.iterdir()]
         file_chunks = [files[i:i + self.ocr_chunk_size] for i in range(0, len(files), self.ocr_chunk_size)]
 
-        start = cv.getTickCount()
-        prefix = "Extracting text from frames:"
+        prefix = "Extracting text from frame chunks"
         with ProcessPoolExecutor(max_workers=self.ocr_max_processes) as executor:
+            pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
-            for i, f in enumerate(as_completed(futures)):
-                self.print_progress(i, len(file_chunks) - 1, prefix)
-            print("")
-        end = cv.getTickCount()
-        total_time = (end - start) / cv.getTickFrequency()
-        logger.info(f"Done extracting texts! Time: {round(total_time, 3)}s")
+            for f in as_completed(futures):
+                logger.debug(f)
+                pbar.update()
+            pbar.close()
+        logger.info("Done extracting texts!")
 
     @staticmethod
     def similarity(text1: str, text2: str) -> float:
