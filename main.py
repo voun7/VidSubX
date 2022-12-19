@@ -190,7 +190,9 @@ class SubtitleExtractor:
             pbar = tqdm(total=len(frame_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
             for f in as_completed(futures):  # as each process completes
-                logger.debug(f)
+                error = f.exception()
+                if error:
+                    logger.exception(error)
                 pbar.update()
             pbar.close()
         logger.info("Done extracting frames from video!")
@@ -216,7 +218,9 @@ class SubtitleExtractor:
             pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
             for f in as_completed(futures):
-                logger.debug(f)
+                error = f.exception()
+                if error:
+                    logger.exception(error)
                 pbar.update()
             pbar.close()
         logger.info("Done extracting texts!")
