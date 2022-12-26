@@ -187,8 +187,8 @@ class SubtitleExtractor:
         logger.debug("Using multiprocessing for extracting frames")
         # execute across multiple cpu cores to speed up processing, get the count automatically
         with ProcessPoolExecutor() as executor:
-            pbar = tqdm(total=len(frame_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
+            pbar = tqdm(total=len(frame_chunks), desc=prefix, colour="green")
             for f in as_completed(futures):  # as each process completes
                 error = f.exception()
                 if error:
@@ -216,8 +216,8 @@ class SubtitleExtractor:
         prefix = "Extracting text from frame chunks"
         logger.debug("Using multiprocessing for extracting text")
         with ProcessPoolExecutor(max_workers=self.ocr_max_processes) as executor:
-            pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
             futures = [executor.submit(self.extract_text, files) for files in file_chunks]
+            pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
             for f in as_completed(futures):
                 error = f.exception()
                 if error:
