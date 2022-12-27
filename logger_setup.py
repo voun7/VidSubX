@@ -3,34 +3,42 @@ import sys
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
+LOG_FILE = "logs/runtime.log"
 
-def get_log() -> None:
+
+def get_console_handler():
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    # The console sends only messages by default no need for formatter
+    return console_handler
+
+
+def get_file_handler():
+    file_handler = TimedRotatingFileHandler(LOG_FILE, when='midnight', interval=1, backupCount=7, encoding='utf-8')
+    file_handler.namer = my_namer
+    file_handler.setLevel(logging.DEBUG)
+    file_log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(file_log_format)
+    return file_handler
+
+
+def get_logger(logger_name):
     # Create folder for file logs
     log_dir = Path(f"{Path.cwd()}/logs")
     if not log_dir.exists():
         log_dir.mkdir()
 
-    # Create a custom base_logger
-    base_logger = logging.getLogger()
-    base_logger.setLevel(logging.DEBUG)
+    # Create a custom logger
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)  # better to have too much log than not enough
 
-    # Create handlers
-    file_handler = TimedRotatingFileHandler(
-        'logs/runtime.log', when='midnight', interval=1, backupCount=7, encoding='utf-8'
-    )
-    file_handler.namer = my_namer
-    file_handler.setLevel(logging.DEBUG)
-    console_handler = logging.StreamHandler(stream=sys.stdout)
-    console_handler.setLevel(logging.INFO)
+    # Add handlers to the logger
+    logger.addHandler(get_console_handler())
+    logger.addHandler(get_file_handler())
 
-    # Create formatters and add it to handlers
-    main_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    # The console sends only messages by default no need for formatter
-    file_handler.setFormatter(main_format)
-
-    # Add handlers to the base_logger
-    base_logger.addHandler(file_handler)
-    base_logger.addHandler(console_handler)
+    # with this pattern, it's rarely necessary to propagate the error up to parent
+    logger.propagate = False
+    return logger
 
 
 def my_namer(default_name):
@@ -40,11 +48,11 @@ def my_namer(default_name):
     base_filename, ext, date = default_name.split(".")
     return f"{base_filename}.{date}.{ext}"
 
-
-# # Use the following to add logger to other modules.
-# import logging
-# logger = logging.getLogger(__name__)
+# # Use the following to add custom logger to other modules.
+# from logger_setup import get_logger
+# logger = get_logger(__name__)
 # Do not log this messages unless they are at least warnings
+# import logging
 # logging.getLogger("").setLevel(logging.WARNING)
 
 # Go to C:\Users\VOUN-XPS\miniconda3\envs\VSE\Lib\site-packages\paddle\distributed\utils\log_utils.py

@@ -1,4 +1,3 @@
-import logging
 import shutil
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from difflib import SequenceMatcher
@@ -10,10 +9,10 @@ import numpy as np
 from natsort import natsorted
 from tqdm import tqdm
 
-from logger_setup import get_log
+from logger_setup import get_logger
 from paddleocr import PaddleOCR
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class SubtitleExtractor:
@@ -334,11 +333,10 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    get_log()
-    logger.debug("Logging Started")
+    logger.debug("Main program Started")
     test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
     se = SubtitleExtractor()
     for video in test_videos.glob("*.mp4"):
         se.run(video)
 
-    logger.debug("Logging Ended\n\n")
+    logger.debug("Main program Ended\n\n")
