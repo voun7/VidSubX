@@ -3,18 +3,17 @@ import sys
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
-LOG_FILE = "logs/runtime.log"
 
-
-def get_console_handler():
+def get_console_handler() -> logging.handlers:
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
     # The console sends only messages by default no need for formatter
     return console_handler
 
 
-def get_file_handler():
-    file_handler = TimedRotatingFileHandler(LOG_FILE, when='midnight', interval=1, backupCount=7, encoding='utf-8')
+def get_file_handler() -> logging.handlers:
+    log_file = "logs/runtime.log"
+    file_handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=7, encoding='utf-8')
     file_handler.namer = my_namer
     file_handler.setLevel(logging.DEBUG)
     file_log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
