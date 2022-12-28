@@ -5,15 +5,15 @@ from tkinter import ttk
 class SubtitleExtractorGUI:
     def __init__(self, root):
         self.root = root
-        self.main_frame = None
         self._create_layout()
+        self.interrupt = False
 
     def _create_layout(self):
         self.root.title("Video Subtitle Extractor")
 
         self._menu_bar()
 
-        self.main_frame = ttk.Frame(self.root, padding=(4, 4, 4, 4))
+        self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 15))
 
         self._video_frame()
         self._progress_frame()
@@ -53,27 +53,26 @@ class SubtitleExtractorGUI:
         progress_frame = ttk.Frame(self.main_frame)
         progress_frame.grid(row=1, sticky="W")
 
-        run = ttk.Button(progress_frame, text="Run")
-        run.grid(pady=10, padx=30)
+        self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
+        self.run_button.grid(pady=10, padx=30)
 
-        progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=800, mode='determinate')
-        progress_bar.grid(column=2, row=0)
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=800, mode='determinate')
+        self.progress_bar.grid(column=2, row=0)
 
     def _output_frame(self):
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(row=2)
 
-        output_list = Listbox(output_frame, width=122)
-        output_list.grid()
+        self.output_text = Text(output_frame, width=97, height=12, state="disabled")
+        self.output_text.grid()
 
-        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=output_list.yview)
+        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.output_text.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
 
-        output_list['yscrollcommand'] = output_scroll.set
+        self.output_text.configure(yscrollcommand=output_scroll.set)
+
         output_frame.grid_columnconfigure(0, weight=1)
         output_frame.grid_rowconfigure(0, weight=1)
-        for i in range(1, 101):
-            output_list.insert('end', 'Line %d of 100' % i)
 
     def _language_settings(self):
         pass
@@ -83,6 +82,24 @@ class SubtitleExtractorGUI:
 
     def _open_file(self):
         pass
+
+    def _stop(self):
+        self.interrupt = True
+        self.progress_bar.stop()
+        self.run_button.configure(text="Run", command=self._run)
+
+    def step(self):
+        for i in range(1, 101):
+            self.progress_bar['value'] += 1
+            self.output_text.configure(state="normal")
+            self.output_text.insert("end", f"Line {i} of 100\n")
+            self.output_text.see("end")
+            self.output_text.configure(state="disabled")
+        self._stop()
+
+    def _run(self):
+        self.run_button.configure(text='Stop', command=self._stop)
+        self.step()
 
 
 rt = Tk()
