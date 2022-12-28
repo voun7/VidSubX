@@ -1,3 +1,4 @@
+import threading
 from tkinter import *
 from tkinter import ttk
 
@@ -6,7 +7,6 @@ class SubtitleExtractorGUI:
     def __init__(self, root):
         self.root = root
         self._create_layout()
-        self.interrupt = False
 
     def _create_layout(self):
         self.root.title("Video Subtitle Extractor")
@@ -40,7 +40,7 @@ class SubtitleExtractorGUI:
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
         menu_file.add_command(label="Open", command=self._open_file)
-        menu_file.add_command(label="Close", command=self.root.quit)
+        menu_file.add_command(label="Close", command=self._close_window)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
         menu_settings.add_command(label="Extraction", command=self._extraction_settings)
@@ -83,9 +83,12 @@ class SubtitleExtractorGUI:
     def _open_file(self):
         pass
 
-    def _stop(self):
+    def _close_window(self):
+        self._stop_run()
+        self.root.quit()
+
+    def _stop_run(self):
         self.interrupt = True
-        self.progress_bar.stop()
         self.run_button.configure(text="Run", command=self._run)
 
     def _text_to_output(self, text):
@@ -94,15 +97,20 @@ class SubtitleExtractorGUI:
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
-    def _run(self):
-        self.run_button.configure(text='Stop', command=self._stop)
-        for i in range(1, 100001):
-            # if self.interrupt:
-            #     break
+    def long_running_method(self):
+        num = 100000
+        self.progress_bar.configure(maximum=num)
+        for i in range(0, num):
+            if self.interrupt:
+                break
+            self._text_to_output(f"Line {i} of {num}")
             self.progress_bar['value'] += 1
-            self._text_to_output(f"Line {i} of 100001")
-        # self.root.after(1, self._run)
-        self._stop()
+        self._stop_run()
+
+    def _run(self):
+        self.interrupt = False
+        self.run_button.configure(text='Stop', command=self._stop_run)
+        threading.Thread(target=self.long_running_method).start()
 
 
 rt = Tk()
