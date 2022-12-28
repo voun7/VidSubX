@@ -63,13 +63,13 @@ class SubtitleExtractorGUI:
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(row=2)
 
-        self.output_text = Text(output_frame, width=97, height=12, state="disabled")
-        self.output_text.grid()
+        self.text_output_widget = Text(output_frame, width=97, height=12, state="disabled")
+        self.text_output_widget.grid()
 
-        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.output_text.yview)
+        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.text_output_widget.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
 
-        self.output_text.configure(yscrollcommand=output_scroll.set)
+        self.text_output_widget.configure(yscrollcommand=output_scroll.set)
 
         output_frame.grid_columnconfigure(0, weight=1)
         output_frame.grid_rowconfigure(0, weight=1)
@@ -88,18 +88,21 @@ class SubtitleExtractorGUI:
         self.progress_bar.stop()
         self.run_button.configure(text="Run", command=self._run)
 
-    def step(self):
-        for i in range(1, 101):
-            self.progress_bar['value'] += 1
-            self.output_text.configure(state="normal")
-            self.output_text.insert("end", f"Line {i} of 100\n")
-            self.output_text.see("end")
-            self.output_text.configure(state="disabled")
-        self._stop()
+    def _text_to_output(self, text):
+        self.text_output_widget.configure(state="normal")
+        self.text_output_widget.insert("end", f"{text}\n")
+        self.text_output_widget.see("end")
+        self.text_output_widget.configure(state="disabled")
 
     def _run(self):
         self.run_button.configure(text='Stop', command=self._stop)
-        self.step()
+        for i in range(1, 100001):
+            # if self.interrupt:
+            #     break
+            self.progress_bar['value'] += 1
+            self._text_to_output(f"Line {i} of 100001")
+        # self.root.after(1, self._run)
+        self._stop()
 
 
 rt = Tk()
