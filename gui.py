@@ -4,6 +4,10 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 
+import cv2 as cv
+import numpy as np
+from PIL import Image, ImageTk
+
 
 class SubtitleExtractorGUI:
     def __init__(self, root):
@@ -54,7 +58,7 @@ class SubtitleExtractorGUI:
         video_frame.grid(sticky="N, S, E, W")
 
         self.video_canvas = Canvas(video_frame, bg="black")
-        self.video_canvas.grid(sticky="N, S, E, W")
+        self.video_canvas.grid()
 
         video_frame.grid_columnconfigure(0, weight=1)
         video_frame.grid_rowconfigure(0, weight=1)
@@ -90,8 +94,33 @@ class SubtitleExtractorGUI:
     def _extraction_settings(self):
         pass
 
+    @staticmethod
+    def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
+        height = int(frame.shape[0] * scale)
+        width = int(frame.shape[1] * scale)
+        dimensions = (width, height)
+        return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
+
     def _display_video(self):
-        pass
+        self.video_cap = cv.VideoCapture(str(self.video_path))
+        frame_width = int(self.video_cap.get(cv.CAP_PROP_FRAME_WIDTH)) * 0.5
+        frame_height = int(self.video_cap.get(cv.CAP_PROP_FRAME_HEIGHT)) * 0.5
+
+        self.video_canvas.configure(width=frame_width, height=frame_height)
+
+        while self.video_cap.isOpened():
+            success, frame = self.video_cap.read()
+            if not success:
+                print(f"Video has ended!")  # or failed to read
+                break
+
+            cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
+            frame_resized = self.rescale_frame(cv2image)
+
+            img = Image.fromarray(frame_resized)
+            photo = ImageTk.PhotoImage(image=img)
+            self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
+            self.video_canvas.image = photo
 
     def _open_file(self):
         title = "Open"
@@ -100,6 +129,8 @@ class SubtitleExtractorGUI:
         if filename:
             self.write_to_output(f"Opened file: {filename}")
             self.video_path = filename
+
+            Thread(target=self._display_video, daemon=True).start()
 
     def _on_closing(self):
         self._stop_run()
