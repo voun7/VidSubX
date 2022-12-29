@@ -1,6 +1,9 @@
+import threading
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+
+import cv2 as cv
 
 
 class SubtitleExtractorGUI:
@@ -48,8 +51,14 @@ class SubtitleExtractorGUI:
         menu_settings.add_command(label="Extraction", command=self._extraction_settings)
 
     def _video_frame(self):
-        video_frame = ttk.Frame(self.main_frame, borderwidth=2, relief="ridge", width=1000, height=600)
+        video_frame = ttk.Frame(self.main_frame)
         video_frame.grid(sticky="N, S, E, W")
+
+        self.video_canvas = Canvas(video_frame, width=1000, height=600, bg="black")
+        self.video_canvas.grid(sticky="N, S, E, W")
+
+        video_frame.grid_columnconfigure(0, weight=1)
+        video_frame.grid_rowconfigure(0, weight=1)
 
     def _work_frame(self):
         progress_frame = ttk.Frame(self.main_frame)
