@@ -42,7 +42,7 @@ class SubtitleExtractorGUI:
         menubar.add_cascade(menu=menu_file, label="File")
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
-        menu_file.add_command(label="Open", command=self._open_files)
+        menu_file.add_command(label="Open", command=self._open_file)
         menu_file.add_command(label="Close", command=self._on_closing)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
@@ -53,7 +53,7 @@ class SubtitleExtractorGUI:
         video_frame.grid(sticky="N, S, E, W")
 
         self.video_canvas = Canvas(video_frame, bg="black")
-        self.video_canvas.grid()
+        self.video_canvas.grid(sticky="N, S, E, W")
 
         video_frame.grid_columnconfigure(0, weight=1)
         video_frame.grid_rowconfigure(0, weight=1)
@@ -65,7 +65,7 @@ class SubtitleExtractorGUI:
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
         self.run_button.grid(pady=10, padx=30)
 
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=700, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=500, mode='determinate')
         self.progress_bar.grid(column=2, row=0)
 
     def _output_frame(self):
@@ -89,17 +89,16 @@ class SubtitleExtractorGUI:
     def _extraction_settings(self):
         pass
 
-    def _open_files(self):
+    def _display_video(self):
+        pass
+
+    def _open_file(self):
         title = "Open"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
-        filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
-        if filenames:
-            for filename in filenames:
-                self.write_to_output(f"Opened file: {filename}")
-            self.video_paths = filenames
-
-    def _add_batch_mode_layout(self):
-        pass
+        filename = filedialog.askopenfilename(title=title, filetypes=file_types)
+        if filename:
+            self.write_to_output(f"Opened file: {filename}")
+            self.video_path = filename
 
     def _on_closing(self):
         self._stop_run()
