@@ -18,6 +18,7 @@ class SubtitleExtractorGUI:
 
     def _create_layout(self):
         self.root.title("Video Subtitle Extractor")
+        self.root.resizable(FALSE, FALSE)
 
         self._menu_bar()
 
@@ -28,12 +29,6 @@ class SubtitleExtractorGUI:
         self._output_frame()
 
         self.main_frame.grid(sticky="N, S, E, W")
-
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-
-        self.main_frame.columnconfigure(0, weight=1)
-        self.main_frame.rowconfigure(0, weight=1)
 
     def _menu_bar(self):
         self.root.option_add('*tearOff', FALSE)
@@ -55,23 +50,20 @@ class SubtitleExtractorGUI:
 
     def _video_frame(self):
         video_frame = ttk.Frame(self.main_frame)
-        video_frame.grid(sticky="N, S, E, W")
+        video_frame.grid()
 
         self.video_canvas = Canvas(video_frame, bg="black")
         self.video_canvas.grid()
 
-        video_frame.grid_columnconfigure(0, weight=1)
-        video_frame.grid_rowconfigure(0, weight=1)
-
     def _work_frame(self):
         progress_frame = ttk.Frame(self.main_frame)
-        progress_frame.grid(row=1, sticky="N, S, E, W")
+        progress_frame.grid(row=1)
 
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
-        self.run_button.grid(pady=10, padx=30)
+        self.run_button.grid(pady=6, padx=30)
 
         self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=500, mode='determinate')
-        self.progress_bar.grid(column=2, row=0)
+        self.progress_bar.grid(column=1, row=0)
 
     def _output_frame(self):
         output_frame = ttk.Frame(self.main_frame)
