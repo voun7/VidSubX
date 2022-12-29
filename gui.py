@@ -20,7 +20,7 @@ class SubtitleExtractorGUI:
         self._progress_frame()
         self._output_frame()
 
-        self.main_frame.grid()
+        self.main_frame.grid(sticky="N, S, E, W")
 
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
@@ -48,11 +48,11 @@ class SubtitleExtractorGUI:
 
     def _video_frame(self):
         video_frame = ttk.Frame(self.main_frame, borderwidth=2, relief="ridge", width=1000, height=600)
-        video_frame.grid()
+        video_frame.grid(sticky="N, S, E, W")
 
     def _progress_frame(self):
         progress_frame = ttk.Frame(self.main_frame)
-        progress_frame.grid(row=1, sticky="W")
+        progress_frame.grid(row=1, sticky="N, S, E, W")
 
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
         self.run_button.grid(pady=10, padx=30)
@@ -62,10 +62,10 @@ class SubtitleExtractorGUI:
 
     def _output_frame(self):
         output_frame = ttk.Frame(self.main_frame)
-        output_frame.grid(row=2)
+        output_frame.grid(row=2, sticky="N, S, E, W")
 
-        self._text_output_widget = Text(output_frame, width=97, height=12, state="disabled")
-        self._text_output_widget.grid()
+        self._text_output_widget = Text(output_frame, height=12, state="disabled")
+        self._text_output_widget.grid(sticky="N, S, E, W")
 
         output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self._text_output_widget.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
