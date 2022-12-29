@@ -64,13 +64,13 @@ class SubtitleExtractorGUI:
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(row=2, sticky="N, S, E, W")
 
-        self._text_output_widget = Text(output_frame, height=12, state="disabled")
-        self._text_output_widget.grid(sticky="N, S, E, W")
+        self.text_output_widget = Text(output_frame, height=12, state="disabled")
+        self.text_output_widget.grid(sticky="N, S, E, W")
 
-        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self._text_output_widget.yview)
+        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.text_output_widget.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
 
-        self._text_output_widget.configure(yscrollcommand=output_scroll.set)
+        self.text_output_widget.configure(yscrollcommand=output_scroll.set)
 
         output_frame.grid_columnconfigure(0, weight=1)
         output_frame.grid_rowconfigure(0, weight=1)
@@ -87,7 +87,7 @@ class SubtitleExtractorGUI:
         filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
         if filenames:
             for name in filenames:
-                self.text_to_output(f"Opened file: {name}")
+                self.write_to_output(f"Opened file: {name}")
             self.video_paths = filenames
 
     def _close_main_window(self):
@@ -98,18 +98,18 @@ class SubtitleExtractorGUI:
         self.interrupt = True
         self.run_button.configure(text="Run", command=self._run)
 
-    def text_to_output(self, text):
-        self._text_output_widget.configure(state="normal")
-        self._text_output_widget.insert("end", f"{text}\n")
-        self._text_output_widget.see("end")
-        self._text_output_widget.configure(state="disabled")
+    def write_to_output(self, text):
+        self.text_output_widget.configure(state="normal")
+        self.text_output_widget.insert("end", f"{text}\n")
+        self.text_output_widget.see("end")
+        self.text_output_widget.configure(state="disabled")
 
     def long_running_method(self, count=0):
         num = 1000
         self.progress_bar.configure(maximum=num)
         if self.interrupt:
             return
-        self.text_to_output(f"Line {count} of {num}")
+        self.write_to_output(f"Line {count} of {num}")
         self.progress_bar['value'] += 1
         if count == num:
             self._stop_run()
@@ -125,7 +125,7 @@ class SubtitleExtractorGUI:
             pass
             # self.text_to_output(self.video_paths)
         else:
-            self.text_to_output("No video has been selected!")
+            self.write_to_output("No video has been selected!")
 
         self.long_running_method()
 
