@@ -1,4 +1,3 @@
-import threading
 from tkinter import *
 from tkinter import ttk
 
@@ -97,20 +96,24 @@ class SubtitleExtractorGUI:
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
-    def long_running_method(self):
-        num = 100000
+    def long_running_method(self, count=0):
+        num = 1000
         self.progress_bar.configure(maximum=num)
-        for i in range(0, num):
-            if self.interrupt:
-                break
-            self._text_to_output(f"Line {i} of {num}")
-            self.progress_bar['value'] += 1
-        self._stop_run()
+        if self.interrupt:
+            return
+        self._text_to_output(f"Line {count} of {num}")
+        self.progress_bar['value'] += 1
+        if count == num:
+            self._stop_run()
+            return
+        self.root.after(1, lambda: self.long_running_method(count + 1))
 
     def _run(self):
         self.interrupt = False
         self.run_button.configure(text='Stop', command=self._stop_run)
-        threading.Thread(target=self.long_running_method).start()
+        self.progress_bar['value'] = 0
+
+        self.long_running_method()
 
 
 rt = Tk()
