@@ -17,7 +17,7 @@ class SubtitleExtractorGUI:
         self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 15))
 
         self._video_frame()
-        self._progress_frame()
+        self._work_frame()
         self._output_frame()
 
         self.main_frame.grid(sticky="N, S, E, W")
@@ -51,7 +51,7 @@ class SubtitleExtractorGUI:
         video_frame = ttk.Frame(self.main_frame, borderwidth=2, relief="ridge", width=1000, height=600)
         video_frame.grid(sticky="N, S, E, W")
 
-    def _progress_frame(self):
+    def _work_frame(self):
         progress_frame = ttk.Frame(self.main_frame)
         progress_frame.grid(row=1, sticky="N, S, E, W")
 
