@@ -1,10 +1,6 @@
-from threading import Thread
 from tkinter import *
-from tkinter import ttk
 from tkinter import filedialog
-
-import cv2 as cv
-from PIL import Image, ImageTk
+from tkinter import ttk
 
 
 class SubtitleExtractorGUI:
@@ -93,30 +89,6 @@ class SubtitleExtractorGUI:
     def _extraction_settings(self):
         pass
 
-    def video_stream(self):
-        while self.capture.isOpened():
-            success, frame = self.capture.read()
-            if not success:
-                print(f"Video has ended!")
-                break
-            cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
-            img = Image.fromarray(cv2image)
-            self.current_frame = ImageTk.PhotoImage(image=img)
-            self.video_canvas.create_image(0, 0, image=self.current_frame, anchor='center')
-
-    def _display_video(self):
-        if len(self.video_paths) == 1:
-            for video in self.video_paths:
-                self.video_paths = video
-            self.capture = cv.VideoCapture(str(self.video_paths))
-            width = int(self.capture.get(cv.CAP_PROP_FRAME_WIDTH))
-            height = int(self.capture.get(cv.CAP_PROP_FRAME_HEIGHT))
-            self.video_canvas.configure(width=width*0.5, height=height*0.5)
-
-            Thread(target=self.video_stream, daemon=True).start()
-        else:
-            self._add_batch_mode_layout()
-
     def _open_files(self):
         title = "Open"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
@@ -125,7 +97,6 @@ class SubtitleExtractorGUI:
             for filename in filenames:
                 self.write_to_output(f"Opened file: {filename}")
             self.video_paths = filenames
-            self._display_video()
 
     def _add_batch_mode_layout(self):
         pass
@@ -133,7 +104,6 @@ class SubtitleExtractorGUI:
     def _on_closing(self):
         self._stop_run()
         self.root.quit()
-        self.capture.release()
 
     def _stop_run(self):
         self.interrupt = True
