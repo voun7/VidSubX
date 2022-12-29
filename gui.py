@@ -1,3 +1,5 @@
+import time
+from threading import Thread
 from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
@@ -8,8 +10,7 @@ class SubtitleExtractorGUI:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
-        self.video_paths = None
-        self.current_frame = None
+        self.video_path = None
 
     def _create_layout(self):
         self.root.title("Video Subtitle Extractor")
@@ -114,25 +115,24 @@ class SubtitleExtractorGUI:
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
-    def long_running_method(self, count=0):
+    def long_running_method(self):
         num = 1000
         self.progress_bar.configure(maximum=num)
-        if self.interrupt:
-            return
-        self.write_to_output(f"Line {count} of {num}")
-        self.progress_bar['value'] += 1
-        if count == num:
-            self._stop_run()
-            return
-        self.root.after(1, lambda: self.long_running_method(count + 1))
+        for i in range(0, num):
+            if self.interrupt:
+                break
+            self.write_to_output(f"Line {i} of {num}")
+            self.progress_bar['value'] += 1
+            time.sleep(0.00001)
+        self._stop_run()
 
     def _run(self):
-        if self.video_paths:
+        if self.video_path:
             self.interrupt = False
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.progress_bar['value'] = 0
 
-            # self.long_running_method()
+            Thread(target=self.long_running_method, daemon=True).start()
         else:
             self.write_to_output("No video has been selected!")
 
