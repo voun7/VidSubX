@@ -40,7 +40,8 @@ class SubtitleExtractorGUI:
         menubar.add_cascade(menu=menu_file, label="File")
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
-        menu_file.add_command(label="Open", command=self._open_files)
+        menu_file.add_command(label="Open", command=self._open_file)
+        menu_file.add_command(label="Open (batch mode)", command=self._open_files_batch)
         menu_file.add_command(label="Close", command=self._close_main_window)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
@@ -81,14 +82,25 @@ class SubtitleExtractorGUI:
     def _extraction_settings(self):
         pass
 
-    def _open_files(self):
+    def _open_file(self):
         title = "Select Video file"
+        file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("all files", "*.*"))
+        filename = filedialog.askopenfilename(title=title, filetypes=file_types)
+        if filename:
+            self.write_to_output(f"Opened file: {filename}")
+            self.video_paths = filename
+
+    def _open_files_batch(self):
+        title = "Select Video files"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("all files", "*.*"))
         filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
         if filenames:
-            for name in filenames:
-                self.write_to_output(f"Opened file: {name}")
+            for filename in filenames:
+                self.write_to_output(f"Opened file: {filename}")
             self.video_paths = filenames
+
+    def _add_batch_mode_layout(self):
+        pass
 
     def _close_main_window(self):
         self._stop_run()
