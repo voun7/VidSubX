@@ -1,16 +1,19 @@
-import threading
+from threading import Thread
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 
 import cv2 as cv
+from PIL import Image, ImageTk
 
 
 class SubtitleExtractorGUI:
     def __init__(self, root):
         self.root = root
+        self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
         self.video_paths = None
+        self.current_frame = None
 
     def _create_layout(self):
         self.root.title("Video Subtitle Extractor")
@@ -43,9 +46,8 @@ class SubtitleExtractorGUI:
         menubar.add_cascade(menu=menu_file, label="File")
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
-        menu_file.add_command(label="Open", command=self._open_file)
-        menu_file.add_command(label="Open (batch mode)", command=self._open_files_batch)
-        menu_file.add_command(label="Close", command=self._close_main_window)
+        menu_file.add_command(label="Open", command=self._open_files)
+        menu_file.add_command(label="Close", command=self._on_closing)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
         menu_settings.add_command(label="Extraction", command=self._extraction_settings)
@@ -54,8 +56,8 @@ class SubtitleExtractorGUI:
         video_frame = ttk.Frame(self.main_frame)
         video_frame.grid(sticky="N, S, E, W")
 
-        self.video_canvas = Canvas(video_frame, width=1000, height=600, bg="black")
-        self.video_canvas.grid(sticky="N, S, E, W")
+        self.video_canvas = Canvas(video_frame, bg="black")
+        self.video_canvas.grid()
 
         video_frame.grid_columnconfigure(0, weight=1)
         video_frame.grid_rowconfigure(0, weight=1)
@@ -67,7 +69,7 @@ class SubtitleExtractorGUI:
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
         self.run_button.grid(pady=10, padx=30)
 
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=800, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=700, mode='determinate')
         self.progress_bar.grid(column=2, row=0)
 
     def _output_frame(self):
@@ -91,29 +93,47 @@ class SubtitleExtractorGUI:
     def _extraction_settings(self):
         pass
 
-    def _open_file(self):
-        title = "Select Video file"
-        file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("all files", "*.*"))
-        filename = filedialog.askopenfilename(title=title, filetypes=file_types)
-        if filename:
-            self.write_to_output(f"Opened file: {filename}")
-            self.video_paths = filename
+    def video_stream(self):
+        while self.capture.isOpened():
+            success, frame = self.capture.read()
+            if not success:
+                print(f"Video has ended!")
+                break
+            cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
+            img = Image.fromarray(cv2image)
+            self.current_frame = ImageTk.PhotoImage(image=img)
+            self.video_canvas.create_image(0, 0, image=self.current_frame, anchor='center')
 
-    def _open_files_batch(self):
-        title = "Select Video files"
-        file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("all files", "*.*"))
+    def _display_video(self):
+        if len(self.video_paths) == 1:
+            for video in self.video_paths:
+                self.video_paths = video
+            self.capture = cv.VideoCapture(str(self.video_paths))
+            width = int(self.capture.get(cv.CAP_PROP_FRAME_WIDTH))
+            height = int(self.capture.get(cv.CAP_PROP_FRAME_HEIGHT))
+            self.video_canvas.configure(width=width*0.5, height=height*0.5)
+
+            Thread(target=self.video_stream, daemon=True).start()
+        else:
+            self._add_batch_mode_layout()
+
+    def _open_files(self):
+        title = "Open"
+        file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
         filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
         if filenames:
             for filename in filenames:
                 self.write_to_output(f"Opened file: {filename}")
             self.video_paths = filenames
+            self._display_video()
 
     def _add_batch_mode_layout(self):
         pass
 
-    def _close_main_window(self):
+    def _on_closing(self):
         self._stop_run()
         self.root.quit()
+        self.capture.release()
 
     def _stop_run(self):
         self.interrupt = True
@@ -138,19 +158,17 @@ class SubtitleExtractorGUI:
         self.root.after(1, lambda: self.long_running_method(count + 1))
 
     def _run(self):
-        self.interrupt = False
-        self.run_button.configure(text='Stop', command=self._stop_run)
-        self.progress_bar['value'] = 0
-
         if self.video_paths:
-            pass
-            # self.text_to_output(self.video_paths)
+            self.interrupt = False
+            self.run_button.configure(text='Stop', command=self._stop_run)
+            self.progress_bar['value'] = 0
+
+            # self.long_running_method()
         else:
             self.write_to_output("No video has been selected!")
 
-        self.long_running_method()
 
-
-rt = Tk()
-SubtitleExtractorGUI(rt)
-rt.mainloop()
+if __name__ == '__main__':
+    rt = Tk()
+    SubtitleExtractorGUI(rt)
+    rt.mainloop()
