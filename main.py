@@ -1,3 +1,4 @@
+import logging
 import shutil
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from difflib import SequenceMatcher
@@ -12,7 +13,9 @@ from tqdm import tqdm
 from logger_setup import get_logger
 from paddleocr import PaddleOCR
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
+
+get_logger()
 
 
 class SubtitleExtractor:

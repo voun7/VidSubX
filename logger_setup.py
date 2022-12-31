@@ -21,23 +21,19 @@ def get_file_handler() -> logging.handlers:
     return file_handler
 
 
-def get_logger(logger_name):
+def get_logger():
     # Create folder for file logs
     log_dir = Path(f"{Path.cwd()}/logs")
     if not log_dir.exists():
         log_dir.mkdir()
 
     # Create a custom logger
-    logger = logging.getLogger(logger_name)
+    logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)  # better to have too much log than not enough
 
     # Add handlers to the logger
     logger.addHandler(get_console_handler())
     logger.addHandler(get_file_handler())
-
-    # with this pattern, it's rarely necessary to propagate the error up to parent
-    logger.propagate = False
-    return logger
 
 
 def my_namer(default_name):
@@ -48,10 +44,9 @@ def my_namer(default_name):
     return f"{base_filename}.{date}.{ext}"
 
 # # Use the following to add custom logger to other modules.
-# from logger_setup import get_logger
-# logger = get_logger(__name__)
-# Do not log this messages unless they are at least warnings
 # import logging
+# logger = logging.getLogger(__name__)
+# Do not log this messages unless they are at least warnings
 # logging.getLogger("").setLevel(logging.WARNING)
 
 # Go to C:\Users\VOUN-XPS\miniconda3\envs\VSE\Lib\site-packages\paddle\distributed\utils\log_utils.py
