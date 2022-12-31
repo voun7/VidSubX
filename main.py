@@ -1,6 +1,5 @@
 import logging
 import shutil
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from difflib import SequenceMatcher
 from itertools import pairwise
 from pathlib import Path
@@ -8,10 +7,10 @@ from pathlib import Path
 import cv2 as cv
 import numpy as np
 from natsort import natsorted
-from tqdm import tqdm
 
 from logger_setup import get_logger
-from paddleocr import PaddleOCR
+from video_to_frames import video_to_frames
+from frames_to_text import frames_to_text
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +18,6 @@ get_logger()
 
 
 class SubtitleExtractor:
-    ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
-
     def __init__(self, extract_frequency: int = 2, frame_chunk_size: int = 250, ocr_chunk_size: int = 150,
                  ocr_max_processes: int = 4,
                  text_similarity_threshold: float = 0.8) -> None:
@@ -120,114 +117,6 @@ class SubtitleExtractor:
         # gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
         return subtitle_area
 
-    def extract_frames(self, start: int, end: int) -> int:
-        """
-        Extract frames from a video using OpenCVs VideoCapture.
-
-        :param start: start frame
-        :param end: end frame
-        :return: count of images saved
-        """
-
-        capture = cv.VideoCapture(str(self.video_path))  # open the video using OpenCV
-
-        if start < 0:  # if start isn't specified lets assume 0
-            start = 0
-        if end < 0:  # if end isn't specified assume the end of the video
-            end = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
-
-        capture.set(1, start)  # set the starting frame of the capture
-        frame = start  # keep track of which frame we are up to, starting from start
-        while_safety = 0  # a safety counter to ensure we don't enter an infinite while loop
-        saved_count = 0  # a count of how many frames we have saved
-
-        while frame < end:  # let's loop through the frames until the end
-
-            _, image = capture.read()  # read an image from the capture
-
-            if while_safety > 500:  # break the while if our safety max out at 500
-                break
-
-            # sometimes OpenCV reads Nones during a video, in which case we want to just skip
-            if image is None:  # if we get a bad return flag or the image we read is None, lets not save
-                while_safety += 1  # add 1 to our while safety, since we skip before incrementing our frame variable
-                continue  # skip
-
-            if frame % self.extract_frequency == 0:  # if this is a frame we want to write out
-                while_safety = 0  # reset the safety count
-                frame_position = capture.get(cv.CAP_PROP_POS_MSEC)  # get the name of the frame
-                file_name = Path(f"{self.frame_output}/{frame_position}.jpg")  # create the file save path and format
-                preprocessed_frame = self.preprocess_sub_frame(image)
-                cv.imwrite(str(file_name), preprocessed_frame)  # save the extracted image
-                saved_count += 1  # increment our counter by one
-
-            frame += 1  # increment our frame count
-
-        capture.release()  # after the while has finished close the capture
-        return saved_count  # and return the count of the images we saved
-
-    def video_to_frames(self) -> None:
-        """
-        Extracts the frames from a video using multiprocessing.
-        """
-
-        frame_count = self.video_details[1]
-
-        # ignore chunk size if it's greater than frame count
-        self.frame_chunk_size = self.frame_chunk_size if frame_count > self.frame_chunk_size else frame_count - 1
-
-        if frame_count < 1:  # if video has no frames, might be and opencv error
-            logger.error("Video has no frames. Check your OpenCV installation")
-
-        # split the frames into chunk lists
-        frame_chunks = [[i, i + self.frame_chunk_size] for i in range(0, frame_count, self.frame_chunk_size)]
-        # make sure last chunk has correct end frame, also handles case chunk_size < frame count
-        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
-        logger.debug(f"Frame chunks = {frame_chunks}")
-
-        prefix = "Extracting frames from video chunks"
-        logger.debug("Using multiprocessing for extracting frames")
-        # execute across multiple cpu cores to speed up processing, get the count automatically
-        with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(self.extract_frames, f[0], f[1]) for f in frame_chunks]
-            pbar = tqdm(total=len(frame_chunks), desc=prefix, colour="green")
-            for f in as_completed(futures):  # as each process completes
-                error = f.exception()
-                if error:
-                    logger.exception(error)
-                pbar.update()
-            pbar.close()
-        logger.info("Done extracting frames from video!")
-
-    def extract_text(self, files: list) -> int:
-        saved_count = 0
-        for file in files:
-            saved_count += 1
-            name = Path(f"{self.text_output}/{file.stem}.txt")
-            result = self.ocr.ocr(str(file), cls=True)
-            if result[0]:
-                text = result[0][0][1][0]
-                with open(name, 'w', encoding="utf-8") as text_file:
-                    text_file.write(text)
-        return saved_count
-
-    def frames_to_text(self) -> None:
-        files = [file for file in self.frame_output.iterdir()]
-        file_chunks = [files[i:i + self.ocr_chunk_size] for i in range(0, len(files), self.ocr_chunk_size)]
-
-        prefix = "Extracting text from frame chunks"
-        logger.debug("Using multiprocessing for extracting text")
-        with ProcessPoolExecutor(max_workers=self.ocr_max_processes) as executor:
-            futures = [executor.submit(self.extract_text, files) for files in file_chunks]
-            pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
-            for f in as_completed(futures):
-                error = f.exception()
-                if error:
-                    logger.exception(error)
-                pbar.update()
-            pbar.close()
-        logger.info("Done extracting texts!")
-
     @staticmethod
     def similarity(text1: str, text2: str) -> float:
         return SequenceMatcher(a=text1, b=text2).quick_ratio()
@@ -323,9 +212,9 @@ class SubtitleExtractor:
 
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
-        self.video_to_frames()
+        video_to_frames(self.video_path, self.frame_output, self.sub_area, self.extract_frequency, self.frame_chunk_size)
         logger.info("Starting to extracting text from frames...")
-        self.frames_to_text()
+        frames_to_text(self.frame_output, self.text_output, self.ocr_chunk_size, self.ocr_max_processes)
         logger.info("Generating subtitle...")
         self.generate_subtitle()
 
