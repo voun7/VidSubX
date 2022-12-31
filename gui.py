@@ -93,10 +93,12 @@ class SubtitleExtractorGUI:
         dimensions = (width, height)
         return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
 
-    def _display_video(self):
-        self.video_cap = cv.VideoCapture(str(self.video_path))
-        frame_width = int(self.video_cap.get(cv.CAP_PROP_FRAME_WIDTH)) * 0.5
-        frame_height = int(self.video_cap.get(cv.CAP_PROP_FRAME_HEIGHT)) * 0.5
+    def video_details(self) -> tuple:
+        fps = self.video_capture.get(cv.CAP_PROP_FPS)
+        frame_total = int(self.video_capture.get(cv.CAP_PROP_FRAME_COUNT))
+        frame_width = int(self.video_capture.get(cv.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(self.video_capture.get(cv.CAP_PROP_FRAME_HEIGHT))
+        return fps, frame_total, frame_width, frame_height
 
         self.video_canvas.configure(width=frame_width, height=frame_height)
 
