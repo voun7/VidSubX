@@ -8,9 +8,9 @@ import cv2 as cv
 import numpy as np
 from natsort import natsorted
 
+from frames_to_text import frames_to_text
 from logger_setup import get_logger
 from video_to_frames import video_to_frames
-from frames_to_text import frames_to_text
 
 logger = logging.getLogger(__name__)
 

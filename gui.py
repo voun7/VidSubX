@@ -60,10 +60,10 @@ class SubtitleExtractorGUI:
         progress_frame.grid(row=1)
 
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
-        self.run_button.grid(pady=6, padx=30)
+        self.run_button.grid(pady=6, padx=10)
 
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=500, mode='determinate')
-        self.progress_bar.grid(column=1, row=0)
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=700, mode='determinate')
+        self.progress_bar.grid(column=1, row=0, padx=10)
 
     def _output_frame(self):
         output_frame = ttk.Frame(self.main_frame)
@@ -121,7 +121,6 @@ class SubtitleExtractorGUI:
         if filename:
             self.write_to_output(f"Opened file: {filename}")
             self.video_path = filename
-
             Thread(target=self._display_video, daemon=True).start()
 
     def _on_closing(self):
