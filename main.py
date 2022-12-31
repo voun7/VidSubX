@@ -77,10 +77,6 @@ class SubtitleExtractor:
             color_red = (0, 0, 255)
             cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
 
-            # show preprocessed subtitle area
-            preprocessed_sub = self.preprocess_sub_frame(frame)
-            cv.imshow("Preprocessed Sub", preprocessed_sub)
-
             frame_resized = self.rescale_frame(frame)
             cv.imshow("Video Output", frame_resized)
 
@@ -96,13 +92,6 @@ class SubtitleExtractor:
         if self.vd_output_dir.exists():
             shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
-
-    def preprocess_sub_frame(self, frame: np.ndarray) -> np.ndarray:
-        x1, y1, x2, y2 = self.sub_area
-        subtitle_area = frame[y1:y2, x1:x2]  # crop the subtitle area
-        # rescaled_sub_area = self.rescale_frame(subtitle_area)
-        # gray_image = cv.cvtColor(rescaled_sub_area, cv.COLOR_BGR2GRAY)
-        return subtitle_area
 
     @staticmethod
     def similarity(text1: str, text2: str, similarity_threshold: float = 0.8) -> float:
