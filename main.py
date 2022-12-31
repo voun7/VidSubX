@@ -18,23 +18,10 @@ get_logger()
 
 
 class SubtitleExtractor:
-    def __init__(self, extract_frequency: int = 2, frame_chunk_size: int = 250, ocr_chunk_size: int = 150,
-                 ocr_max_processes: int = 4,
-                 text_similarity_threshold: float = 0.8) -> None:
+    def __init__(self) -> None:
         """
         Extracts hardcoded subtitles from video.
-
-        :param extract_frequency: extract every this many frames
-        :param frame_chunk_size: how many frames to split into chunks (one chunk per cpu core process)
-        :param ocr_chunk_size:
-        :param ocr_max_processes:
-        :param text_similarity_threshold:
         """
-        self.extract_frequency = extract_frequency
-        self.frame_chunk_size = frame_chunk_size
-        self.ocr_chunk_size = ocr_chunk_size
-        self.ocr_max_processes = ocr_max_processes
-        self.text_similarity_threshold = text_similarity_threshold
         self.video_path = None
         self.video_details = None
         self.sub_area = None
@@ -212,9 +199,9 @@ class SubtitleExtractor:
 
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
-        video_to_frames(self.video_path, self.frame_output, self.sub_area, self.extract_frequency, self.frame_chunk_size)
+        video_to_frames(self.video_path, self.frame_output, self.sub_area)
         logger.info("Starting to extracting text from frames...")
-        frames_to_text(self.frame_output, self.text_output, self.ocr_chunk_size, self.ocr_max_processes)
+        frames_to_text(self.frame_output, self.text_output)
         logger.info("Generating subtitle...")
         self.generate_subtitle()
 

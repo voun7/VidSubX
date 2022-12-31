@@ -24,7 +24,7 @@ def extract_text(text_output: Path, files: list) -> int:
     return saved_count
 
 
-def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int, ocr_max_processes: int) -> None:
+def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150, ocr_max_processes: int = 4) -> None:
     files = [file for file in frame_output.iterdir()]
     file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 

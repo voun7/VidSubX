@@ -5,7 +5,6 @@ from pathlib import Path
 import cv2 as cv
 from tqdm import tqdm
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +61,7 @@ def extract_frames(video_path: Path, frames_dir: Path, key_area: tuple, start: i
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: int, chunk_size: int) -> None:
+def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: int = 2, chunk_size: int = 250) -> None:
     """
     Extracts the frames from a video using multiprocessing
     :param video_path: path to the video
