@@ -105,8 +105,8 @@ class SubtitleExtractor:
         return subtitle_area
 
     @staticmethod
-    def similarity(text1: str, text2: str) -> float:
-        return SequenceMatcher(a=text1, b=text2).quick_ratio()
+    def similarity(text1: str, text2: str, similarity_threshold: float = 0.8) -> float:
+        return SequenceMatcher(a=text1, b=text2).quick_ratio() > similarity_threshold
 
     def remove_duplicate_texts(self) -> None:
         logger.info("Deleting duplicate texts...")
@@ -121,7 +121,7 @@ class SubtitleExtractor:
         for file1, file2 in pairwise(natsorted(self.text_output.iterdir())):
             similarity = self.similarity(file1.read_text(encoding="utf-8"), file2.read_text(encoding="utf-8"))
             counter += 1
-            if similarity > self.text_similarity_threshold and counter != no_of_files:
+            if similarity and counter != no_of_files:
                 # print(file1.name, file2.name, similarity)
                 if not starting_file:
                     starting_file = file1
