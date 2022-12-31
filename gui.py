@@ -100,21 +100,23 @@ class SubtitleExtractorGUI:
         frame_height = int(self.video_capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         return fps, frame_total, frame_width, frame_height
 
+    def _set_video_display_size(self, scale=0.5):
+        _, _, frame_width, frame_height, = self.video_details()
+        frame_width = frame_width * scale
+        frame_height = frame_height * scale
         self.video_canvas.configure(width=frame_width, height=frame_height)
 
-        while self.video_cap.isOpened():
-            success, frame = self.video_cap.read()
-            if not success:
-                print(f"Video has ended!")  # or failed to read
-                break
+    def _display_video(self, second=0):
+        self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
+        _, frame = self.video_capture.read()
 
-            cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
-            frame_resized = self.rescale_frame(cv2image)
+        cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
+        frame_resized = self.rescale_frame(cv2image)
 
-            img = Image.fromarray(frame_resized)
-            photo = ImageTk.PhotoImage(image=img)
-            self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
-            self.video_canvas.image = photo
+        img = Image.fromarray(frame_resized)
+        photo = ImageTk.PhotoImage(image=img)
+        self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
+        self.video_canvas.image = photo
 
     def _open_file(self):
         title = "Open"
@@ -123,6 +125,9 @@ class SubtitleExtractorGUI:
         if filename:
             self.write_to_output(f"Opened file: {filename}")
             self.video_path = filename
+            self.video_capture = cv.VideoCapture(str(self.video_path))
+            self._set_video_display_size()
+            self._display_video()
             Thread(target=self._display_video, daemon=True).start()
 
     def _on_closing(self):
