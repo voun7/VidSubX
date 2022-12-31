@@ -38,11 +38,11 @@ class SubtitleExtractor:
             exit()
         capture = cv.VideoCapture(str(self.video_path))
         fps = capture.get(cv.CAP_PROP_FPS)
-        frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
+        frame_total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
         frame_height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         frame_width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
         capture.release()
-        return fps, frame_count, frame_height, frame_width
+        return fps, frame_total, frame_height, frame_width
 
     def __subtitle_area(self, sub_area: None | tuple) -> tuple:
         """
@@ -180,9 +180,9 @@ class SubtitleExtractor:
         self.video_details = self.get_video_details()
         self.sub_area = self.__subtitle_area(sub_area)
 
-        fps, frame_count, frame_height, frame_width = self.video_details
+        fps, frame_total, frame_height, frame_width = self.video_details
         logger.info(f"File Path: {self.video_path}")
-        logger.info(f"Frame Count: {frame_count}, Frame Rate: {fps}")
+        logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
         logger.info(f"Subtitle Area: {self.sub_area}")
 
