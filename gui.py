@@ -15,6 +15,7 @@ class SubtitleExtractorGUI:
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
         self.video_path = None
+        self.video_capture = None
 
     def _create_layout(self):
         self.root.title("Video Subtitle Extractor")
@@ -42,7 +43,7 @@ class SubtitleExtractorGUI:
         menubar.add_cascade(menu=menu_file, label="File")
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
-        menu_file.add_command(label="Open", command=self._open_file)
+        menu_file.add_command(label="Open", command=self.open_file)
         menu_file.add_command(label="Close", command=self._on_closing)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
@@ -118,7 +119,11 @@ class SubtitleExtractorGUI:
         self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
         self.video_canvas.image = photo
 
-    def _open_file(self):
+    def open_file(self):
+        if self.video_capture is not None:
+            print("video open")
+            self.video_capture.release()
+
         title = "Open"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
         filename = filedialog.askopenfilename(title=title, filetypes=file_types)
