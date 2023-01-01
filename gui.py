@@ -263,8 +263,10 @@ class SubtitleExtractorGUI:
 
     def _set_batch_layout(self) -> None:
         print("Setting batch layout")
+        index = list(self.video_queue).index(self.current_video)
+        video_index = f"Video {index + 1} of {len(self.video_queue)}"
         self.previous_button.configure(state="normal")
-        self.video_label.configure(state="normal")
+        self.video_label.configure(state="normal", text=video_index)
         self.next_button.configure(state="normal")
 
     def open_files(self) -> None:
