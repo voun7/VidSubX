@@ -288,7 +288,6 @@ class SubtitleExtractorGUI:
         next_index = index + 1
 
         if index < queue_len - 1:
-            print(index)
             self._set_video(next_index)
 
     def _set_video(self, video_index: int = 0) -> None:
