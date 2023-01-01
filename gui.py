@@ -129,13 +129,16 @@ class SubtitleExtractorGUI:
         return x1, y1, x2, y2
 
     def draw_subtitle_area(self, x1: int = None, y1: int = None, x2: int = None, y2: int = None) -> None:
+        border_width = 4
+        border_color = "green"
+
         if all(value is not None for value in [x1, y1, x2, y2]):
             print('Subtitle coordinates are not None')
-            self.video_canvas.create_rectangle(x1, y1, x2, y2)
+            self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
             print('Some Subtitle coordinates are None')
             x1, y1, x2, y2 = self.default_subtitle_area()
-            self.video_canvas.create_rectangle(x1, y1, x2, y2)
+            self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
 
     def _display_video_frame(self, second=0):
         self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
