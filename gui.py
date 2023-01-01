@@ -117,10 +117,9 @@ class SubtitleExtractorGUI:
         frame_height = int(self.video_capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         return fps, frame_total, frame_width, frame_height
 
-    def _set_video_display_size(self, scale=0.5):
+    def _set_canvas_size(self):
         _, _, frame_width, frame_height, = self.video_details()
-        frame_width = frame_width * scale
-        frame_height = frame_height * scale
+        frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height)
 
     def _display_video(self, second=0):
@@ -147,7 +146,7 @@ class SubtitleExtractorGUI:
             self.write_to_output(f"Opened file: {filename}")
             self.video_path = filename
             self.video_capture = cv.VideoCapture(str(self.video_path))
-            self._set_video_display_size()
+            self._set_canvas_size()
             self._display_video()
             Thread(target=self._display_video, daemon=True).start()
 
