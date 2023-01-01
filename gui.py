@@ -256,12 +256,18 @@ class SubtitleExtractorGUI:
         print("Next video button clicked")
 
     def _reset_batch_layout(self) -> None:
+        """
+        Deactivate the batch layout from the work frame on the gui.
+        """
         print("Batch layout deactivated")
         self.previous_button.configure(state="disabled")
         self.video_label.configure(state="normal", text='')
         self.next_button.configure(state="disabled")
 
     def _set_batch_layout(self) -> None:
+        """
+        Activate the batch layout from the work frame on the gui.
+        """
         print("Setting batch layout")
         index = list(self.video_queue).index(self.current_video)
         video_index = f"Video {index + 1} of {len(self.video_queue)}"
