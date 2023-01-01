@@ -137,7 +137,7 @@ class SubtitleExtractorGUI:
             x1, y1, x2, y2 = self.default_subtitle_area()
             self.video_canvas.create_rectangle(x1, y1, x2, y2)
 
-    def _display_video(self, second=0):
+    def _display_video_frame(self, second=0):
         self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
         _, frame = self.video_capture.read()
 
@@ -163,7 +163,7 @@ class SubtitleExtractorGUI:
             self.video_path = filename
             self.video_capture = cv.VideoCapture(str(self.video_path))
             self._set_canvas_size()
-            self._display_video()
+            self._display_video_frame()
             self.draw_subtitle_area()
 
     def _on_closing(self):
