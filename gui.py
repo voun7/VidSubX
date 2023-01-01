@@ -269,6 +269,28 @@ class SubtitleExtractorGUI:
         self.video_label.configure(state="normal", text=video_index)
         self.next_button.configure(state="normal")
 
+    def _set_video(self, video_index: int = 0) -> None:
+        """
+        Set the gui for the given current video queue index.
+        :param video_index: Index of video that should be set to current. Defaults to first index.
+        """
+        if self.video_capture is not None:
+            print("Closing open video")
+            self.video_capture.release()
+
+            if len(self.video_queue) == 1:
+                self._reset_batch_layout()
+
+        self.current_video = list(self.video_queue.keys())[video_index]
+        self.video_capture = cv.VideoCapture(str(self.current_video))
+        self._set_canvas_size()
+        self._set_frame_slider()
+        self._display_video_frame()
+        self.draw_subtitle_area()
+
+        if len(self.video_queue) > 1:
+            self._set_batch_layout()
+
     def open_files(self) -> None:
         """
         Open file dialog to select a file then call required methods.
@@ -278,25 +300,21 @@ class SubtitleExtractorGUI:
         title = "Select Video(s)"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
         filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
-        if filenames:
-            if self.video_capture is not None:
-                print("Closing open video")
-                self.video_capture.release()
 
+        # This condition prevents the below methods from being called
+        # when button is clicked but no files are selected.
+        if filenames:
+            # Empty the video queue before adding the new videos.
+            print("Video queue cleared")
             self.video_queue = {}
+
+            # Add all opened videos to a queue.
             for filename in filenames:
                 self.write_to_output(f"Opened file: {filename}")
                 self.video_queue[filename] = None
 
-            self.current_video = next(iter(self.video_queue.items()))
-            self.video_capture = cv.VideoCapture(str(self.current_video[0]))
-            self._set_canvas_size()
-            self._set_frame_slider()
-            self._display_video_frame()
-            self.draw_subtitle_area()
-
-            if len(self.video_queue) > 1:
-                self._set_batch_layout()
+            # Set one of the opened videos to current video.
+            self._set_video()
 
     def _on_closing(self) -> None:
         """
