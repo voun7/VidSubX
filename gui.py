@@ -14,7 +14,8 @@ class SubtitleExtractorGUI:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
-        self.video_path = None
+        self.video_queue = {}
+        self.current_video = None
         self.video_capture = None
 
     def _create_layout(self) -> None:
@@ -56,7 +57,7 @@ class SubtitleExtractorGUI:
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
         # Add menu items.
-        menu_file.add_command(label="Open", command=self.open_file)
+        menu_file.add_command(label="Open file(s)", command=self.open_files)
         menu_file.add_command(label="Close", command=self._on_closing)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
@@ -92,8 +93,21 @@ class SubtitleExtractorGUI:
         self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
         # Create progress bar widget for showing the text extraction progress.
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=600, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=400, mode='determinate')
         self.progress_bar.grid(column=1, row=0, padx=10)
+
+        # Create button widget for previous video in queue for subtitle area selection.
+        self.previous_button = ttk.Button(progress_frame, text="Previous Video", command=self._previous_video,
+                                          state="disabled")
+        self.previous_button.grid(column=2, row=0, padx=10)
+
+        # Create label widget to show current video number and number of videos.
+        self.video_label = ttk.Label(progress_frame, state="disabled")
+        self.video_label.grid(column=3, row=0, padx=10)
+
+        # Create button widget for next video in queue for subtitle area selection.
+        self.next_button = ttk.Button(progress_frame, text="Next Video", command=self._next_video, state="disabled")
+        self.next_button.grid(column=4, row=0, padx=10)
 
     def _output_frame(self) -> None:
         """
@@ -231,28 +245,48 @@ class SubtitleExtractorGUI:
         fps, frame_total, _, _ = self.video_details()
         duration = frame_total / fps
 
-        self.video_scale.configure(state="normal", from_=0, to=duration)
+        self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
 
-    def open_file(self) -> None:
+    def _previous_video(self):
+        print("Previous video button clicked")
+
+    def _next_video(self):
+        print("Next video button clicked")
+
+    def _set_batch_layout(self):
+        print("Setting batch layout")
+        self.previous_button.configure(state="normal")
+        self.video_label.configure(state="normal")
+        self.next_button.configure(state="normal")
+
+    def open_files(self) -> None:
         """
         Open file dialog to select a file then call required methods.
         """
         print("Open button clicked")
-        if self.video_capture is not None:
-            print("Closing open video")
-            self.video_capture.release()
 
-        title = "Open"
+        title = "Select Video(s)"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
-        filename = filedialog.askopenfilename(title=title, filetypes=file_types)
-        if filename:
-            self.write_to_output(f"Opened file: {filename}")
-            self.video_path = filename
-            self.video_capture = cv.VideoCapture(str(self.video_path))
+        filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
+        if filenames:
+            if self.video_capture is not None:
+                print("Closing open video")
+                self.video_capture.release()
+
+            self.video_queue = {}
+            for filename in filenames:
+                self.write_to_output(f"Opened file: {filename}")
+                self.video_queue[filename] = None
+
+            self.current_video = next(iter(self.video_queue.items()))
+            self.video_capture = cv.VideoCapture(str(self.current_video[0]))
             self._set_canvas_size()
             self._set_frame_slider()
             self._display_video_frame()
             self.draw_subtitle_area()
+
+            if len(self.video_queue) > 1:
+                self._set_batch_layout()
 
     def _on_closing(self) -> None:
         """
@@ -295,7 +329,7 @@ class SubtitleExtractorGUI:
         Start the text extraction from video frames.
         """
         print("Run button clicked")
-        if self.video_path:
+        if self.current_video:
             self.interrupt = False
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.progress_bar['value'] = 0
