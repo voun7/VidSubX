@@ -29,7 +29,7 @@ class SubtitleExtractorGUI:
         self._work_frame()
         self._output_frame()
 
-        self.main_frame.grid(sticky="N, S, E, W")
+        self.main_frame.grid(column=0, row=0, sticky="N, S, E, W")
 
     def _menu_bar(self):
         self.root.option_add('*tearOff', FALSE)
@@ -51,27 +51,27 @@ class SubtitleExtractorGUI:
 
     def _video_frame(self):
         video_frame = ttk.Frame(self.main_frame)
-        video_frame.grid()
+        video_frame.grid(column=0, row=0)
 
         self.video_canvas = Canvas(video_frame, bg="black")
         self.video_canvas.grid()
 
     def _work_frame(self):
         progress_frame = ttk.Frame(self.main_frame)
-        progress_frame.grid(row=1)
+        progress_frame.grid(column=0, row=1)
 
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
-        self.run_button.grid(pady=6, padx=10)
+        self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=700, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=600, mode='determinate')
         self.progress_bar.grid(column=1, row=0, padx=10)
 
     def _output_frame(self):
         output_frame = ttk.Frame(self.main_frame)
-        output_frame.grid(row=2, sticky="N, S, E, W")
+        output_frame.grid(column=0, row=2, sticky="N, S, E, W")
 
         self.text_output_widget = Text(output_frame, height=12, state="disabled")
-        self.text_output_widget.grid(sticky="N, S, E, W")
+        self.text_output_widget.grid(column=0, row=0, sticky="N, S, E, W")
 
         output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.text_output_widget.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
