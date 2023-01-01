@@ -88,11 +88,27 @@ class SubtitleExtractorGUI:
         pass
 
     @staticmethod
-    def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
-        height = int(frame.shape[0] * scale)
-        width = int(frame.shape[1] * scale)
-        dimensions = (width, height)
-        return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
+    def rescale_to_frame(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
+                         scale: float = 0.5) -> np.ndarray | tuple:
+        if frame is not None:
+            height = int(frame.shape[0] * scale)
+            width = int(frame.shape[1] * scale)
+            dimensions = (width, height)
+            return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
+
+        if subtitle_area:
+            x1, y1, x2, y2 = subtitle_area
+            x1 = x1 * scale
+            y1 = y1 * scale
+            x2 = x2 * scale
+            y2 = y2 * scale
+            return x1, y1, x2, y2
+
+        if resolution:
+            frame_width, frame_height = resolution
+            frame_width = frame_width * scale
+            frame_height = frame_height * scale
+            return frame_width, frame_height
 
     def video_details(self) -> tuple:
         fps = self.video_capture.get(cv.CAP_PROP_FPS)
@@ -112,7 +128,7 @@ class SubtitleExtractorGUI:
         _, frame = self.video_capture.read()
 
         cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
-        frame_resized = self.rescale_frame(cv2image)
+        frame_resized = self.rescale_to_frame(cv2image)
 
         img = Image.fromarray(frame_resized)
         photo = ImageTk.PhotoImage(image=img)
