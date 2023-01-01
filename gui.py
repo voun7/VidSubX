@@ -180,6 +180,7 @@ class SubtitleExtractorGUI:
         """
         Set canvas size to the size of captured video.
         """
+        print("Setting canvas size")
         _, _, frame_width, frame_height, = self.video_details()
         frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height)
@@ -206,10 +207,10 @@ class SubtitleExtractorGUI:
         border_color = "green"
 
         if all(value is not None for value in [x1, y1, x2, y2]):
-            print('Subtitle coordinates are not None')
+            # print('Subtitle coordinates are not None')
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
-            print('Some Subtitle coordinates are None')
+            # print('Some Subtitle coordinates are None')
             x1, y1, x2, y2 = self.default_subtitle_area()
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
 
@@ -242,6 +243,7 @@ class SubtitleExtractorGUI:
         """
         Activate the slider, then set the starting and ending values of the slider.
         """
+        print("Setting frame slider")
         fps, frame_total, _, _ = self.video_details()
         duration = frame_total / fps
 
