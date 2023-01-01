@@ -10,78 +10,111 @@ from PIL import Image, ImageTk
 
 
 class SubtitleExtractorGUI:
-    def __init__(self, root):
+    def __init__(self, root: ttk) -> None:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
         self.video_path = None
         self.video_capture = None
 
-    def _create_layout(self):
+    def _create_layout(self) -> None:
+        """
+        Use ttk to create frames for gui.
+        """
+        # Window title
         self.root.title("Video Subtitle Extractor")
+        # Do not allow window to be resizable.
         self.root.resizable(FALSE, FALSE)
 
+        # Create window menu bar.
         self._menu_bar()
 
+        # Create main frame that will contain other frames.
         self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 15))
 
+        # Frames created in main frame.
         self._video_frame()
         self._work_frame()
         self._output_frame()
 
+        # Main frame's position in root window.
         self.main_frame.grid(column=0, row=0, sticky="N, S, E, W")
 
-    def _menu_bar(self):
+    def _menu_bar(self) -> None:
+        # Remove dashed lines that come default with tkinter menu bar.
         self.root.option_add('*tearOff', FALSE)
 
+        # Create menu bar in root window.
         menubar = Menu(self.root)
         self.root.config(menu=menubar)
 
+        # Create menus for menu bar.
         menu_file = Menu(menubar)
         menu_settings = Menu(menubar)
 
         menubar.add_cascade(menu=menu_file, label="File")
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
+        # Add menu items.
         menu_file.add_command(label="Open", command=self.open_file)
         menu_file.add_command(label="Close", command=self._on_closing)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
         menu_settings.add_command(label="Extraction", command=self._extraction_settings)
 
-    def _video_frame(self):
+    def _video_frame(self) -> None:
+        """
+        Frame that contains the widgets for the video.
+        """
+        # Create video frame in main frame.
         video_frame = ttk.Frame(self.main_frame)
         video_frame.grid(column=0, row=0)
 
+        # Create canvas widget in video frame.
         self.video_canvas = Canvas(video_frame, bg="black")
         self.video_canvas.grid(column=0, row=0)
 
+        # Create frame slider widget in video frame.
         self.video_scale = ttk.Scale(video_frame, command=self._frame_slider, orient=HORIZONTAL, length=600,
                                      state="disabled")
         self.video_scale.grid(column=0, row=1)
 
-    def _work_frame(self):
+    def _work_frame(self) -> None:
+        """
+        Frame that contains the widgets for working with the video or videos (batch mode).
+        """
+        # Create work frame in main frame.
         progress_frame = ttk.Frame(self.main_frame)
         progress_frame.grid(column=0, row=1)
 
+        # Create button widget for starting the text extraction.
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
         self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
+        # Create progress bar widget for showing the text extraction progress.
         self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=600, mode='determinate')
         self.progress_bar.grid(column=1, row=0, padx=10)
 
-    def _output_frame(self):
+    def _output_frame(self) -> None:
+        """
+        Frame that contains the widgets for the extraction text output.
+        """
+        # Create output frame in main frame
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(column=0, row=2, sticky="N, S, E, W")
 
+        # Create text widget for showing the text extraction details in the output. Does not allow input from gui.
         self.text_output_widget = Text(output_frame, height=12, state="disabled")
         self.text_output_widget.grid(column=0, row=0, sticky="N, S, E, W")
 
+        # Create scrollbar widget for text widget.
         output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.text_output_widget.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
 
+        # Connect text and scrollbar widgets.
         self.text_output_widget.configure(yscrollcommand=output_scroll.set)
 
+        # Resize output frame if main frame is resized.
         output_frame.grid_columnconfigure(0, weight=1)
         output_frame.grid_rowconfigure(0, weight=1)
 
@@ -94,6 +127,9 @@ class SubtitleExtractorGUI:
     @staticmethod
     def rescale_to_frame(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
                          scale: float = 0.5) -> np.ndarray | tuple:
+        """
+        Method to rescale any frame, subtitle area and resolution.
+        """
         if frame is not None:
             height = int(frame.shape[0] * scale)
             width = int(frame.shape[1] * scale)
@@ -115,24 +151,43 @@ class SubtitleExtractorGUI:
             return frame_width, frame_height
 
     def video_details(self) -> tuple:
+        """
+        Get the video details of the currently captured video.
+
+        :return: video details
+        """
         fps = self.video_capture.get(cv.CAP_PROP_FPS)
         frame_total = int(self.video_capture.get(cv.CAP_PROP_FRAME_COUNT))
         frame_width = int(self.video_capture.get(cv.CAP_PROP_FRAME_WIDTH))
         frame_height = int(self.video_capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         return fps, frame_total, frame_width, frame_height
 
-    def _set_canvas_size(self):
+    def _set_canvas_size(self) -> None:
+        """
+        Set canvas size to the size of captured video.
+        """
         _, _, frame_width, frame_height, = self.video_details()
         frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height)
 
-    def default_subtitle_area(self):
+    def default_subtitle_area(self) -> tuple:
+        """
+        The default subtitle area given to the captured video.
+        :return: subtitle area coordinates.
+        """
         _, _, frame_width, frame_height, = self.video_details()
         frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
         x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
         return x1, y1, x2, y2
 
     def draw_subtitle_area(self, x1: int = None, y1: int = None, x2: int = None, y2: int = None) -> None:
+        """
+        Draw subtitle on video frame.
+        :param x1: top left corner
+        :param y1: top left corner
+        :param x2: bottom right corner
+        :param y2: bottom right corner
+        """
         border_width = 4
         border_color = "green"
 
@@ -144,7 +199,11 @@ class SubtitleExtractorGUI:
             x1, y1, x2, y2 = self.default_subtitle_area()
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
 
-    def _display_video_frame(self, second=0):
+    def _display_video_frame(self, second: float | int = 0) -> None:
+        """
+        Find captured video frame through corresponding second and display on video canvas.
+        :param second: corresponding second
+        """
         self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
         _, frame = self.video_capture.read()
 
@@ -156,19 +215,28 @@ class SubtitleExtractorGUI:
         self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
         self.video_canvas.image = photo
 
-    def _frame_slider(self, scale_value):
-        print(scale_value)
+    def _frame_slider(self, scale_value: str) -> None:
+        """
+        Make changes according to the position of the slider.
+        :param scale_value: current position of the slider.
+        """
         scale_value = float(scale_value)
         self._display_video_frame(scale_value)
         self.draw_subtitle_area()
 
-    def _set_frame_slider(self):
+    def _set_frame_slider(self) -> None:
+        """
+        Activate the slider, then set the starting and ending values of the slider.
+        """
         fps, frame_total, _, _ = self.video_details()
         duration = frame_total / fps
 
         self.video_scale.configure(state="normal", from_=0, to=duration)
 
-    def open_file(self):
+    def open_file(self) -> None:
+        """
+        Open file dialog to select a file then call required methods.
+        """
         print("Open button clicked")
         if self.video_capture is not None:
             print("Closing open video")
@@ -186,16 +254,26 @@ class SubtitleExtractorGUI:
             self._display_video_frame()
             self.draw_subtitle_area()
 
-    def _on_closing(self):
+    def _on_closing(self) -> None:
+        """
+        Method called when window is closed.
+        """
         self._stop_run()
         self.root.quit()
 
-    def _stop_run(self):
+    def _stop_run(self) -> None:
+        """
+        Stop program from running.
+        """
         print("Stop button clicked")
         self.interrupt = True
         self.run_button.configure(text="Run", command=self._run)
 
-    def write_to_output(self, text):
+    def write_to_output(self, text: str) -> None:
+        """
+        Write text to the output frame's text widget.
+        :param text: text to write.
+        """
         self.text_output_widget.configure(state="normal")
         self.text_output_widget.insert("end", f"{text}\n")
         self.text_output_widget.see("end")
@@ -212,7 +290,10 @@ class SubtitleExtractorGUI:
             time.sleep(0.00001)
         self._stop_run()
 
-    def _run(self):
+    def _run(self) -> None:
+        """
+        Start the text extraction from video frames.
+        """
         print("Run button clicked")
         if self.video_path:
             self.interrupt = False
