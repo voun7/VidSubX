@@ -122,6 +122,21 @@ class SubtitleExtractorGUI:
         frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height)
 
+    def default_subtitle_area(self):
+        _, _, frame_width, frame_height, = self.video_details()
+        frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
+        x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
+        return x1, y1, x2, y2
+
+    def draw_subtitle_area(self, x1: int = None, y1: int = None, x2: int = None, y2: int = None) -> None:
+        if all(value is not None for value in [x1, y1, x2, y2]):
+            # print('Multiple variables are not None')
+            self.video_canvas.create_rectangle(x1, y1, x2, y2)
+        else:
+            # print('Some variables are None')
+            x1, y1, x2, y2 = self.default_subtitle_area()
+            self.video_canvas.create_rectangle(x1, y1, x2, y2)
+
     def _display_video(self, second=0):
         self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
         _, frame = self.video_capture.read()
@@ -148,7 +163,7 @@ class SubtitleExtractorGUI:
             self.video_capture = cv.VideoCapture(str(self.video_path))
             self._set_canvas_size()
             self._display_video()
-            Thread(target=self._display_video, daemon=True).start()
+            self.draw_subtitle_area()
 
     def _on_closing(self):
         self._stop_run()
