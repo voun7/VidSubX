@@ -249,12 +249,6 @@ class SubtitleExtractorGUI:
 
         self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
 
-    def _previous_video(self):
-        print("Previous video button clicked")
-
-    def _next_video(self):
-        print("Next video button clicked")
-
     def _reset_batch_layout(self) -> None:
         """
         Deactivate the batch layout from the work frame on the gui.
@@ -269,11 +263,33 @@ class SubtitleExtractorGUI:
         Activate the batch layout from the work frame on the gui.
         """
         print("Setting batch layout")
-        index = list(self.video_queue).index(self.current_video)
-        video_index = f"Video {index + 1} of {len(self.video_queue)}"
         self.previous_button.configure(state="normal")
-        self.video_label.configure(state="normal", text=video_index)
+        self.video_label.configure(state="normal", text=self._video_indexer()[2])
         self.next_button.configure(state="normal")
+
+    def _video_indexer(self) -> tuple:
+        """
+        Checks the index of the current video in the video queue dictionary using its key.
+        """
+        index = list(self.video_queue).index(self.current_video)
+        queue_len = len(self.video_queue)
+        video_index = f"Video {index + 1} of {queue_len}"
+        return index, queue_len, video_index
+
+    def _previous_video(self):
+        print("Previous video button clicked")
+        index = self._video_indexer()[0]
+        previous_index = index - 1
+        self._set_video(previous_index)
+
+    def _next_video(self):
+        print("Next video button clicked")
+        index, queue_len, _ = self._video_indexer()
+        next_index = index + 1
+
+        if index < queue_len - 1:
+            print(index)
+            self._set_video(next_index)
 
     def _set_video(self, video_index: int = 0) -> None:
         """
