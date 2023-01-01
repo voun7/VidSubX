@@ -330,6 +330,8 @@ class SubtitleExtractorGUI:
             print("Video queue cleared")
             self.video_queue = {}
 
+            self.clear_output()
+
             # Add all opened videos to a queue.
             for filename in filenames:
                 self.write_to_output(f"Opened file: {filename}")
@@ -352,6 +354,15 @@ class SubtitleExtractorGUI:
         print("Stop button clicked")
         self.interrupt = True
         self.run_button.configure(text="Run", command=self._run)
+
+    def clear_output(self) -> None:
+        """
+        Removes all the text in the text output widget.
+        """
+        print("Text output cleared")
+        self.text_output_widget.configure(state="normal")
+        self.text_output_widget.delete("1.0", "end")
+        self.text_output_widget.configure(state="disabled")
 
     def write_to_output(self, text: str) -> None:
         """
@@ -383,6 +394,7 @@ class SubtitleExtractorGUI:
             self.interrupt = False
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.progress_bar['value'] = 0
+            self.video_capture.release()
 
             Thread(target=self.long_running_method, daemon=True).start()
         else:
