@@ -54,7 +54,11 @@ class SubtitleExtractorGUI:
         video_frame.grid(column=0, row=0)
 
         self.video_canvas = Canvas(video_frame, bg="black")
-        self.video_canvas.grid()
+        self.video_canvas.grid(column=0, row=0)
+
+        self.video_scale = ttk.Scale(video_frame, command=self._frame_slider, orient=HORIZONTAL, length=600,
+                                     state="disabled")
+        self.video_scale.grid(column=0, row=1)
 
     def _work_frame(self):
         progress_frame = ttk.Frame(self.main_frame)
@@ -152,6 +156,18 @@ class SubtitleExtractorGUI:
         self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
         self.video_canvas.image = photo
 
+    def _frame_slider(self, scale_value):
+        print(scale_value)
+        scale_value = float(scale_value)
+        self._display_video_frame(scale_value)
+        self.draw_subtitle_area()
+
+    def _set_frame_slider(self):
+        fps, frame_total, _, _ = self.video_details()
+        duration = frame_total / fps
+
+        self.video_scale.configure(state="normal", from_=0, to=duration)
+
     def open_file(self):
         print("Open button clicked")
         if self.video_capture is not None:
@@ -166,6 +182,7 @@ class SubtitleExtractorGUI:
             self.video_path = filename
             self.video_capture = cv.VideoCapture(str(self.video_path))
             self._set_canvas_size()
+            self._set_frame_slider()
             self._display_video_frame()
             self.draw_subtitle_area()
 
