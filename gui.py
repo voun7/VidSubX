@@ -176,14 +176,14 @@ class SubtitleExtractorGUI:
         frame_height = int(self.video_capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         return fps, frame_total, frame_width, frame_height
 
-    def _set_canvas_size(self) -> None:
+    def _set_canvas(self) -> None:
         """
         Set canvas size to the size of captured video.
         """
         print("Setting canvas size")
         _, _, frame_width, frame_height, = self.video_details()
         frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
-        self.video_canvas.configure(width=frame_width, height=frame_height)
+        self.video_canvas.configure(width=frame_width, height=frame_height, bg="white")
 
     def default_subtitle_area(self) -> tuple:
         """
@@ -283,7 +283,7 @@ class SubtitleExtractorGUI:
 
         self.current_video = list(self.video_queue.keys())[video_index]
         self.video_capture = cv.VideoCapture(str(self.current_video))
-        self._set_canvas_size()
+        self._set_canvas()
         self._set_frame_slider()
         self._display_video_frame()
         self.draw_subtitle_area()
