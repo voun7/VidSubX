@@ -217,7 +217,7 @@ class SubtitleExtractorGUI:
     def _display_video_frame(self, second: float | int = 0) -> None:
         """
         Find captured video frame through corresponding second and display on video canvas.
-        :param second: corresponding second
+        :param second: default corresponding second
         """
         self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
         _, frame = self.video_capture.read()
