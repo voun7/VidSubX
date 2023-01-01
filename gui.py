@@ -130,10 +130,10 @@ class SubtitleExtractorGUI:
 
     def draw_subtitle_area(self, x1: int = None, y1: int = None, x2: int = None, y2: int = None) -> None:
         if all(value is not None for value in [x1, y1, x2, y2]):
-            # print('Multiple variables are not None')
+            print('Subtitle coordinates are not None')
             self.video_canvas.create_rectangle(x1, y1, x2, y2)
         else:
-            # print('Some variables are None')
+            print('Some Subtitle coordinates are None')
             x1, y1, x2, y2 = self.default_subtitle_area()
             self.video_canvas.create_rectangle(x1, y1, x2, y2)
 
@@ -150,8 +150,9 @@ class SubtitleExtractorGUI:
         self.video_canvas.image = photo
 
     def open_file(self):
+        print("Open button clicked")
         if self.video_capture is not None:
-            print("video open")
+            print("Closing open video")
             self.video_capture.release()
 
         title = "Open"
@@ -170,6 +171,7 @@ class SubtitleExtractorGUI:
         self.root.quit()
 
     def _stop_run(self):
+        print("Stop button clicked")
         self.interrupt = True
         self.run_button.configure(text="Run", command=self._run)
 
@@ -191,6 +193,7 @@ class SubtitleExtractorGUI:
         self._stop_run()
 
     def _run(self):
+        print("Run button clicked")
         if self.video_path:
             self.interrupt = False
             self.run_button.configure(text='Stop', command=self._stop_run)
