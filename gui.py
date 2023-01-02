@@ -403,4 +403,4 @@ if __name__ == '__main__':
     rt = Tk()
     SubtitleExtractorGUI(rt)
     rt.mainloop()
-    logger.debug("GUI program Ended.")
+    logger.debug("GUI program Ended.\n\n")
