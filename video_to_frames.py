@@ -20,8 +20,6 @@ def extract_frames(video_path: Path, frames_dir: Path, key_area: tuple, start: i
     :return: count of images saved
     """
 
-    x1, y1, x2, y2 = key_area
-
     capture = cv.VideoCapture(str(video_path))  # open the video using OpenCV
 
     if start < 0:  # if start isn't specified lets assume 0
@@ -49,10 +47,12 @@ def extract_frames(video_path: Path, frames_dir: Path, key_area: tuple, start: i
         if frame % every == 0:  # if this is a frame we want to write out based on the 'every' argument
             while_safety = 0  # reset the safety count
             # crop and save key area
-            cropped_frame = image[y1:y2, x1:x2]
+            if key_area:
+                x1, y1, x2, y2 = key_area
+                image = image[y1:y2, x1:x2]
             frame_position = capture.get(cv.CAP_PROP_POS_MSEC)
             save_name = f"{frames_dir}/{frame_position}.jpg"  # create the save path
-            cv.imwrite(save_name, cropped_frame)  # save the extracted image
+            cv.imwrite(save_name, image)  # save the extracted image
             saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
