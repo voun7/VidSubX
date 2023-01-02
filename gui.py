@@ -195,24 +195,22 @@ class SubtitleExtractorGUI:
         x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
         return x1, y1, x2, y2
 
-    def draw_subtitle_area(self, x1: int = None, y1: int = None, x2: int = None, y2: int = None) -> None:
-        """
-        Draw subtitle on video frame.
-        :param x1: top left corner
-        :param y1: top left corner
-        :param x2: bottom right corner
-        :param y2: bottom right corner
-        """
-        border_width = 4
-        border_color = "green"
+    def _set_sub_area(self, subtitle_area):
+        self.current_sub_area = subtitle_area
+        self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
-        if all(value is not None for value in [x1, y1, x2, y2]):
-            # print('Subtitle coordinates are not None')
+    def draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, border_color: str = "green") -> None:
+        """
+        Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
+        """
+        if subtitle_area:
+            print("Subtitle coordinates are not None", subtitle_area)
+            x1, y1, x2, y2 = subtitle_area
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
+            self._set_sub_area(subtitle_area)
         else:
-            # print('Some Subtitle coordinates are None')
-            x1, y1, x2, y2 = self.default_subtitle_area()
-            self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
+            print("Subtitle coordinates are None. Being set to default sub area")
+            self._set_sub_area(self.default_subtitle_area())
 
     def _display_video_frame(self, second: float | int = 0) -> None:
         """
@@ -237,7 +235,7 @@ class SubtitleExtractorGUI:
         """
         scale_value = float(scale_value)
         self._display_video_frame(scale_value)
-        self.draw_subtitle_area()
+        self.draw_subtitle_area(self.current_sub_area)
 
     def _set_frame_slider(self) -> None:
         """
@@ -303,11 +301,12 @@ class SubtitleExtractorGUI:
                 self._reset_batch_layout()
 
         self.current_video = list(self.video_queue.keys())[video_index]
+        self.current_sub_area = list(self.video_queue.values())[video_index]
         self.video_capture = cv.VideoCapture(str(self.current_video))
         self._set_canvas()
         self._set_frame_slider()
         self._display_video_frame()
-        self.draw_subtitle_area()
+        self.draw_subtitle_area(self.current_sub_area)
 
         if len(self.video_queue) > 1:
             self._set_batch_layout()
