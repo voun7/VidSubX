@@ -355,8 +355,10 @@ class SubtitleExtractorGUI:
         """
         Use the main module extraction class to extract text from subtitle.
         """
-        self.progress_bar.configure(maximum=len(self.video_queue))
+        queue_len = len(self.video_queue)
+        self.progress_bar.configure(maximum=queue_len)
         for video, sub_area in self.video_queue.items():
+            self.video_label.configure(text=f"{self.video_indexer(video)[1]} of {queue_len} Video(s) Completed")
             if self.interrupt:
                 break
             SubEx.run(video, sub_area)
