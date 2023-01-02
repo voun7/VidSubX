@@ -1,3 +1,4 @@
+import logging
 import time
 from threading import Thread
 from tkinter import *
@@ -7,6 +8,12 @@ from tkinter import ttk
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
+
+from logger_setup import get_logger
+
+logger = logging.getLogger(__name__)
+
+get_logger()
 
 
 class SubtitleExtractorGUI:
@@ -180,7 +187,7 @@ class SubtitleExtractorGUI:
         """
         Set canvas size to the size of captured video.
         """
-        print("Setting canvas size")
+        logger.debug("Setting canvas size")
         _, _, frame_width, frame_height, = self.video_details()
         frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height, bg="white")
@@ -208,11 +215,11 @@ class SubtitleExtractorGUI:
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
         if subtitle_area:
-            print("Subtitle coordinates are not None", subtitle_area)
+            logger.debug(f"Subtitle coordinates are not None. {subtitle_area}")
             x1, y1, x2, y2 = subtitle_area
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
-            print("Subtitle coordinates are None. Being set to default sub area")
+            logger.debug("Subtitle coordinates are None. Being set to default sub area")
             self._set_sub_area(self.default_subtitle_area())
 
     def _display_video_frame(self, second: float | int = 0) -> None:
@@ -244,7 +251,7 @@ class SubtitleExtractorGUI:
         """
         Activate the slider, then set the starting and ending values of the slider.
         """
-        print("Setting frame slider")
+        logger.debug("Setting frame slider")
         fps, frame_total, _, _ = self.video_details()
         duration = frame_total / fps
 
@@ -254,7 +261,7 @@ class SubtitleExtractorGUI:
         """
         Deactivate the batch layout from the work frame on the gui.
         """
-        print("Batch layout deactivated")
+        logger.debug("Batch layout deactivated")
         self.previous_button.configure(state="disabled")
         self.video_label.configure(state="normal", text='')
         self.next_button.configure(state="disabled")
@@ -263,7 +270,7 @@ class SubtitleExtractorGUI:
         """
         Activate the batch layout from the work frame on the gui.
         """
-        print("Setting batch layout")
+        logger.debug("Setting batch layout")
         self.previous_button.configure(state="normal")
         self.video_label.configure(state="normal", text=self._video_indexer()[2])
         self.next_button.configure(state="normal")
@@ -281,7 +288,7 @@ class SubtitleExtractorGUI:
         """
         Change current video to the previous video in queue.
         """
-        print("Previous video button clicked")
+        logger.debug("Previous video button clicked")
         index = self._video_indexer()[0]
         previous_index = index - 1
         self._set_video(previous_index)
@@ -290,7 +297,7 @@ class SubtitleExtractorGUI:
         """
         Change current video to the next video in queue.
         """
-        print("Next video button clicked")
+        logger.debug("Next video button clicked")
         index, queue_len, _ = self._video_indexer()
         next_index = index + 1
 
@@ -303,7 +310,7 @@ class SubtitleExtractorGUI:
         :param video_index: Index of video that should be set to current. Defaults to first index.
         """
         if self.video_capture is not None:
-            print("Closing open video")
+            logger.debug("Closing open video")
             self.video_capture.release()
 
             if len(self.video_queue) == 1:
@@ -324,7 +331,7 @@ class SubtitleExtractorGUI:
         """
         Open file dialog to select a file then call required methods.
         """
-        print("Open button clicked")
+        logger.debug("Open button clicked")
 
         title = "Select Video(s)"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
@@ -334,7 +341,7 @@ class SubtitleExtractorGUI:
         # when button is clicked but no files are selected.
         if filenames:
             # Empty the video queue before adding the new videos.
-            print("Video queue cleared")
+            logger.debug("Video queue cleared")
             self.video_queue = {}
 
             self.clear_output()
@@ -358,7 +365,7 @@ class SubtitleExtractorGUI:
         """
         Stop program from running.
         """
-        print("Stop button clicked")
+        logger.debug("Stop button clicked")
         self.interrupt = True
         self.run_button.configure(text="Run", command=self._run)
 
@@ -366,7 +373,7 @@ class SubtitleExtractorGUI:
         """
         Removes all the text in the text output widget.
         """
-        print("Text output cleared")
+        logger.debug("Text output cleared")
         self.text_output_widget.configure(state="normal")
         self.text_output_widget.delete("1.0", "end")
         self.text_output_widget.configure(state="disabled")
@@ -396,7 +403,7 @@ class SubtitleExtractorGUI:
         """
         Start the text extraction from video frames.
         """
-        print("Run button clicked")
+        logger.debug("Run button clicked")
         if self.current_video:
             self.interrupt = False
             self.run_button.configure(text='Stop', command=self._stop_run)
@@ -409,6 +416,8 @@ class SubtitleExtractorGUI:
 
 
 if __name__ == '__main__':
+    logger.debug("GUI program Started.")
     rt = Tk()
     SubtitleExtractorGUI(rt)
     rt.mainloop()
+    logger.debug("GUI program Ended.")
