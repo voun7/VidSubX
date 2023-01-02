@@ -357,6 +357,7 @@ class SubtitleExtractorGUI:
         """
         queue_len = len(self.video_queue)
         self.progress_bar.configure(maximum=queue_len)
+        self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         for video, sub_area in self.video_queue.items():
             if self.interrupt:
                 break
