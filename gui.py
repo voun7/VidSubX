@@ -321,10 +321,8 @@ class SubtitleExtractorGUI:
         # This condition prevents the below methods from being called
         # when button is clicked but no files are selected.
         if filenames:
-            # Empty the video queue before adding the new videos.
-            logger.debug("Video queue cleared")
-            self.video_queue = {}
-
+            logger.debug("Video queue and text widget output cleared")
+            self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.clear_output()
 
             # Add all opened videos to a queue.
@@ -332,8 +330,7 @@ class SubtitleExtractorGUI:
                 self.write_to_output(f"Opened file: {filename}")
                 self.video_queue[filename] = None
 
-            # Set one of the opened videos to current video.
-            self._set_video()
+            self._set_video()  # Set one of the opened videos to current video.
 
     def clear_output(self) -> None:
         """
