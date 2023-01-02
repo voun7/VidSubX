@@ -211,7 +211,6 @@ class SubtitleExtractorGUI:
             print("Subtitle coordinates are not None", subtitle_area)
             x1, y1, x2, y2 = subtitle_area
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
-            self._set_sub_area(subtitle_area)
         else:
             print("Subtitle coordinates are None. Being set to default sub area")
             self._set_sub_area(self.default_subtitle_area())
