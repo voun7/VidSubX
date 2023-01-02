@@ -1,5 +1,4 @@
 import logging
-import time
 from threading import Thread
 from tkinter import *
 from tkinter import filedialog
@@ -10,11 +9,13 @@ import numpy as np
 from PIL import Image, ImageTk
 
 from logger_setup import get_logger
-from main import SubtitleExtractor as SubEx
+from main import SubtitleExtractor
 
 logger = logging.getLogger(__name__)
 
 get_logger()
+
+SubEx = SubtitleExtractor()
 
 
 class SubtitleExtractorGUI:
@@ -352,15 +353,16 @@ class SubtitleExtractorGUI:
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
-    def long_running_method(self):
-        num = 1000
-        self.progress_bar.configure(maximum=num)
-        for i in range(0, num):
+    def extract_subtitle(self) -> None:
+        """
+        Use the main module extraction class to extract text from subtitle.
+        """
+        self.progress_bar.configure(maximum=len(self.video_queue))
+        for video, sub_area in self.video_queue.items():
             if self.interrupt:
                 break
-            self.write_to_output(f"Line {i} of {num}")
+            SubEx.run(video, sub_area)
             self.progress_bar['value'] += 1
-            time.sleep(0.00001)
         self._stop_run()
 
     def _stop_run(self) -> None:
