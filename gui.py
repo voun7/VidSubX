@@ -146,8 +146,8 @@ class SubtitleExtractorGUI:
         pass
 
     @staticmethod
-    def rescale_to_frame(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
-                         scale: float = 0.5) -> np.ndarray | tuple:
+    def rescale(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
+                scale: float = 0.5) -> np.ndarray | tuple:
         """
         Method to rescale any frame, subtitle area and resolution.
         """
@@ -188,8 +188,8 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
-        _, _, frame_width, frame_height, = self.video_details()
-        frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
+        _, _, frame_width, frame_height, = SubEx.video_details(self.current_video)
+        frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height, bg="white")
 
     def default_subtitle_area(self) -> tuple:
@@ -216,7 +216,7 @@ class SubtitleExtractorGUI:
         """
         if subtitle_area:
             logger.debug(f"Subtitle coordinates are not None. {subtitle_area}")
-            x1, y1, x2, y2 = subtitle_area
+            x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
             logger.debug("Subtitle coordinates are None. Being set to default sub area")
@@ -231,7 +231,7 @@ class SubtitleExtractorGUI:
         _, frame = self.video_capture.read()
 
         cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
-        frame_resized = self.rescale_to_frame(cv2image)
+        frame_resized = self.rescale(cv2image)
 
         img = Image.fromarray(frame_resized)
         photo = ImageTk.PhotoImage(image=img)
