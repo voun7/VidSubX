@@ -140,6 +140,23 @@ class SubtitleExtractorGUI:
         output_frame.grid_columnconfigure(0, weight=1)
         output_frame.grid_rowconfigure(0, weight=1)
 
+    def _reset_batch_layout(self) -> None:
+        """
+        Deactivate the batch layout from the work frame on the gui.
+        """
+        logger.debug("Batch layout deactivated")
+        self.previous_button.configure(state="disabled")
+        self.next_button.configure(state="disabled")
+
+    def _set_batch_layout(self) -> None:
+        """
+        Activate the batch layout from the work frame on the gui.
+        """
+        logger.debug("Setting batch layout")
+        self.previous_button.configure(state="normal")
+        self.video_label.configure(state="normal", text=self._video_indexer()[2])
+        self.next_button.configure(state="normal")
+
     def _language_settings(self):
         pass
 
@@ -237,24 +254,6 @@ class SubtitleExtractorGUI:
 
         self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
 
-    def _reset_batch_layout(self) -> None:
-        """
-        Deactivate the batch layout from the work frame on the gui.
-        """
-        logger.debug("Batch layout deactivated")
-        self.previous_button.configure(state="disabled")
-        self.video_label.configure(state="normal", text='')
-        self.next_button.configure(state="disabled")
-
-    def _set_batch_layout(self) -> None:
-        """
-        Activate the batch layout from the work frame on the gui.
-        """
-        logger.debug("Setting batch layout")
-        self.previous_button.configure(state="normal")
-        self.video_label.configure(state="normal", text=self._video_indexer()[2])
-        self.next_button.configure(state="normal")
-
     def _video_indexer(self) -> tuple:
         """
         Checks the index of the current video in the video queue dictionary using its key.
@@ -334,21 +333,6 @@ class SubtitleExtractorGUI:
             # Set one of the opened videos to current video.
             self._set_video()
 
-    def _on_closing(self) -> None:
-        """
-        Method called when window is closed.
-        """
-        self._stop_run()
-        self.root.quit()
-
-    def _stop_run(self) -> None:
-        """
-        Stop program from running.
-        """
-        logger.debug("Stop button clicked")
-        self.interrupt = True
-        self.run_button.configure(text="Run", command=self._run)
-
     def clear_output(self) -> None:
         """
         Removes all the text in the text output widget.
@@ -379,6 +363,15 @@ class SubtitleExtractorGUI:
             time.sleep(0.00001)
         self._stop_run()
 
+    def _stop_run(self) -> None:
+        """
+        Stop program from running.
+        """
+        logger.debug("Stop button clicked")
+        self.interrupt = True
+        self.run_button.configure(text="Run", command=self._run)
+        self.current_video = None
+
     def _run(self) -> None:
         """
         Start the text extraction from video frames.
@@ -393,6 +386,13 @@ class SubtitleExtractorGUI:
             Thread(target=self.long_running_method, daemon=True).start()
         else:
             self.write_to_output("No video has been selected!")
+
+    def _on_closing(self) -> None:
+        """
+        Method called when window is closed.
+        """
+        self._stop_run()
+        self.root.quit()
 
 
 if __name__ == '__main__':
