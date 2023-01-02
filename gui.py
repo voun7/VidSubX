@@ -382,11 +382,12 @@ class SubtitleExtractorGUI:
         logger.debug("Run button clicked")
         if self.current_video:
             self.interrupt = False
-            self.run_button.configure(text='Stop', command=self._stop_run)
-            self.progress_bar['value'] = 0
             self.video_capture.release()
-
-            Thread(target=self.long_running_method, daemon=True).start()
+            self.run_button.configure(text='Stop', command=self._stop_run)
+            self.video_scale.configure(state="disabled")
+            self.progress_bar.configure(value=0)
+            self._reset_batch_layout()
+            Thread(target=self.extract_subtitle, daemon=True).start()
         else:
             self.write_to_output("No video has been selected!")
 
