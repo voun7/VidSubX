@@ -27,13 +27,13 @@ class SubtitleExtractor:
         self.text_output = self.vd_output_dir / "extracted texts"
 
     @staticmethod
-    def video_details(video_path) -> tuple:
+    def video_details(video_path: str) -> tuple:
         """
         Get the video details of the video in path.
 
         :return: video details
         """
-        capture = cv.VideoCapture(str(video_path))
+        capture = cv.VideoCapture(video_path)
         fps = capture.get(cv.CAP_PROP_FPS)
         frame_total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
         frame_width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
@@ -132,7 +132,7 @@ class SubtitleExtractor:
         self._save_subtitle(subtitles)
         logger.info("Subtitle generated!")
 
-    def run(self, video_path: Path, sub_area: tuple = None) -> None:
+    def run(self, video_path: str, sub_area: tuple = None) -> None:
         """
         Run through the steps of extracting texts from subtitle area in video.
         """
@@ -145,9 +145,9 @@ class SubtitleExtractor:
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
 
-        self.video_path = video_path
+        self.video_path = Path(video_path)
 
-        fps, frame_total, frame_width, frame_height = self.video_details(self.video_path)
+        fps, frame_total, frame_width, frame_height = self.video_details(video_path)
         sub_area = self.default_sub_area(frame_width, frame_height, sub_area)
 
         logger.info(f"File Path: {self.video_path}")
@@ -173,6 +173,6 @@ if __name__ == '__main__':
     test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
     se = SubtitleExtractor()
     for video in test_videos.glob("*.mp4"):
-        se.run(video)
+        se.run(str(video))
 
     logger.debug("Main program Ended.")
