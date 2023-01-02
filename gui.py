@@ -102,21 +102,18 @@ class SubtitleExtractorGUI:
         self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
         # Create progress bar widget for showing the text extraction progress.
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=400, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=600, mode='determinate')
         self.progress_bar.grid(column=1, row=0, padx=10)
 
         # Create button widget for previous video in queue for subtitle area selection.
-        self.previous_button = ttk.Button(progress_frame, text="Previous Video", command=self._previous_video,
-                                          state="disabled")
-        self.previous_button.grid(column=2, row=0, padx=10)
+        self.previous_button = ttk.Button(progress_frame, text="Previous Video", command=self._previous_video)
 
         # Create label widget to show current video number and number of videos.
         self.video_label = ttk.Label(progress_frame)
         self.video_label.grid(column=3, row=0, padx=10)
 
         # Create button widget for next video in queue for subtitle area selection.
-        self.next_button = ttk.Button(progress_frame, text="Next Video", command=self._next_video, state="disabled")
-        self.next_button.grid(column=4, row=0, padx=10)
+        self.next_button = ttk.Button(progress_frame, text="Next Video", command=self._next_video)
 
     def _output_frame(self) -> None:
         """
@@ -146,17 +143,18 @@ class SubtitleExtractorGUI:
         Deactivate the batch layout from the work frame on the gui.
         """
         logger.debug("Batch layout deactivated")
-        self.previous_button.configure(state="disabled")
-        self.next_button.configure(state="disabled")
+        self.previous_button.grid_remove()
+        self.next_button.grid_remove()
 
     def _set_batch_layout(self) -> None:
         """
         Activate the batch layout from the work frame on the gui.
         """
         logger.debug("Setting batch layout")
-        self.previous_button.configure(state="normal")
+        self.progress_bar.configure(length=500)
         self.video_label.configure(state="normal", text=self.video_indexer(self.current_video)[2])
-        self.next_button.configure(state="normal")
+        self.previous_button.grid(column=2, row=0, padx=10)
+        self.next_button.grid(column=4, row=0, padx=10)
 
     def _language_settings(self):
         pass
