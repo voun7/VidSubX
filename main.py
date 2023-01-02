@@ -174,5 +174,4 @@ if __name__ == '__main__':
     se = SubtitleExtractor()
     for video in test_videos.glob("*.mp4"):
         se.run(str(video))
-
-    logger.debug("Main program Ended.")
+    logger.debug("Main program Ended.\n\n")
