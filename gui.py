@@ -195,7 +195,11 @@ class SubtitleExtractorGUI:
         x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
         return x1, y1, x2, y2
 
-    def _set_sub_area(self, subtitle_area):
+    def _set_sub_area(self, subtitle_area: tuple) -> None:
+        """
+        Set current video subtitle area to new area.
+        :param subtitle_area: new subtitle area to be used.
+        """
         self.current_sub_area = subtitle_area
         self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
@@ -274,13 +278,19 @@ class SubtitleExtractorGUI:
         video_index = f"Video {index + 1} of {queue_len}"
         return index, queue_len, video_index
 
-    def _previous_video(self):
+    def _previous_video(self) -> None:
+        """
+        Change current video to the previous video in queue.
+        """
         print("Previous video button clicked")
         index = self._video_indexer()[0]
         previous_index = index - 1
         self._set_video(previous_index)
 
-    def _next_video(self):
+    def _next_video(self) -> None:
+        """
+        Change current video to the next video in queue.
+        """
         print("Next video button clicked")
         index, queue_len, _ = self._video_indexer()
         next_index = index + 1
