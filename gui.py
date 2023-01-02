@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 from logger_setup import get_logger
+from main import SubtitleExtractor as SubEx
 
 logger = logging.getLogger(__name__)
 
@@ -171,18 +172,6 @@ class SubtitleExtractorGUI:
             frame_height = frame_height * scale
             return frame_width, frame_height
 
-    def video_details(self) -> tuple:
-        """
-        Get the video details of the currently captured video.
-
-        :return: video details
-        """
-        fps = self.video_capture.get(cv.CAP_PROP_FPS)
-        frame_total = int(self.video_capture.get(cv.CAP_PROP_FRAME_COUNT))
-        frame_width = int(self.video_capture.get(cv.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(self.video_capture.get(cv.CAP_PROP_FRAME_HEIGHT))
-        return fps, frame_total, frame_width, frame_height
-
     def _set_canvas(self) -> None:
         """
         Set canvas size to the size of captured video.
@@ -191,16 +180,6 @@ class SubtitleExtractorGUI:
         _, _, frame_width, frame_height, = SubEx.video_details(self.current_video)
         frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height, bg="white")
-
-    def default_subtitle_area(self) -> tuple:
-        """
-        The default subtitle area given to the captured video.
-        :return: subtitle area coordinates.
-        """
-        _, _, frame_width, frame_height, = self.video_details()
-        frame_width, frame_height = self.rescale_to_frame(resolution=(frame_width, frame_height))
-        x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
-        return x1, y1, x2, y2
 
     def _set_sub_area(self, subtitle_area: tuple) -> None:
         """
@@ -220,7 +199,8 @@ class SubtitleExtractorGUI:
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
             logger.debug("Subtitle coordinates are None. Being set to default sub area")
-            self._set_sub_area(self.default_subtitle_area())
+            _, _, frame_width, frame_height, = SubEx.video_details(self.current_video)
+            self._set_sub_area(SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
 
     def _display_video_frame(self, second: float | int = 0) -> None:
         """
@@ -252,7 +232,7 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        fps, frame_total, _, _ = self.video_details()
+        fps, frame_total, _, _ = SubEx.video_details(self.current_video)
         duration = frame_total / fps
 
         self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
