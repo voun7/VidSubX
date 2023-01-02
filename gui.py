@@ -111,7 +111,7 @@ class SubtitleExtractorGUI:
         self.previous_button.grid(column=2, row=0, padx=10)
 
         # Create label widget to show current video number and number of videos.
-        self.video_label = ttk.Label(progress_frame, state="disabled")
+        self.video_label = ttk.Label(progress_frame)
         self.video_label.grid(column=3, row=0, padx=10)
 
         # Create button widget for next video in queue for subtitle area selection.
@@ -294,6 +294,7 @@ class SubtitleExtractorGUI:
             self.video_capture.release()
 
             if len(self.video_queue) == 1:
+                self.video_label.configure(text='')
                 self._reset_batch_layout()
 
         self.current_video = list(self.video_queue.keys())[video_index]
