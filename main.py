@@ -5,7 +5,6 @@ from itertools import pairwise
 from pathlib import Path
 
 import cv2 as cv
-import numpy as np
 from natsort import natsorted
 
 from frames_to_text import frames_to_text
@@ -14,8 +13,6 @@ from video_to_frames import video_to_frames
 
 logger = logging.getLogger(__name__)
 
-get_logger()
-
 
 class SubtitleExtractor:
     def __init__(self) -> None:
@@ -23,8 +20,6 @@ class SubtitleExtractor:
         Extracts hardcoded subtitles from video.
         """
         self.video_path = None
-        self.video_details = None
-        self.sub_area = None
         # Create cache directory
         self.vd_output_dir = Path(f"{Path.cwd()}/output")
         # Extracted video frame storage directory
@@ -32,19 +27,23 @@ class SubtitleExtractor:
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
 
-    def get_video_details(self) -> tuple:
-        if "mp4" not in self.video_path.suffix:
-            logger.error("File path does not contain video!")
-            exit()
-        capture = cv.VideoCapture(str(self.video_path))
+    @staticmethod
+    def video_details(video_path) -> tuple:
+        """
+        Get the video details of the video in path.
+
+        :return: video details
+        """
+        capture = cv.VideoCapture(str(video_path))
         fps = capture.get(cv.CAP_PROP_FPS)
         frame_total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
-        frame_height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         frame_width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
         capture.release()
-        return fps, frame_total, frame_height, frame_width
+        return fps, frame_total, frame_width, frame_height
 
-    def __subtitle_area(self, sub_area: None | tuple) -> tuple:
+    @staticmethod
+    def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple:
         """
         Returns a default subtitle area that can be used if no subtitle is given.
         :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
@@ -52,38 +51,8 @@ class SubtitleExtractor:
         if sub_area:
             return sub_area
         else:
-            _, _, frame_height, frame_width = self.video_details
             x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
             return x1, y1, x2, y2
-
-    @staticmethod
-    def rescale_frame(frame: np.ndarray, scale: float = 0.5) -> np.ndarray:
-        height = int(frame.shape[0] * scale)
-        width = int(frame.shape[1] * scale)
-        dimensions = (width, height)
-        return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
-
-    def view_frames(self) -> None:
-        video_cap = cv.VideoCapture(str(self.video_path))
-        while True:
-            success, frame = video_cap.read()
-            if not success:
-                logger.warning(f"Video has ended!")  # or failed to read
-                break
-            x1, y1, x2, y2 = self.sub_area
-            # draw rectangle over subtitle area
-            top_left_corner = (x1, y1)
-            bottom_right_corner = (x2, y2)
-            color_red = (0, 0, 255)
-            cv.rectangle(frame, top_left_corner, bottom_right_corner, color_red, 2)
-
-            frame_resized = self.rescale_frame(frame)
-            cv.imshow("Video Output", frame_resized)
-
-            if cv.waitKey(1) == ord('q'):
-                break
-        video_cap.release()
-        cv.destroyAllWindows()
 
     def empty_cache(self) -> None:
         """
@@ -166,7 +135,7 @@ class SubtitleExtractor:
 
     def run(self, video_path: Path, sub_area: tuple = None) -> None:
         """
-        Run through the steps of extracting video.
+        Run through the steps of extracting texts from subtitle area in video.
         """
         start = cv.getTickCount()
         # Empty cache at the beginning of program run before it recreates itself
@@ -176,19 +145,19 @@ class SubtitleExtractor:
             self.frame_output.mkdir(parents=True)
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
-        self.video_path = video_path
-        self.video_details = self.get_video_details()
-        self.sub_area = self.__subtitle_area(sub_area)
 
-        fps, frame_total, frame_height, frame_width = self.video_details
+        self.video_path = video_path
+
+        fps, frame_total, frame_width, frame_height = self.video_details(self.video_path)
+        sub_area = self.default_sub_area(frame_width, frame_height, sub_area)
+
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
         logger.info(f"Subtitle Area: {sub_area}")
 
-        # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
-        video_to_frames(self.video_path, self.frame_output, self.sub_area)
+        video_to_frames(self.video_path, self.frame_output, sub_area)
         logger.info("Starting to extracting text from frames...")
         frames_to_text(self.frame_output, self.text_output)
         logger.info("Generating subtitle...")
