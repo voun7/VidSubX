@@ -298,7 +298,7 @@ class SubtitleExtractorGUI:
 
         self.current_video = list(self.video_queue.keys())[video_index]
         self.current_sub_area = list(self.video_queue.values())[video_index]
-        self.video_capture = cv.VideoCapture(str(self.current_video))
+        self.video_capture = cv.VideoCapture(self.current_video)
         self._set_canvas()
         self._set_frame_slider()
         self._display_video_frame()
