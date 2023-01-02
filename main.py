@@ -184,7 +184,7 @@ class SubtitleExtractor:
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
-        logger.info(f"Subtitle Area: {self.sub_area}")
+        logger.info(f"Subtitle Area: {sub_area}")
 
         # self.view_frames()
         logger.info("Starting to extracting video keyframes...")
@@ -201,10 +201,10 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    logger.debug("Main program Started")
+    logger.debug("Main program Started.")
     test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
     se = SubtitleExtractor()
     for video in test_videos.glob("*.mp4"):
         se.run(video)
 
-    logger.debug("Main program Ended\n\n")
+    logger.debug("Main program Ended.")
