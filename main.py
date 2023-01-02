@@ -170,7 +170,7 @@ class SubtitleExtractor:
 
 if __name__ == '__main__':
     logger.debug("Main program Started.")
-    test_videos = Path(r"C:\Users\VOUN-XPS\Downloads\test videos")
+    test_videos = Path(r"")
     se = SubtitleExtractor()
     for video in test_videos.glob("*.mp4"):
         se.run(str(video))
