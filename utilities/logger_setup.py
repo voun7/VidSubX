@@ -12,7 +12,7 @@ def get_console_handler() -> logging.handlers:
 
 
 def get_file_handler() -> logging.handlers:
-    log_file = "../logs/runtime.log"
+    log_file = "./logs/runtime.log"
     file_handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=7, encoding='utf-8')
     file_handler.namer = my_namer
     file_handler.setLevel(logging.DEBUG)
@@ -23,7 +23,7 @@ def get_file_handler() -> logging.handlers:
 
 def get_logger():
     # Create folder for file logs
-    log_dir = Path(f"{Path.cwd()}/logs")
+    log_dir = Path("./logs")
     if not log_dir.exists():
         log_dir.mkdir()
 
