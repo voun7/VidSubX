@@ -8,7 +8,7 @@ import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
 
-from logger_setup import get_logger
+from utilities.logger_setup import get_logger
 from main import SubtitleExtractor
 
 logger = logging.getLogger(__name__)
@@ -396,7 +396,8 @@ class SubtitleExtractorGUI:
         Method called when window is closed.
         """
         self._stop_run()
-        self.root.quit()
+        self.root.destroy()
+        exit()
 
 
 if __name__ == '__main__':

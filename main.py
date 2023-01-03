@@ -7,8 +7,8 @@ from pathlib import Path
 import cv2 as cv
 from natsort import natsorted
 
-from frames_to_text import frames_to_text
-from video_to_frames import video_to_frames
+from utilities.frames_to_text import frames_to_text
+from utilities.video_to_frames import video_to_frames
 
 logger = logging.getLogger(__name__)
 
