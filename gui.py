@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 get_logger()
 
-SubEx = SubtitleExtractor()
-
 
 class SubtitleExtractorGUI:
+    SubEx = SubtitleExtractor()
+
     def __init__(self, root: ttk) -> None:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -193,7 +193,7 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
-        _, _, frame_width, frame_height, = SubEx.video_details(self.current_video)
+        _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
         frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
         self.video_canvas.configure(width=frame_width, height=frame_height, bg="white")
 
@@ -215,8 +215,8 @@ class SubtitleExtractorGUI:
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
             logger.debug("Subtitle coordinates are None. Being set to default sub area")
-            _, _, frame_width, frame_height, = SubEx.video_details(self.current_video)
-            self._set_sub_area(SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
+            _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
+            self._set_sub_area(self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
 
     def _display_video_frame(self, second: float | int = 0) -> None:
         """
@@ -248,7 +248,7 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        fps, frame_total, _, _ = SubEx.video_details(self.current_video)
+        fps, frame_total, _, _ = self.SubEx.video_details(self.current_video)
         duration = frame_total / fps
 
         self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
@@ -361,7 +361,7 @@ class SubtitleExtractorGUI:
         for video, sub_area in self.video_queue.items():
             if self.interrupt:
                 break
-            SubEx.run(video, sub_area)
+            self.SubEx.run(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self._stop_run()
