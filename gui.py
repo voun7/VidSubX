@@ -61,15 +61,15 @@ class SubtitleExtractorGUI:
         self.root.config(menu=menubar)
 
         # Create menus for menu bar.
-        menu_file = Menu(menubar)
+        self.menu_file = Menu(menubar)
         menu_settings = Menu(menubar)
 
-        menubar.add_cascade(menu=menu_file, label="File")
+        menubar.add_cascade(menu=self.menu_file, label="File")
         menubar.add_cascade(menu=menu_settings, label="Settings")
 
         # Add menu items.
-        menu_file.add_command(label="Open file(s)", command=self.open_files)
-        menu_file.add_command(label="Close", command=self._on_closing)
+        self.menu_file.add_command(label="Open file(s)", command=self.open_files)
+        self.menu_file.add_command(label="Close", command=self._on_closing)
 
         menu_settings.add_command(label="Language", command=self._language_settings)
         menu_settings.add_command(label="Extraction", command=self._extraction_settings)
@@ -364,6 +364,7 @@ class SubtitleExtractorGUI:
             self.running = True
             if utils.process_state():
                 logger.warning("Process interrupted")
+                self.running = False
                 return
             self.SubEx.run(video, sub_area)
             self.progress_bar['value'] += 1
@@ -379,6 +380,7 @@ class SubtitleExtractorGUI:
         utils.interrupt_process(True)
         if not self.running:
             self.run_button.configure(text="Run", command=self._run)
+            self.menu_file.entryconfig("Open file(s)", state="normal")
             self.current_video = None
 
     def _run(self) -> None:
@@ -390,6 +392,7 @@ class SubtitleExtractorGUI:
             utils.interrupt_process(False)
             self.video_capture.release()
             self.run_button.configure(text='Stop', command=self._stop_run)
+            self.menu_file.entryconfig("Open file(s)", state="disabled")
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
