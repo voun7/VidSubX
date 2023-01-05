@@ -365,6 +365,7 @@ class SubtitleExtractorGUI:
             if utils.process_state():
                 logger.warning("Process interrupted")
                 self.running = False
+                self._stop_run()
                 return
             self.SubEx.run(video, sub_area)
             self.progress_bar['value'] += 1
