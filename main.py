@@ -8,6 +8,7 @@ from pathlib import Path
 import cv2 as cv
 from natsort import natsorted
 
+import utilities.utils as utils
 from utilities.frames_to_text import frames_to_text
 from utilities.video_to_frames import video_to_frames
 
@@ -119,20 +120,24 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
 
     def generate_subtitle(self) -> None:
-        self.merge_similar_texts()
-        self.remove_duplicate_texts()
-        subtitles = []
-        line_code = 0
-        for file in natsorted(self.text_output.iterdir()):
-            file_name = file.stem.split("--")
-            line_code += 1
-            frame_start = self.timecode(float(file_name[0]))
-            frame_end = self.timecode(float(file_name[1]))
-            file_content = file.read_text(encoding="utf-8")
-            subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n\n"
-            subtitles.append(subtitle_line)
-        self._save_subtitle(subtitles)
-        logger.info("Subtitle generated!")
+        if not utils.process_state():
+            logger.info("Generating subtitle...")
+            self.merge_similar_texts()
+            self.remove_duplicate_texts()
+            subtitles = []
+            line_code = 0
+            for file in natsorted(self.text_output.iterdir()):
+                file_name = file.stem.split("--")
+                line_code += 1
+                frame_start = self.timecode(float(file_name[0]))
+                frame_end = self.timecode(float(file_name[1]))
+                file_content = file.read_text(encoding="utf-8")
+                subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n\n"
+                subtitles.append(subtitle_line)
+            self._save_subtitle(subtitles)
+            logger.info("Subtitle generated!")
+        else:
+            logger.warning("Subtitle generation process interrupted!")
 
     def run(self, video_path: str, sub_area: tuple = None) -> None:
         """
@@ -161,12 +166,11 @@ class SubtitleExtractor:
         video_to_frames(self.video_path, self.frame_output, sub_area)
         logger.info("Starting to extracting text from frames...")
         frames_to_text(self.frame_output, self.text_output)
-        logger.info("Generating subtitle...")
         self.generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        logger.info(f"Subtitle file generated successfully, Total time: {round(total_time, 3)}s\n")
+        logger.info(f"Subtitle Extraction Done! Total time: {round(total_time, 3)}s\n")
         self.empty_cache()
 
 

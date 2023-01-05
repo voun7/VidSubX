@@ -8,8 +8,9 @@ import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
 
-from utilities.logger_setup import get_logger
+import utilities.utils as utils
 from main import SubtitleExtractor
+from utilities.logger_setup import get_logger
 
 logger = logging.getLogger(__name__)
 
@@ -359,8 +360,9 @@ class SubtitleExtractorGUI:
         self.progress_bar.configure(maximum=queue_len)
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         for video, sub_area in self.video_queue.items():
-            if self.interrupt:
-                break
+            if utils.process_state():
+                logger.warning("Process interrupted")
+                return
             self.SubEx.run(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
@@ -371,7 +373,7 @@ class SubtitleExtractorGUI:
         Stop program from running.
         """
         logger.debug("Stop button clicked")
-        self.interrupt = True
+        utils.interrupt_process(True)
         self.run_button.configure(text="Run", command=self._run)
         self.current_video = None
 
@@ -381,7 +383,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Run button clicked")
         if self.current_video:
-            self.interrupt = False
+            utils.interrupt_process(False)
             self.video_capture.release()
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.video_scale.configure(state="disabled")
