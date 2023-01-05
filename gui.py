@@ -1,4 +1,5 @@
 import logging
+import sys
 from threading import Thread
 from tkinter import *
 from tkinter import filedialog
@@ -28,6 +29,7 @@ class SubtitleExtractorGUI:
         self.current_video = None
         self.video_capture = None
         self.running = False
+        self.console_redirector()
 
     def _create_layout(self) -> None:
         """
@@ -325,11 +327,12 @@ class SubtitleExtractorGUI:
         if filenames:
             logger.debug("Video queue and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
+            self.progress_bar.configure(value=0)
             self.clear_output()
 
             # Add all opened videos to a queue.
             for filename in filenames:
-                self.write_to_output(f"Opened file: {filename}")
+                logger.info(f"Opened file: {filename}")
                 self.video_queue[filename] = None
 
             self._set_video()  # Set one of the opened videos to current video.
@@ -343,15 +346,25 @@ class SubtitleExtractorGUI:
         self.text_output_widget.delete("1.0", "end")
         self.text_output_widget.configure(state="disabled")
 
+    def console_redirector(self) -> None:
+        """
+        Redirect console statements to text widget
+        """
+        sys.stdout.write = self.write_to_output
+        sys.stderr.write = self.write_to_output
+
     def write_to_output(self, text: str) -> None:
         """
         Write text to the output frame's text widget.
         :param text: text to write.
         """
-        self.text_output_widget.configure(state="normal")
-        self.text_output_widget.insert("end", f"{text}\n")
-        self.text_output_widget.see("end")
-        self.text_output_widget.configure(state="disabled")
+        def write(widget: Text, text_inner: str) -> None:
+            widget.configure(state="normal")
+            widget.insert("end", f"{text_inner}")
+            widget.see("end")
+            widget.configure(state="disabled")
+
+        Thread(target=write, args=(self.text_output_widget, text), daemon=True).start()
 
     def extract_subtitle(self) -> None:
         """
@@ -399,7 +412,7 @@ class SubtitleExtractorGUI:
             self._reset_batch_layout()
             Thread(target=self.extract_subtitle, daemon=True).start()
         else:
-            self.write_to_output("No video has been selected!")
+            logger.info("No video has been selected!")
 
     def _on_closing(self) -> None:
         """
