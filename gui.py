@@ -27,6 +27,7 @@ class SubtitleExtractorGUI:
         self.video_queue = {}
         self.current_video = None
         self.video_capture = None
+        self.running = False
 
     def _create_layout(self) -> None:
         """
@@ -360,12 +361,14 @@ class SubtitleExtractorGUI:
         self.progress_bar.configure(maximum=queue_len)
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         for video, sub_area in self.video_queue.items():
+            self.running = True
             if utils.process_state():
                 logger.warning("Process interrupted")
                 return
             self.SubEx.run(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
+        self.running = False
         self._stop_run()
 
     def _stop_run(self) -> None:
@@ -374,8 +377,9 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Stop button clicked")
         utils.interrupt_process(True)
-        self.run_button.configure(text="Run", command=self._run)
-        self.current_video = None
+        if not self.running:
+            self.run_button.configure(text="Run", command=self._run)
+            self.current_video = None
 
     def _run(self) -> None:
         """
