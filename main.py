@@ -55,7 +55,7 @@ class SubtitleExtractor:
             x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
             return x1, y1, x2, y2
 
-    def empty_cache(self) -> None:
+    def _empty_cache(self) -> None:
         """
         Delete all cache files produced during subtitle extraction.
         """
@@ -67,13 +67,13 @@ class SubtitleExtractor:
     def similarity(text1: str, text2: str, similarity_threshold: float = 0.8) -> float:
         return SequenceMatcher(a=text1, b=text2).quick_ratio() > similarity_threshold
 
-    def remove_duplicate_texts(self) -> None:
+    def _remove_duplicate_texts(self) -> None:
         logger.info("Deleting duplicate texts...")
         for file in self.text_output.iterdir():
             if "--" not in file.name:
                 file.unlink()
 
-    def merge_similar_texts(self) -> None:
+    def _merge_similar_texts(self) -> None:
         no_of_files = len(list(self.text_output.iterdir())) - 1
         counter = 0
         starting_file = None
@@ -119,7 +119,7 @@ class SubtitleExtractor:
         with open(name, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
 
-    def generate_subtitle(self) -> None:
+    def _generate_subtitle(self) -> None:
         """
         Use texts in folder to create subtitle file.
         :return:
@@ -130,8 +130,8 @@ class SubtitleExtractor:
             return
 
         logger.info("Generating subtitle...")
-        self.merge_similar_texts()
-        self.remove_duplicate_texts()
+        self._merge_similar_texts()
+        self._remove_duplicate_texts()
         subtitles = []
         line_code = 0
         for file in natsorted(self.text_output.iterdir()):
@@ -150,9 +150,9 @@ class SubtitleExtractor:
         Run through the steps of extracting texts from subtitle area in video.
         """
         start = cv.getTickCount()
-        # Empty cache at the beginning of program run before it recreates itself
-        self.empty_cache()
-        # If the directory does not exist, create the folder
+        # Empty cache at the beginning of program run before it recreates itself.
+        self._empty_cache()
+        # If the directory does not exist, create the folder.
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
         if not self.text_output.exists():
@@ -170,12 +170,12 @@ class SubtitleExtractor:
 
         video_to_frames(self.video_path, self.frame_output, sub_area)
         frames_to_text(self.frame_output, self.text_output)
-        self.generate_subtitle()
+        self._generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         logger.info(f"Subtitle Extraction Done! Total time: {round(total_time, 3)}s\n")
-        self.empty_cache()
+        self._empty_cache()
 
 
 if __name__ == '__main__':
