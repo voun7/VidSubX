@@ -77,6 +77,8 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
         logger.warning("Frame extraction process interrupted!")
         return
 
+    logger.info("Starting to extracting video keyframes...")
+
     capture = cv.VideoCapture(str(video_path))  # load the video
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away

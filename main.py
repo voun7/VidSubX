@@ -164,9 +164,7 @@ class SubtitleExtractor:
         logger.info(f"Resolution: {frame_width} X {frame_height}")
         logger.info(f"Subtitle Area: {sub_area}")
 
-        logger.info("Starting to extracting video keyframes...")
         video_to_frames(self.video_path, self.frame_output, sub_area)
-        logger.info("Starting to extracting text from frames...")
         frames_to_text(self.frame_output, self.text_output)
         self.generate_subtitle()
 

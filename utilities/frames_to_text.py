@@ -42,6 +42,8 @@ def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150,
         logger.warning("Text extraction process interrupted!")
         return
 
+    logger.info("Starting to extracting text from frames...")
+
     files = [file for file in frame_output.iterdir()]
     file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
