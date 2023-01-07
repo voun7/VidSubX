@@ -72,6 +72,10 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
     :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
     :return: path to the directory where the frames were saved, or None if fails
     """
+    # cancel if process has been cancelled.
+    if utils.process_state():
+        logger.warning("Frame extraction process interrupted!")
+        return
 
     capture = cv.VideoCapture(str(video_path))  # load the video
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
@@ -82,7 +86,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
 
     if frame_count < 1:  # if video has no frames, might be and opencv error
         logger.error("Video has no frames. Check your OpenCV installation")
-        return None  # end function call
+        return  # end function call
 
     # split the frames into chunk lists
     frame_chunks = [[i, i + chunk_size] for i in range(0, frame_count, chunk_size)]
@@ -96,13 +100,12 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
     # create a process pool to execute across multiple cpu cores to speed up processing
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
-                   for f in frame_chunks if not utils.process_state()]  # submit the processes: extract_frames(...)
+                   for f in frame_chunks]  # submit the processes: extract_frames(...)
         for i, f in enumerate(as_completed(futures)):  # as each process completes
             error = f.exception()
             if error:
+                logger.exception(f.result())
                 logger.exception(error)
-            if utils.process_state():
-                logger.warning("Frame extraction process interrupted")
-            else:
-                utils.print_progress(i, len(frame_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
+
+            utils.print_progress(i, len(frame_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
     logger.info("Frame Extraction Done!")

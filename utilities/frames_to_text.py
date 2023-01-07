@@ -37,6 +37,11 @@ def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150,
     :param chunk_size: size of files given to each processor
     :param ocr_max_processes: number of processors to be used
     """
+    # cancel if process has been cancelled.
+    if utils.process_state():
+        logger.warning("Text extraction process interrupted!")
+        return
+
     files = [file for file in frame_output.iterdir()]
     file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
@@ -44,14 +49,12 @@ def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150,
     logger.debug("Using multiprocessing for extracting text")
 
     with ProcessPoolExecutor(max_workers=ocr_max_processes) as executor:
-        futures = [executor.submit(extract_text, text_output, files) for files in file_chunks
-                   if not utils.process_state()]
-        for i, f in enumerate(as_completed(futures)):  # as each process completes
+        futures = [executor.submit(extract_text, text_output, files) for files in file_chunks]
+        for i, f in enumerate(as_completed(futures)):  # as each  process completes
             error = f.exception()
             if error:
+                logger.exception(f.result())
                 logger.exception(error)
-            if utils.process_state():
-                logger.warning("Text extraction process interrupted")
-            else:
-                utils.print_progress(i, len(file_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
+
+            utils.print_progress(i, len(file_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
     logger.info("Text Extraction Done!")
