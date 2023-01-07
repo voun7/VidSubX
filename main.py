@@ -175,6 +175,10 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
+    from utilities.logger_setup import get_logger
+
+    get_logger()
+
     logger.debug("Main program Started.")
     test_videos = Path(r"")
     se = SubtitleExtractor()
