@@ -120,6 +120,10 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
 
     def generate_subtitle(self) -> None:
+        """
+        Use texts in folder to create subtitle file.
+        :return:
+        """
         # cancel if process has been cancelled.
         if utils.process_state():
             logger.warning("Subtitle generation process interrupted!")
