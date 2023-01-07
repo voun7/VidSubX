@@ -141,7 +141,6 @@ class SubtitleExtractor:
         self._save_subtitle(subtitles)
         logger.info("Subtitle generated!")
 
-
     def run(self, video_path: str, sub_area: tuple = None) -> None:
         """
         Run through the steps of extracting texts from subtitle area in video.

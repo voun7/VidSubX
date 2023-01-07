@@ -106,6 +106,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
             if error:
                 logger.exception(f.result())
                 logger.exception(error)
-
-            utils.print_progress(i, len(frame_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
+            # print it's progress
+            utils.print_progress(i, len(frame_chunks) - 1, prefix=prefix, suffix='Complete')
+    print()
     logger.info("Frame Extraction Done!")

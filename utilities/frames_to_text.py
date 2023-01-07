@@ -55,6 +55,7 @@ def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150,
             if error:
                 logger.exception(f.result())
                 logger.exception(error)
-
-            utils.print_progress(i, len(file_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
+            # print it's progress
+            utils.print_progress(i, len(file_chunks) - 1, prefix=prefix, suffix='Complete')
+    print()
     logger.info("Text Extraction Done!")
