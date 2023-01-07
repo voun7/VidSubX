@@ -1,21 +1,17 @@
 import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from multiprocessing import Manager, Event
 from pathlib import Path
 
 import cv2 as cv
-from tqdm import tqdm
 
 import utilities.utils as utils
 
 logger = logging.getLogger(__name__)
 
 
-def extract_frames(event: Event, video_path: Path, frames_dir: Path, key_area: tuple,
-                   start: int, end: int, every: int) -> int | None:
+def extract_frames(video_path: Path, frames_dir: Path, key_area: tuple, start: int, end: int, every: int) -> int | None:
     """
     Extract frames from a video using OpenCVs VideoCapture
-    :param event: an event used to stop running tasks
     :param video_path: path of the video
     :param frames_dir: the directory to save the frames
     :param key_area: coordinates of the frame containing subtitle
@@ -38,10 +34,6 @@ def extract_frames(event: Event, video_path: Path, frames_dir: Path, key_area: t
     saved_count = 0  # a count of how many frames we have saved
 
     while frame < end:  # let's loop through the frames until the end
-
-        # check if the task should stop
-        if event.is_set():
-            return
 
         _, image = capture.read()  # read an image from the capture
 
@@ -101,24 +93,16 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
     prefix = "Extracting frames from video chunks"  # a prefix string to be printed in progress bar
     logger.debug("Using multiprocessing for extracting frames")
 
-    with Manager() as manager:
-        # create an event used to stop running tasks
-        event = manager.Event()
-
-        # create a process pool to execute across multiple cpu cores to speed up processing
-        with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(extract_frames, event, video_path, frames_dir, key_area, f[0], f[1], every)
-                       for f in frame_chunks if not utils.process_state()]  # submit the processes: extract_frames(...)
-            pbar = tqdm(total=len(frame_chunks), desc=prefix, colour="green")
-            for f in as_completed(futures):  # as each process completes
-                error = f.exception()
-                if error:
-                    logger.exception(error)
-                if utils.process_state():
-                    logger.warning("Frame extraction process interrupted")
-                    f.cancel()
-                    event.set()
-                else:
-                    pbar.update()
-            pbar.close()
+    # create a process pool to execute across multiple cpu cores to speed up processing
+    with ProcessPoolExecutor() as executor:
+        futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
+                   for f in frame_chunks if not utils.process_state()]  # submit the processes: extract_frames(...)
+        for i, f in enumerate(as_completed(futures)):  # as each process completes
+            error = f.exception()
+            if error:
+                logger.exception(error)
+            if utils.process_state():
+                logger.warning("Frame extraction process interrupted")
+            else:
+                utils.print_progress(i, len(frame_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
     logger.info("Frame Extraction Done!")

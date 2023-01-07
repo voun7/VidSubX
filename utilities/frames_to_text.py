@@ -1,9 +1,6 @@
 import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from multiprocessing import Manager, Event
 from pathlib import Path
-
-from tqdm import tqdm
 
 import utilities.utils as utils
 from paddleocr import PaddleOCR
@@ -13,20 +10,15 @@ logger = logging.getLogger(__name__)
 paddle_ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
 
 
-def extract_text(event: Event, text_output: Path, files: list) -> int | None:
+def extract_text(text_output: Path, files: list) -> int | None:
     """
     Extract text from a frame using paddle ocr
-    :param event: an event used to stop running tasks
     :param text_output: directory for extracted texts
     :param files: files with text for extraction
     :return: count of texts extracted
     """
     saved_count = 0
     for file in files:
-        # check if the task should stop
-        if event.is_set():
-            return
-
         saved_count += 1
         name = Path(f"{text_output}/{file.stem}.txt")
         result = paddle_ocr.ocr(str(file), cls=True)
@@ -51,23 +43,15 @@ def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150,
     prefix = "Extracting text from frame chunks"
     logger.debug("Using multiprocessing for extracting text")
 
-    with Manager() as manager:
-        # create an event used to stop running tasks
-        event = manager.Event()
-
-        with ProcessPoolExecutor(max_workers=ocr_max_processes) as executor:
-            futures = [executor.submit(extract_text, event, text_output, files)
-                       for files in file_chunks if not utils.process_state()]
-            pbar = tqdm(total=len(file_chunks), desc=prefix, colour="green")
-            for f in as_completed(futures):
-                error = f.exception()
-                if error:
-                    logger.exception(error)
-                if utils.process_state():
-                    logger.warning("Text extraction process interrupted")
-                    f.cancel()
-                    event.set()
-                else:
-                    pbar.update()
-            pbar.close()
+    with ProcessPoolExecutor(max_workers=ocr_max_processes) as executor:
+        futures = [executor.submit(extract_text, text_output, files) for files in file_chunks
+                   if not utils.process_state()]
+        for i, f in enumerate(as_completed(futures)):  # as each process completes
+            error = f.exception()
+            if error:
+                logger.exception(error)
+            if utils.process_state():
+                logger.warning("Text extraction process interrupted")
+            else:
+                utils.print_progress(i, len(file_chunks) - 1, prefix=prefix, suffix='Complete')  # print it's progress
     logger.info("Text Extraction Done!")
