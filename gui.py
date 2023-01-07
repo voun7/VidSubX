@@ -315,7 +315,7 @@ class SubtitleExtractorGUI:
 
     def open_files(self) -> None:
         """
-        Open file dialog to select a file then call required methods.
+        Open file dialog to select a file or files then call required methods.
         """
         logger.debug("Open button clicked")
 
@@ -326,7 +326,7 @@ class SubtitleExtractorGUI:
         # This condition prevents the below methods from being called
         # when button is clicked but no files are selected.
         if filenames:
-            logger.debug("Video queue and text widget output cleared")
+            logger.debug("New files have been selected, video queue, and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.progress_bar.configure(value=0)
             self.clear_output()
@@ -405,9 +405,9 @@ class SubtitleExtractorGUI:
         logger.debug("Run button clicked")
         if self.current_video:
             utils.interrupt_process(False)
-            self.video_capture.release()
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.menu_file.entryconfig("Open file(s)", state="disabled")
+            self.video_capture.release()
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
