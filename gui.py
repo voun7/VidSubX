@@ -26,6 +26,7 @@ class SubtitleExtractorGUI:
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
         self.video_queue = {}
+        self.vse_thread = Thread(target=self.extract_subtitle)
         self.current_video = None
         self.video_capture = None
         self.running = False
@@ -410,7 +411,7 @@ class SubtitleExtractorGUI:
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
-            Thread(target=self.extract_subtitle, daemon=True).start()
+            self.vse_thread.start()
         else:
             logger.info("No video has been selected!")
 
@@ -424,7 +425,7 @@ class SubtitleExtractorGUI:
 
 
 if __name__ == '__main__':
-    logger.debug("GUI program Started.")
+    logger.debug("\n\nGUI program Started.")
     rt = Tk()
     SubtitleExtractorGUI(rt)
     rt.mainloop()
