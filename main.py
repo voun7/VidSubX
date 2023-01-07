@@ -122,7 +122,7 @@ class SubtitleExtractor:
 
     def _generate_subtitle(self) -> None:
         """
-        Use texts in folder to create subtitle file.
+        Use text files in folder to create subtitle file.
         :return:
         """
         # cancel if process has been cancelled.
@@ -148,7 +148,7 @@ class SubtitleExtractor:
 
     def run(self, video_path: str, sub_area: tuple = None) -> None:
         """
-        Run through the steps of extracting texts from subtitle area in video.
+        Run through the steps of extracting texts from subtitle area in video to create subtitle.
         """
         start = cv.getTickCount()
         # Empty cache at the beginning of program run before it recreates itself.
