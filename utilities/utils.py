@@ -1,4 +1,7 @@
+import logging
 import sys
+
+logger = logging.getLogger(__name__)
 
 INTERRUPT_PROCESS = False
 
@@ -6,6 +9,7 @@ INTERRUPT_PROCESS = False
 def interrupt_process(condition: bool) -> None:
     global INTERRUPT_PROCESS
     INTERRUPT_PROCESS = condition
+    logger.debug(f"INTERRUPT_PROCESS set to: {INTERRUPT_PROCESS}")
 
 
 def process_state() -> bool:
