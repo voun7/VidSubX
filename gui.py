@@ -219,7 +219,7 @@ class SubtitleExtractorGUI:
             x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
             self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
-            logger.debug("Subtitle coordinates are None. Being set to default sub area")
+            logger.debug("Subtitle coordinates are None.")
             _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
             self._set_sub_area(self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
 
@@ -359,6 +359,7 @@ class SubtitleExtractorGUI:
         Write text to the output frame's text widget.
         :param text: text to write.
         """
+
         def write(widget: Text, text_inner: str) -> None:
             widget.configure(state="normal")
             widget.insert("end", f"{text_inner}")

@@ -52,6 +52,7 @@ class SubtitleExtractor:
         if sub_area:
             return sub_area
         else:
+            logger.debug("Subtitle area being set to default sub area")
             x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
             return x1, y1, x2, y2
 
