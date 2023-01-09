@@ -1,5 +1,4 @@
 import logging
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ def process_state() -> bool:
     return INTERRUPT_PROCESS
 
 
-def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=50):
+def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=25):
     """
     Call in a loop to create standard out progress bar
     :param iteration: current iteration
@@ -32,5 +31,4 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_lengt
     percents = format_str.format(100 * (iteration / float(total)))  # calculate the % done
     filled_length = int(round(bar_length * iteration / float(total)))  # calculate the filled bar length
     bar = '#' * filled_length + '-' * (bar_length - filled_length)  # generate the bar string
-    sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, bar, percents, '%', suffix))  # write out the bar
-    sys.stdout.flush()  # flush to stdout
+    logger.info(f"{prefix} |{bar}| {percents}% {suffix}")
