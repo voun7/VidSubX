@@ -31,4 +31,5 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_lengt
     percents = format_str.format(100 * (iteration / float(total)))  # calculate the % done
     filled_length = int(round(bar_length * iteration / float(total)))  # calculate the filled bar length
     bar = '#' * filled_length + '-' * (bar_length - filled_length)  # generate the bar string
+    # print(f"\r{prefix} |{bar}| {percents}% {suffix}", end='', flush=True)  # prints progress on the same line
     logger.info(f"{prefix} |{bar}| {percents}% {suffix}")
