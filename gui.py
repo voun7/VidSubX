@@ -359,14 +359,10 @@ class SubtitleExtractorGUI:
         Write text to the output frame's text widget.
         :param text: text to write.
         """
-
-        def write(widget: Text, text_inner: str) -> None:
-            widget.configure(state="normal")
-            widget.insert("end", f"{text_inner}")
-            widget.see("end")
-            widget.configure(state="disabled")
-
-        Thread(target=write, args=(self.text_output_widget, text), daemon=True).start()
+        self.text_output_widget.configure(state="normal")
+        self.text_output_widget.insert("end", f"{text}")
+        self.text_output_widget.see("end")
+        self.text_output_widget.configure(state="disabled")
 
     def extract_subtitle(self) -> None:
         """
@@ -394,6 +390,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Stop button clicked")
         utils.interrupt_process(True)
+        # self.vse_thread.join()
         if not self.running:
             self.run_button.configure(text="Run", command=self._run)
             self.menu_file.entryconfig("Open file(s)", state="normal")
