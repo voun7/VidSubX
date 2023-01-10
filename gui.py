@@ -329,7 +329,7 @@ class SubtitleExtractorGUI:
             logger.debug("New files have been selected, video queue, and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.progress_bar.configure(value=0)
-            self.clear_output()
+            self.set_output()
 
             # Add all opened videos to a queue.
             for filename in filenames:
@@ -338,15 +338,6 @@ class SubtitleExtractorGUI:
 
             self._set_video()  # Set one of the opened videos to current video.
 
-    def clear_output(self) -> None:
-        """
-        Removes all the text in the text output widget.
-        """
-        logger.debug("Text output cleared")
-        self.text_output_widget.configure(state="normal")
-        self.text_output_widget.delete("1.0", "end")
-        self.text_output_widget.configure(state="disabled")
-
     def console_redirector(self) -> None:
         """
         Redirect console statements to text widget
@@ -354,11 +345,23 @@ class SubtitleExtractorGUI:
         sys.stdout.write = self.write_to_output
         sys.stderr.write = self.write_to_output
 
+    def set_output(self, text: str = None) -> None:
+        if text is None:
+            logger.debug("Text output cleared")
+            self.text_output_widget.configure(state="normal")
+            self.text_output_widget.delete("1.0", "end")
+            self.text_output_widget.configure(state="disabled")
+            return
+
+        if text:
+            return text
+
     def write_to_output(self, text: str) -> None:
         """
         Write text to the output frame's text widget.
         :param text: text to write.
         """
+        self.set_output(text)
         self.text_output_widget.configure(state="normal")
         self.text_output_widget.insert("end", f"{text}")
         self.text_output_widget.see("end")
