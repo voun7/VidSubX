@@ -344,7 +344,7 @@ class SubtitleExtractorGUI:
         Redirect console statements to text widget
         """
         sys.stdout.write = self.write_to_output
-        sys.stderr.write = self.write_to_output
+        # sys.stderr.write = self.write_to_output
 
     def set_output(self, text: str = None) -> None:
         """
