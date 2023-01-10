@@ -1,6 +1,7 @@
 import logging
 import re
 import sys
+from functools import partial
 from threading import Thread
 from tkinter import *
 from tkinter import filedialog
@@ -89,8 +90,8 @@ class SubtitleExtractorGUI:
         # Create canvas widget in video frame.
         self.canvas = Canvas(video_frame, bg="black", cursor="tcross")
         self.canvas.grid(column=0, row=0)
-        self.canvas.bind("<Button-1>", self._canvas_mouse_click)
-        self.canvas.bind("<B1-Motion>", self._canvas_mouse_click_and_move)
+        self.canvas.bind("<Button-1>", self._on_click)
+        self.canvas.bind("<B1-Motion>", self._on_motion)
 
         # Create frame slider widget in video frame.
         self.video_scale = ttk.Scale(video_frame, command=self._frame_slider, orient=HORIZONTAL, length=600,
@@ -205,22 +206,6 @@ class SubtitleExtractorGUI:
         frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
         self.canvas.configure(width=frame_width, height=frame_height, bg="white")
 
-    def _canvas_mouse_click(self, event):
-        # find rectangle items under mouse cursor
-        items = [x for x in self.canvas.find_withtag("current") if self.canvas.type(x) == "rectangle"]
-        if items:
-            # item found, use it as the "current" item
-            self.start = self.canvas.coords(items[0])[:2]
-            self.current = items[0]
-        else:
-            # no item found, create new "current" rectangle item
-            self.start = event.x, event.y
-            self.current = self.canvas.create_rectangle(*self.start, *self.start, width=4)
-
-    def _canvas_mouse_click_and_move(self, event):
-        # resize the "current" item
-        self.canvas.coords(self.current, *self.start, event.x, event.y)
-
     def _set_sub_area(self, subtitle_area: tuple) -> None:
         """
         Set current video subtitle area to new area.
@@ -228,6 +213,33 @@ class SubtitleExtractorGUI:
         """
         self.current_sub_area = subtitle_area
         self.video_queue[f"{self.current_video}"] = self.current_sub_area
+
+    def _on_click(self, event):
+        """
+        Fires when user clicks on the background ... creates a new rectangle
+        """
+        self.mouse_start = event.x, event.y
+        self.current = self.canvas.create_rectangle(*self.mouse_start, *self.mouse_start, width=5)
+        self.canvas.bind('<Button-1>', partial(self._on_click_rectangle, self.current))
+        self.canvas.bind('<B1-Motion>', self._on_motion)
+
+    def _on_click_rectangle(self, tag, event):
+        """
+        Fires when the user clicks on a rectangle ... edits the clicked on rectangle
+        """
+        x1, y1, x2, y2 = self.canvas.coords(tag)
+        if abs(event.x - x1) < abs(event.x - x2):
+            # opposing side was grabbed; swap the anchor and mobile side
+            x1, x2 = x2, x1
+        if abs(event.y - y1) < abs(event.y - y2):
+            y1, y2 = y2, y1
+        self.mouse_start = x1, y1
+
+    def _on_motion(self, event):
+        """
+        Fires when the user drags the mouse ... resizes currently active rectangle
+        """
+        self.canvas.coords(self.current, *self.mouse_start, event.x, event.y)
 
     def draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, border_color: str = "green") -> None:
         """
@@ -237,10 +249,10 @@ class SubtitleExtractorGUI:
             logger.debug(f"Subtitle coordinates are not None. {subtitle_area}")
             x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
             self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
-        else:
-            logger.debug("Subtitle coordinates are None.")
-            _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
-            self._set_sub_area(self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
+        # else:
+        #     logger.debug("Subtitle coordinates are None.")
+        #     _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
+        #     self._set_sub_area(self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
 
     def _display_video_frame(self, second: float | int = 0) -> None:
         """
