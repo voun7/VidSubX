@@ -361,7 +361,6 @@ class SubtitleExtractorGUI:
         if progress_pattern.search(text):
             previous_line = self.text_output_widget.get("end-2l", "end-1l")
             if progress_pattern.search(previous_line):
-                logger.debug(f"pattern found ----- {previous_line}")
                 self.text_output_widget.configure(state="normal")
                 self.text_output_widget.delete("end-2l", "end-1l")
                 self.text_output_widget.configure(state="disabled")
