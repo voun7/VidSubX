@@ -87,10 +87,10 @@ class SubtitleExtractorGUI:
         video_frame.grid(column=0, row=0)
 
         # Create canvas widget in video frame.
-        self.video_canvas = Canvas(video_frame, bg="black", cursor="tcross")
-        self.video_canvas.grid(column=0, row=0)
-        self.video_canvas.bind("<Button-1>", self._canvas_mouse_click)
-        self.video_canvas.bind("<B1-Motion>", self._canvas_mouse_click_and_move)
+        self.canvas = Canvas(video_frame, bg="black", cursor="tcross")
+        self.canvas.grid(column=0, row=0)
+        self.canvas.bind("<Button-1>", self._canvas_mouse_click)
+        self.canvas.bind("<B1-Motion>", self._canvas_mouse_click_and_move)
 
         # Create frame slider widget in video frame.
         self.video_scale = ttk.Scale(video_frame, command=self._frame_slider, orient=HORIZONTAL, length=600,
@@ -203,23 +203,23 @@ class SubtitleExtractorGUI:
         logger.debug("Setting canvas size")
         _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
         frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
-        self.video_canvas.configure(width=frame_width, height=frame_height, bg="white")
+        self.canvas.configure(width=frame_width, height=frame_height, bg="white")
 
     def _canvas_mouse_click(self, event):
         # find rectangle items under mouse cursor
-        items = [x for x in self.video_canvas.find_withtag("current") if self.video_canvas.type(x) == "rectangle"]
+        items = [x for x in self.canvas.find_withtag("current") if self.canvas.type(x) == "rectangle"]
         if items:
             # item found, use it as the "current" item
-            self.start = self.video_canvas.coords(items[0])[:2]
+            self.start = self.canvas.coords(items[0])[:2]
             self.current = items[0]
         else:
             # no item found, create new "current" rectangle item
             self.start = event.x, event.y
-            self.current = self.video_canvas.create_rectangle(*self.start, *self.start, width=4)
+            self.current = self.canvas.create_rectangle(*self.start, *self.start, width=4)
 
     def _canvas_mouse_click_and_move(self, event):
         # resize the "current" item
-        self.video_canvas.coords(self.current, *self.start, event.x, event.y)
+        self.canvas.coords(self.current, *self.start, event.x, event.y)
 
     def _set_sub_area(self, subtitle_area: tuple) -> None:
         """
@@ -236,7 +236,7 @@ class SubtitleExtractorGUI:
         if subtitle_area:
             logger.debug(f"Subtitle coordinates are not None. {subtitle_area}")
             x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
-            self.video_canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
+            self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
         else:
             logger.debug("Subtitle coordinates are None.")
             _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
@@ -255,8 +255,8 @@ class SubtitleExtractorGUI:
 
         img = Image.fromarray(frame_resized)
         photo = ImageTk.PhotoImage(image=img)
-        self.video_canvas.create_image(0, 0, image=photo, anchor=NW)
-        self.video_canvas.image = photo
+        self.canvas.create_image(0, 0, image=photo, anchor=NW)
+        self.canvas.image = photo
 
     def _frame_slider(self, scale_value: str) -> None:
         """
