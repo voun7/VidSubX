@@ -61,15 +61,15 @@ class SubtitleExtractorGUI:
         self.root.option_add('*tearOff', FALSE)
 
         # Create menu bar in root window.
-        menubar = Menu(self.root)
-        self.root.config(menu=menubar)
+        self.menubar = Menu(self.root)
+        self.root.config(menu=self.menubar)
 
         # Create menus for menu bar.
-        self.menu_file = Menu(menubar)
-        menu_settings = Menu(menubar)
+        self.menu_file = Menu(self.menubar)
+        menu_settings = Menu(self.menubar)
 
-        menubar.add_cascade(menu=self.menu_file, label="File")
-        menubar.add_cascade(menu=menu_settings, label="Settings")
+        self.menubar.add_cascade(menu=self.menu_file, label="File")
+        self.menubar.add_cascade(menu=menu_settings, label="Settings")
 
         # Add menu items.
         self.menu_file.add_command(label="Open file(s)", command=self.open_files)
@@ -407,6 +407,7 @@ class SubtitleExtractorGUI:
         if not self.running:
             self.run_button.configure(text="Run", command=self._run)
             self.menu_file.entryconfig("Open file(s)", state="normal")
+            self.menubar.entryconfig("Settings", state="normal")
             self.current_video = None
 
     def _run(self) -> None:
@@ -418,6 +419,7 @@ class SubtitleExtractorGUI:
             utils.interrupt_process(False)
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.menu_file.entryconfig("Open file(s)", state="disabled")
+            self.menubar.entryconfig("Settings", state="disabled")
             self.video_capture.release()
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
