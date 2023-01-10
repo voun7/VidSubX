@@ -273,7 +273,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Setting frame slider")
         fps, frame_total, _, _ = self.SubEx.video_details(self.current_video)
-        duration = frame_total / fps
+        duration = (frame_total / fps) - 1
 
         self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
 
