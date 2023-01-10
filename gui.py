@@ -1,4 +1,5 @@
 import logging
+import re
 import sys
 from threading import Thread
 from tkinter import *
@@ -346,6 +347,9 @@ class SubtitleExtractorGUI:
         sys.stderr.write = self.write_to_output
 
     def set_output(self, text: str = None) -> None:
+        """
+        Clear all text or clear progress repetition in text widget.
+        """
         if text is None:
             logger.debug("Text output cleared")
             self.text_output_widget.configure(state="normal")
@@ -353,8 +357,14 @@ class SubtitleExtractorGUI:
             self.text_output_widget.configure(state="disabled")
             return
 
-        if text:
-            return text
+        progress_pattern = re.compile(r'.+\s\|[#-]+\|\s[\d.]+%\s')
+        if progress_pattern.search(text):
+            previous_line = self.text_output_widget.get("end-2l", "end-1l")
+            if progress_pattern.search(previous_line):
+                logger.debug(f"pattern found ----- {previous_line}")
+                self.text_output_widget.configure(state="normal")
+                self.text_output_widget.delete("end-2l", "end-1l")
+                self.text_output_widget.configure(state="disabled")
 
     def write_to_output(self, text: str) -> None:
         """
