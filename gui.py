@@ -216,11 +216,10 @@ class SubtitleExtractorGUI:
 
     def _on_click(self, event):
         """
-        Fires when user clicks on the background ... creates a new rectangle
+        Fires when user clicks on the background ... binds to current rectangle
         """
         self.mouse_start = event.x, event.y
-        self.current = self.canvas.create_rectangle(*self.mouse_start, *self.mouse_start, width=5)
-        self.canvas.bind('<Button-1>', partial(self._on_click_rectangle, self.current))
+        self.canvas.bind('<Button-1>', partial(self._on_click_rectangle, self.current_sub_rect))
         self.canvas.bind('<B1-Motion>', self._on_motion)
 
     def _on_click_rectangle(self, tag, event):
@@ -239,20 +238,24 @@ class SubtitleExtractorGUI:
         """
         Fires when the user drags the mouse ... resizes currently active rectangle
         """
-        self.canvas.coords(self.current, *self.mouse_start, event.x, event.y)
+        self.canvas.coords(self.current_sub_rect, *self.mouse_start, event.x, event.y)
+        rect_coords = tuple(self.canvas.coords(self.current_sub_rect))
+        self._set_sub_area(self.rescale(subtitle_area=rect_coords, scale=2))
 
-    def draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, border_color: str = "green") -> None:
+    def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
-        if subtitle_area:
-            logger.debug(f"Subtitle coordinates are not None. {subtitle_area}")
-            x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
-            self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=border_color)
-        # else:
-        #     logger.debug("Subtitle coordinates are None.")
-        #     _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
-        #     self._set_sub_area(self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area))
+        print("current sub area:", subtitle_area)
+        if subtitle_area is None:
+            logger.debug("Subtitle coordinates are None.")
+            _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
+            def_sub = self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area)
+            self._set_sub_area(def_sub)
+            x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
+            self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
+        else:
+            self.canvas.tag_raise(self.current_sub_rect)
 
     def _display_video_frame(self, second: float | int = 0) -> None:
         """
@@ -277,7 +280,7 @@ class SubtitleExtractorGUI:
         """
         scale_value = float(scale_value)
         self._display_video_frame(scale_value)
-        self.draw_subtitle_area(self.current_sub_area)
+        self._draw_subtitle_area(self.current_sub_area)
 
     def _set_frame_slider(self) -> None:
         """
@@ -339,7 +342,7 @@ class SubtitleExtractorGUI:
         self._set_canvas()
         self._set_frame_slider()
         self._display_video_frame()
-        self.draw_subtitle_area(self.current_sub_area)
+        self._draw_subtitle_area(self.current_sub_area)
 
         if len(self.video_queue) > 1:
             self._set_batch_layout()
