@@ -1,7 +1,6 @@
 import logging
 import re
 import sys
-from functools import partial
 from threading import Thread
 from tkinter import *
 from tkinter import filedialog
@@ -219,14 +218,14 @@ class SubtitleExtractorGUI:
         Fires when user clicks on the background ... binds to current rectangle
         """
         self.mouse_start = event.x, event.y
-        self.canvas.bind('<Button-1>', partial(self._on_click_rectangle, self.current_sub_rect))
+        self.canvas.bind('<Button-1>', self._on_click_rectangle)
         self.canvas.bind('<B1-Motion>', self._on_motion)
 
-    def _on_click_rectangle(self, tag, event):
+    def _on_click_rectangle(self, event):
         """
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle
         """
-        x1, y1, x2, y2 = self.canvas.coords(tag)
+        x1, y1, x2, y2 = self.canvas.coords(self.current_sub_rect)
         if abs(event.x - x1) < abs(event.x - x2):
             # opposing side was grabbed; swap the anchor and mobile side
             x1, x2 = x2, x1
