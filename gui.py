@@ -188,7 +188,7 @@ class SubtitleExtractorGUI:
             y1 = y1 * scale
             x2 = x2 * scale
             y2 = y2 * scale
-            return x1, y1, x2, y2
+            return int(x1), int(y1), int(x2), int(y2)
 
         if resolution:
             frame_width, frame_height = resolution
