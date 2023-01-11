@@ -246,7 +246,6 @@ class SubtitleExtractorGUI:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
-        print("current sub area:", subtitle_area)
         if subtitle_area is None:
             logger.debug("Subtitle coordinates are None.")
             _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
@@ -255,6 +254,7 @@ class SubtitleExtractorGUI:
             x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
             self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
         else:
+            self.canvas.coords(self.current_sub_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.current_sub_rect)
 
     def _display_video_frame(self, second: float | int = 0) -> None:
