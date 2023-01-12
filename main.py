@@ -65,7 +65,7 @@ class SubtitleExtractor:
             logger.debug("Emptying cache...")
 
     @staticmethod
-    def similarity(text1: str, text2: str, similarity_threshold: float = 0.8) -> float:
+    def similarity(text1: str, text2: str, similarity_threshold: float = 0.6) -> float:
         return SequenceMatcher(a=text1, b=text2).quick_ratio() > similarity_threshold
 
     def _remove_duplicate_texts(self) -> None:
