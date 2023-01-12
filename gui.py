@@ -462,7 +462,7 @@ class SubtitleExtractorGUI:
         Method called when window is closed.
         """
         self._stop_run()
-        self.root.destroy()
+        self.root.quit()
         exit()
 
 
