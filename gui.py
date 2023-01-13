@@ -74,8 +74,9 @@ class SubtitleExtractorGUI:
         self.menu_file.add_command(label="Open file(s)", command=self.open_files)
         self.menu_file.add_command(label="Close", command=self._on_closing)
 
-        menu_settings.add_command(label="Language", command=self._language_settings)
-        menu_settings.add_command(label="Extraction", command=self._extraction_settings)
+        menu_settings.add_command(label="UI Language", command=self._language_settings)
+        menu_settings.add_command(label="Frame Extraction", command=self._extraction_settings)
+        menu_settings.add_command(label="Text Extraction", command=self._extraction_settings)
 
     def _video_frame(self) -> None:
         """
