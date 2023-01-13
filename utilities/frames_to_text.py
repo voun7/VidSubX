@@ -7,7 +7,7 @@ from paddleocr import PaddleOCR
 
 logger = logging.getLogger(__name__)
 
-paddle_ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
+paddle_ocr = PaddleOCR(use_angle_cls=True, lang='ch', drop_score=0.8, show_log=False)
 
 
 def extract_text(text_output: Path, files: list) -> int | None:
@@ -19,13 +19,15 @@ def extract_text(text_output: Path, files: list) -> int | None:
     """
     saved_count = 0
     for file in files:
-        saved_count += 1
-        name = Path(f"{text_output}/{file.stem}.txt")
-        result = paddle_ocr.ocr(str(file), cls=True)
-        if result[0]:
-            text = result[0][0][1][0]
+        result = paddle_ocr.ocr(str(file))
+        result = result[0]
+        if result:
+            text_list = [line[1][0] for line in result]
+            text = "".join(text_list)
+            name = Path(f"{text_output}/{file.stem}.txt")
             with open(name, 'w', encoding="utf-8") as text_file:
                 text_file.write(text)
+        saved_count += 1
     return saved_count
 
 
