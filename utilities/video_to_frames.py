@@ -72,7 +72,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
     :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
     :return: path to the directory where the frames were saved, or None if fails
     """
-    # cancel if process has been cancelled.
+    # cancel if process has been cancelled by gui.
     if utils.process_state():
         logger.warning("Frame extraction process interrupted!")
         return

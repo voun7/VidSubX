@@ -125,7 +125,7 @@ class SubtitleExtractor:
         Use text files in folder to create subtitle file.
         :return:
         """
-        # cancel if process has been cancelled.
+        # cancel if process has been cancelled by gui.
         if utils.process_state():
             logger.warning("Subtitle generation process interrupted!")
             return
