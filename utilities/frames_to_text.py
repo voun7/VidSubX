@@ -23,7 +23,7 @@ def extract_text(text_output: Path, files: list) -> int | None:
         result = result[0]
         if result:
             text_list = [line[1][0] for line in result]
-            text = "".join(text_list)
+            text = " ".join(text_list)
             name = Path(f"{text_output}/{file.stem}.txt")
             with open(name, 'w', encoding="utf-8") as text_file:
                 text_file.write(text)
