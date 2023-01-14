@@ -185,8 +185,7 @@ if __name__ == '__main__':
     get_logger()
 
     logger.debug("\n\nMain program Started.")
-    test_videos = Path(r"")
+    test_video = Path(r"")
     se = SubtitleExtractor()
-    for video in test_videos.glob("*.mp4"):
-        se.run(str(video))
+    se.run(str(test_video))
     logger.debug("Main program Ended.\n\n")
