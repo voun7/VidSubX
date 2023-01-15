@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 paddle_ocr = PaddleOCR(use_angle_cls=True, lang='ch', drop_score=0.8, show_log=False)
 
 
-def extract_text(text_output: Path, files: list) -> int | None:
+def extract_text(text_output: Path, files: list) -> int:
     """
     Extract text from a frame using paddle ocr
     :param text_output: directory for extracted texts
