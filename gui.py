@@ -363,6 +363,7 @@ class SubtitleExtractorGUI:
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.progress_bar.configure(value=0)
             self.set_output()
+            self.canvas.bind("<B1-Motion>", self._on_motion)  # Enable mouse on canvas.
 
             # Add all opened videos to a queue.
             for filename in filenames:
@@ -450,6 +451,7 @@ class SubtitleExtractorGUI:
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.menu_file.entryconfig("Open file(s)", state="disabled")
             self.menubar.entryconfig("Settings", state="disabled")
+            self.canvas.unbind("<B1-Motion>")
             self.video_capture.release()
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
