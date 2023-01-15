@@ -209,14 +209,16 @@ class SubtitleExtractor:
             return
 
         logger.info("Generating subtitle...")
-        self._merge_adjacent_equal_texts("--")
-        self._remove_duplicate_texts("--")
-        self._merge_adjacent_similar_texts("--", "---")
-        self._remove_duplicate_texts("---")
+        div1 = "--"
+        div2 = "---"
+        self._merge_adjacent_equal_texts(div1)
+        self._remove_duplicate_texts(div1)
+        self._merge_adjacent_similar_texts(div1, div2)
+        self._remove_duplicate_texts(div2)
         subtitles = []
         line_code = 0
         for file in natsorted(self.text_output.iterdir()):
-            file_name = file.stem.split("---")
+            file_name = file.stem.split(div2)
             line_code += 1
             frame_start = self.timecode(float(file_name[0]))
             frame_end = self.timecode(float(file_name[1]))
