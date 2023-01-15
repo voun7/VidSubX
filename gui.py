@@ -225,21 +225,23 @@ class SubtitleExtractorGUI:
         """
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle
         """
-        x1, y1, x2, y2 = self.canvas.coords(self.current_sub_rect)
-        if abs(event.x - x1) < abs(event.x - x2):
-            # opposing side was grabbed; swap the anchor and mobile side
-            x1, x2 = x2, x1
-        if abs(event.y - y1) < abs(event.y - y2):
-            y1, y2 = y2, y1
-        self.mouse_start = x1, y1
+        if self.current_video:
+            x1, y1, x2, y2 = self.canvas.coords(self.current_sub_rect)
+            if abs(event.x - x1) < abs(event.x - x2):
+                # opposing side was grabbed; swap the anchor and mobile side
+                x1, x2 = x2, x1
+            if abs(event.y - y1) < abs(event.y - y2):
+                y1, y2 = y2, y1
+            self.mouse_start = x1, y1
 
     def _on_motion(self, event):
         """
         Fires when the user drags the mouse ... resizes currently active rectangle
         """
-        self.canvas.coords(self.current_sub_rect, *self.mouse_start, event.x, event.y)
-        rect_coords = tuple(self.canvas.coords(self.current_sub_rect))
-        self._set_sub_area(self.rescale(subtitle_area=rect_coords, scale=2))
+        if self.current_video:
+            self.canvas.coords(self.current_sub_rect, *self.mouse_start, event.x, event.y)
+            rect_coords = tuple(self.canvas.coords(self.current_sub_rect))
+            self._set_sub_area(self.rescale(subtitle_area=rect_coords, scale=2))
 
     def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
         """
