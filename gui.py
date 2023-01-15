@@ -65,18 +65,13 @@ class SubtitleExtractorGUI:
 
         # Create menus for menu bar.
         self.menu_file = Menu(self.menubar)
-        menu_settings = Menu(self.menubar)
 
         self.menubar.add_cascade(menu=self.menu_file, label="File")
-        self.menubar.add_cascade(menu=menu_settings, label="Settings")
+        self.menubar.add_command(label="Preferences", command=self._preferences)
 
-        # Add menu items.
+        # Add menu items to file menu.
         self.menu_file.add_command(label="Open file(s)", command=self.open_files)
         self.menu_file.add_command(label="Close", command=self._on_closing)
-
-        menu_settings.add_command(label="UI Language", command=self._language_settings)
-        menu_settings.add_command(label="Frame Extraction", command=self._extraction_settings)
-        menu_settings.add_command(label="Text Extraction", command=self._extraction_settings)
 
     def _video_frame(self) -> None:
         """
@@ -164,11 +159,8 @@ class SubtitleExtractorGUI:
         self.previous_button.grid(column=2, row=0, padx=10)
         self.next_button.grid(column=4, row=0, padx=10)
 
-    def _language_settings(self):
-        pass
-
-    def _extraction_settings(self):
-        pass
+    def _preferences(self):
+        self.preference_window = PreferencesUI()
 
     @staticmethod
     def rescale(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
@@ -439,8 +431,8 @@ class SubtitleExtractorGUI:
         utils.interrupt_process(True)
         if not self.running:
             self.run_button.configure(text="Run", command=self._run)
-            self.menu_file.entryconfig("Open file(s)", state="normal")
-            self.menubar.entryconfig("Settings", state="normal")
+            self.menu_file.entryconfig(0, state="normal")
+            self.menubar.entryconfig(1, state="normal")
             self.current_video = None
 
     def _run(self) -> None:
@@ -451,8 +443,8 @@ class SubtitleExtractorGUI:
         if self.current_video:
             utils.interrupt_process(False)
             self.run_button.configure(text='Stop', command=self._stop_run)
-            self.menu_file.entryconfig("Open file(s)", state="disabled")
-            self.menubar.entryconfig("Settings", state="disabled")
+            self.menu_file.entryconfig(0, state="disabled")
+            self.menubar.entryconfig(1, state="disabled")
             self.canvas.unbind("<B1-Motion>")
             self.video_capture.release()
             self.video_scale.configure(state="disabled")
@@ -469,6 +461,15 @@ class SubtitleExtractorGUI:
         self._stop_run()
         self.root.quit()
         exit()
+
+
+class PreferencesUI(Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.title("Preferences")
+        self.config(width=300, height=200)
+        self.focus()
+        self.grab_set()
 
 
 if __name__ == '__main__':
