@@ -464,12 +464,54 @@ class SubtitleExtractorGUI:
 
 
 class PreferencesUI(Toplevel):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.title("Preferences")
-        self.config(width=300, height=200)
         self.focus()
         self.grab_set()
+        self._create_layout()
+
+    def _create_layout(self) -> None:
+        """
+        Create layout for preferences window.
+        """
+        self.title("Preferences")
+        self.resizable(FALSE, FALSE)
+
+        # Create notebook that will contain tab frames
+        self.window_tabs = ttk.Notebook(self, width=600, height=400)
+        self.window_tabs.grid(column=0, row=0)
+
+        # Add tabs to notebook
+        self._ui_language_tab()
+        self._frame_extraction_tab()
+        self._text_extraction_tab()
+
+    def _ui_language_tab(self) -> None:
+        """
+        Create widgets in UI language tab frame
+        """
+        ui_language_frame = ttk.Frame(self.window_tabs)
+        ui_language_frame.grid(column=0, row=0)
+
+        self.window_tabs.add(ui_language_frame, text="UI Language")
+
+    def _frame_extraction_tab(self) -> None:
+        """
+        Create widgets in Frame extraction tab frame
+        """
+        frame_extraction_frame = ttk.Frame(self.window_tabs)
+        frame_extraction_frame.grid(column=0, row=0)
+
+        self.window_tabs.add(frame_extraction_frame, text="Frame Extraction")
+
+    def _text_extraction_tab(self) -> None:
+        """
+        Create widgets in Text extraction tab frame
+        """
+        text_extraction_frame = ttk.Frame(self.window_tabs)
+        text_extraction_frame.grid(column=0, row=0)
+
+        self.window_tabs.add(text_extraction_frame, text="Text Extraction")
 
 
 if __name__ == '__main__':
