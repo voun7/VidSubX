@@ -204,7 +204,7 @@ class SubtitleExtractor:
         :return:
         """
         # cancel if process has been cancelled by gui.
-        if utils.process_state():
+        if utils.Process.interrupt_process:
             logger.warning("Subtitle generation process interrupted!")
             return
 

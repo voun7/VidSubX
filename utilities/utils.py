@@ -2,13 +2,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-INTERRUPT_PROCESS = False
 
+class Process:
+    interrupt_process = False
 
-def interrupt_process(condition: bool) -> None:
-    global INTERRUPT_PROCESS
-    INTERRUPT_PROCESS = condition
-    logger.debug(f"INTERRUPT_PROCESS set to: {INTERRUPT_PROCESS}")
+    @classmethod
+    def start_process(cls):
+        cls.interrupt_process = False
+        logger.debug(f"interrupt_process set to: {cls.interrupt_process}")
+
+    @classmethod
+    def stop_process(cls):
+        cls.interrupt_process = True
+        logger.debug(f"interrupt_process set to: {cls.interrupt_process}")
 
 
 def process_state() -> bool:

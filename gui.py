@@ -412,7 +412,7 @@ class SubtitleExtractorGUI:
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         for video, sub_area in self.video_queue.items():
             self.running = True
-            if utils.process_state():
+            if utils.Process.interrupt_process:
                 logger.warning("Process interrupted")
                 self.running = False
                 self._stop_run()
@@ -428,7 +428,7 @@ class SubtitleExtractorGUI:
         Stop program from running.
         """
         logger.debug("Stop button clicked")
-        utils.interrupt_process(True)
+        utils.Process.stop_process()
         if not self.running:
             self.run_button.configure(text="Run", command=self._run)
             self.menu_file.entryconfig(0, state="normal")
@@ -441,7 +441,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Run button clicked")
         if self.current_video:
-            utils.interrupt_process(False)
+            utils.Process.start_process()
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.menu_file.entryconfig(0, state="disabled")
             self.menubar.entryconfig(1, state="disabled")

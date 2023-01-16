@@ -73,7 +73,7 @@ def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple, every: 
     :return: path to the directory where the frames were saved, or None if fails
     """
     # cancel if process has been cancelled by gui.
-    if utils.process_state():
+    if utils.Process.interrupt_process:
         logger.warning("Frame extraction process interrupted!")
         return
 

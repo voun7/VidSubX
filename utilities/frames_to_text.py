@@ -40,7 +40,7 @@ def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150,
     :param ocr_max_processes: number of processors to be used
     """
     # cancel if process has been cancelled by gui.
-    if utils.process_state():
+    if utils.Process.interrupt_process:
         logger.warning("Text extraction process interrupted!")
         return
 
