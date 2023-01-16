@@ -482,18 +482,8 @@ class PreferencesUI(Toplevel):
         self.window_tabs.grid(column=0, row=0)
 
         # Add tabs to notebook
-        self._ui_language_tab()
         self._frame_extraction_tab()
         self._text_extraction_tab()
-
-    def _ui_language_tab(self) -> None:
-        """
-        Create widgets in UI language preferences tab frame
-        """
-        ui_language_frame = ttk.Frame(self.window_tabs)
-        ui_language_frame.grid(column=0, row=0)
-
-        self.window_tabs.add(ui_language_frame, text="UI Language")
 
     def _frame_extraction_tab(self) -> None:
         """
