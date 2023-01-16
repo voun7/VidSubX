@@ -488,7 +488,7 @@ class PreferencesUI(Toplevel):
 
     def _ui_language_tab(self) -> None:
         """
-        Create widgets in UI language tab frame
+        Create widgets in UI language preferences tab frame
         """
         ui_language_frame = ttk.Frame(self.window_tabs)
         ui_language_frame.grid(column=0, row=0)
@@ -497,7 +497,7 @@ class PreferencesUI(Toplevel):
 
     def _frame_extraction_tab(self) -> None:
         """
-        Create widgets in Frame extraction tab frame
+        Create widgets in Frame extraction preferences tab frame
         """
         frame_extraction_frame = ttk.Frame(self.window_tabs)
         frame_extraction_frame.grid(column=0, row=0)
@@ -506,7 +506,7 @@ class PreferencesUI(Toplevel):
 
     def _text_extraction_tab(self) -> None:
         """
-        Create widgets in Text extraction tab frame
+        Create widgets in Text extraction preferences tab frame
         """
         text_extraction_frame = ttk.Frame(self.window_tabs)
         text_extraction_frame.grid(column=0, row=0)
