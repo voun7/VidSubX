@@ -126,7 +126,8 @@ class SubtitleExtractor:
         duration = float(name_timecode[1]) - float(name_timecode[0])
         return duration
 
-    def _merge_adjacent_similar_texts(self, old_div, divider, similarity_threshold: float = 0.65) -> None:
+    def _merge_adjacent_similar_texts(self, old_div, divider,
+                                      similarity_threshold: float = utils.Config.text_similarity_threshold) -> None:
         """
         Merge texts that are not the same but beside each other and similar.
         The text that has the longest duration becomes the text for all similar texts.

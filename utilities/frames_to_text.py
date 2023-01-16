@@ -7,7 +7,7 @@ from paddleocr import PaddleOCR
 
 logger = logging.getLogger(__name__)
 
-paddle_ocr = PaddleOCR(use_angle_cls=True, lang='ch', drop_score=0.8, show_log=False)
+paddle_ocr = PaddleOCR(use_angle_cls=True, lang=utils.Config.ocr_rec_language, drop_score=0.8, show_log=False)
 
 
 def extract_text(text_output: Path, files: list) -> int:
@@ -31,7 +31,8 @@ def extract_text(text_output: Path, files: list) -> int:
     return saved_count
 
 
-def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = 150, ocr_max_processes: int = 4) -> None:
+def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = utils.Config.text_extraction_chunk_size,
+                   ocr_max_processes: int = utils.Config.ocr_max_processes) -> None:
     """
     Extracts the texts from frames using multiprocessing
     :param frame_output: directory of the frames

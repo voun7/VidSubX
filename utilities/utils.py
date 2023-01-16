@@ -24,6 +24,16 @@ class Config:
     text_extraction_chunk_size = 150
     ocr_max_processes = 4
     ocr_rec_language = 'ch'
+    text_similarity_threshold = 0.65
+
+    @classmethod
+    def load_config(cls):
+        cls.frame_extraction_frequency = 2
+        cls.frame_extraction_chunk_size = 250
+        cls.text_extraction_chunk_size = 150
+        cls.ocr_max_processes = 4
+        cls.ocr_rec_language = 'ch'
+        cls.text_similarity_threshold = 0.65
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=25):
