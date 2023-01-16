@@ -18,12 +18,12 @@ class Process:
 
 
 class Config:
-    default_frame_extraction_frequency = 2
-    default_frame_extraction_chunk_size = 250
-
-    default_text_extraction_chunk_size = 150
-    default_ocr_max_processes = 4
-    default_ocr_rec_language = 'ch'
+    # Default values
+    frame_extraction_frequency = 2
+    frame_extraction_chunk_size = 250
+    text_extraction_chunk_size = 150
+    ocr_max_processes = 4
+    ocr_rec_language = 'ch'
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=25):
