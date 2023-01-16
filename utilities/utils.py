@@ -17,8 +17,13 @@ class Process:
         logger.debug(f"interrupt_process set to: {cls.interrupt_process}")
 
 
-def process_state() -> bool:
-    return INTERRUPT_PROCESS
+class Config:
+    default_frame_extraction_frequency = 2
+    default_frame_extraction_chunk_size = 250
+
+    default_text_extraction_chunk_size = 150
+    default_ocr_max_processes = 4
+    default_ocr_rec_language = 'ch'
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=25):
