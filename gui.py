@@ -439,7 +439,7 @@ class SubtitleExtractorGUI:
         Start the text extraction from video frames.
         """
         logger.debug("Run button clicked")
-        if self.video_queue:
+        if self.video_queue and self.current_video:
             self.current_video = None
             self.video_capture.release()
             utils.Process.start_process()
@@ -450,8 +450,10 @@ class SubtitleExtractorGUI:
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
             Thread(target=self.extract_subtitle, daemon=True).start()
+        elif self.video_queue:
+            logger.info("Open new video(s)!")
         else:
-            logger.info("No video has been selected!")
+            logger.info("No video has been opened!")
 
     def _on_closing(self) -> None:
         """
