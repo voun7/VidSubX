@@ -46,12 +46,12 @@ class Config:
 
     @classmethod
     def load_config(cls) -> None:
-        cls.frame_extraction_frequency = cls.config[cls.sections[0]][cls.keys[0]]
-        cls.frame_extraction_chunk_size = cls.config[cls.sections[0]][cls.keys[1]]
-        cls.text_extraction_chunk_size = cls.config[cls.sections[1]][cls.keys[2]]
-        cls.ocr_max_processes = cls.config[cls.sections[1]][cls.keys[3]]
+        cls.frame_extraction_frequency = int(cls.config[cls.sections[0]][cls.keys[0]])
+        cls.frame_extraction_chunk_size = int(cls.config[cls.sections[0]][cls.keys[1]])
+        cls.text_extraction_chunk_size = int(cls.config[cls.sections[1]][cls.keys[2]])
+        cls.ocr_max_processes = int(cls.config[cls.sections[1]][cls.keys[3]])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
-        cls.text_similarity_threshold = cls.config[cls.sections[2]][cls.keys[5]]
+        cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
 
     def create_config_file(self) -> None:
         self.config[self.sections[0]] = {self.keys[0]: "2",
