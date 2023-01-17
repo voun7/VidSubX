@@ -144,7 +144,7 @@ class SubtitleExtractor:
             counter += 1
             # print(f"File 1 Name: {file1.name}, Duration: {file1_duration}, Text: {file1_text}\n"
             #       f"File 2 Name: {file2.name}, Duration: {file2_duration}, Text: {file2_text}\n"
-            #       f"File 1 & 2 Similarity: {similarity}\n")
+            #       f"File 1 & 2 Similarity: {similarity}")
             if similarity >= similarity_threshold and counter != no_of_files:
                 if not starting_file:
                     starting_file = file1
@@ -152,6 +152,7 @@ class SubtitleExtractor:
                     file_duration = file1_duration
 
                 if file2_duration > file_duration:  # Change text and duration when longer duration is found.
+                    # print(f"--------longer duration found: {file2_duration}")
                     file_text = file2_text
                     file_duration = file2_duration
             else:
@@ -163,6 +164,8 @@ class SubtitleExtractor:
 
                 new_name = self._similar_text_name_gen(starting_file.stem, ending_file.stem, divider, old_div)
                 new_file_name = f"{self.text_output}/{new_name}"
+                # print(f"New file name: {new_file_name}\n"
+                #       f"New file text: {file_text}\n")
                 with open(new_file_name, 'w', encoding="utf-8") as text_file:
                     text_file.write(file_text)
 
@@ -170,6 +173,8 @@ class SubtitleExtractor:
                     new_name = file2.name.replace(old_div, divider)
                     new_file_name = f"{self.text_output}/{new_name}"
                     file_text = file2_text
+                    # print(f"New file name: {new_file_name}\n"
+                    #       f"New file text: {file_text}\n")
                     with open(new_file_name, 'w', encoding="utf-8") as text_file:
                         text_file.write(file_text)
 
