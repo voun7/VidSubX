@@ -41,7 +41,7 @@ class Config:
 
     def __init__(self) -> None:
         if not self.config_file.exists():
-            self.create_config_file()
+            self.create_default_config_file()
         self.load_config()
 
     @classmethod
@@ -53,7 +53,7 @@ class Config:
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
         cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
 
-    def create_config_file(self) -> None:
+    def create_default_config_file(self) -> None:
         self.config[self.sections[0]] = {self.keys[0]: "2",
                                          self.keys[1]: "250"}
         self.config[self.sections[1]] = {self.keys[2]: "150",
