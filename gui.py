@@ -209,9 +209,10 @@ class SubtitleExtractorGUI:
         """
         Fires when user clicks on the background ... binds to current rectangle
         """
-        self.mouse_start = event.x, event.y
-        self.canvas.bind('<Button-1>', self._on_click_rectangle)
-        self.canvas.bind('<B1-Motion>', self._on_motion)
+        if self.current_video:
+            self.mouse_start = event.x, event.y
+            self.canvas.bind('<Button-1>', self._on_click_rectangle)
+            self.canvas.bind('<B1-Motion>', self._on_motion)
 
     def _on_click_rectangle(self, event):
         """
@@ -357,7 +358,6 @@ class SubtitleExtractorGUI:
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.progress_bar.configure(value=0)
             self.set_output()
-            self.canvas.bind("<B1-Motion>", self._on_motion)  # Enable mouse on canvas.
 
             # Add all opened videos to a queue.
             for filename in filenames:
@@ -433,20 +433,19 @@ class SubtitleExtractorGUI:
             self.run_button.configure(text="Run", command=self._run)
             self.menu_file.entryconfig(0, state="normal")
             self.menubar.entryconfig(1, state="normal")
-            self.current_video = None
 
     def _run(self) -> None:
         """
         Start the text extraction from video frames.
         """
         logger.debug("Run button clicked")
-        if self.current_video:
+        if self.video_queue:
+            self.current_video = None
+            self.video_capture.release()
             utils.Process.start_process()
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.menu_file.entryconfig(0, state="disabled")
             self.menubar.entryconfig(1, state="disabled")
-            self.canvas.unbind("<B1-Motion>")
-            self.video_capture.release()
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
