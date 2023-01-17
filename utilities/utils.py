@@ -44,15 +44,6 @@ class Config:
             self.create_default_config_file()
         self.load_config()
 
-    @classmethod
-    def load_config(cls) -> None:
-        cls.frame_extraction_frequency = int(cls.config[cls.sections[0]][cls.keys[0]])
-        cls.frame_extraction_chunk_size = int(cls.config[cls.sections[0]][cls.keys[1]])
-        cls.text_extraction_chunk_size = int(cls.config[cls.sections[1]][cls.keys[2]])
-        cls.ocr_max_processes = int(cls.config[cls.sections[1]][cls.keys[3]])
-        cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
-        cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
-
     def create_default_config_file(self) -> None:
         self.config[self.sections[0]] = {self.keys[0]: "2",
                                          self.keys[1]: "250"}
@@ -62,6 +53,15 @@ class Config:
         self.config[self.sections[2]] = {self.keys[5]: "0.65"}
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
+
+    @classmethod
+    def load_config(cls) -> None:
+        cls.frame_extraction_frequency = int(cls.config[cls.sections[0]][cls.keys[0]])
+        cls.frame_extraction_chunk_size = int(cls.config[cls.sections[0]][cls.keys[1]])
+        cls.text_extraction_chunk_size = int(cls.config[cls.sections[1]][cls.keys[2]])
+        cls.ocr_max_processes = int(cls.config[cls.sections[1]][cls.keys[3]])
+        cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
+        cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
 
     @classmethod
     def set_frame_extraction_frequency(cls, frequency: int) -> None:
