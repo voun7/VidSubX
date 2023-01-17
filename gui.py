@@ -488,7 +488,7 @@ class PreferencesUI(Toplevel):
 
     def _frame_extraction_tab(self) -> None:
         """
-        Create widgets in Frame extraction preferences tab frame
+        Creates widgets in the Frame extraction preferences tab frame
         """
         frame_extraction_frame = ttk.Frame(self.window_tabs)
         frame_extraction_frame.grid(column=0, row=0)
@@ -497,7 +497,7 @@ class PreferencesUI(Toplevel):
 
     def _text_extraction_tab(self) -> None:
         """
-        Create widgets in Text extraction preferences tab frame
+        Creates widgets in the Text extraction preferences tab frame
         """
         text_extraction_frame = ttk.Frame(self.window_tabs)
         text_extraction_frame.grid(column=0, row=0)
