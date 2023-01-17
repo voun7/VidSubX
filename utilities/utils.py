@@ -30,12 +30,13 @@ class Config:
     config = ConfigParser()
     config.read(config_file)
 
+    sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator"]
+    keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
+            "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold"]
+
     # Initial values
-    frame_extraction_frequency = None
-    frame_extraction_chunk_size = None
-    text_extraction_chunk_size = None
-    ocr_max_processes = None
-    ocr_rec_language = None
+    frame_extraction_frequency = frame_extraction_chunk_size = None
+    text_extraction_chunk_size = ocr_max_processes = ocr_rec_language = None
     text_similarity_threshold = None
 
     def __init__(self) -> None:
@@ -45,58 +46,58 @@ class Config:
 
     @classmethod
     def load_config(cls) -> None:
-        cls.frame_extraction_frequency = cls.config["Frame extraction"]["frame_extraction_frequency"]
-        cls.frame_extraction_chunk_size = cls.config["Frame extraction"]["frame_extraction_chunk_size"]
-        cls.text_extraction_chunk_size = cls.config["Text extraction"]["text_extraction_chunk_size"]
-        cls.ocr_max_processes = cls.config["Text extraction"]["ocr_max_processes"]
-        cls.ocr_rec_language = cls.config["Text extraction"]["ocr_rec_language"]
-        cls.text_similarity_threshold = cls.config["Subtitle generator"]["text_similarity_threshold"]
+        cls.frame_extraction_frequency = cls.config[cls.sections[0]][cls.keys[0]]
+        cls.frame_extraction_chunk_size = cls.config[cls.sections[0]][cls.keys[1]]
+        cls.text_extraction_chunk_size = cls.config[cls.sections[1]][cls.keys[2]]
+        cls.ocr_max_processes = cls.config[cls.sections[1]][cls.keys[3]]
+        cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
+        cls.text_similarity_threshold = cls.config[cls.sections[2]][cls.keys[5]]
 
     def create_config_file(self) -> None:
-        self.config["Frame extraction"] = {"frame_extraction_frequency": "2",
-                                           "frame_extraction_chunk_size": "250"}
-        self.config["Text extraction"] = {"text_extraction_chunk_size": "150",
-                                          "ocr_max_processes": "4",
-                                          "ocr_rec_language": "ch"}
-        self.config["Subtitle generator"] = {"text_similarity_threshold": "0.65"}
+        self.config[self.sections[0]] = {self.keys[0]: "2",
+                                         self.keys[1]: "250"}
+        self.config[self.sections[1]] = {self.keys[2]: "150",
+                                         self.keys[3]: "4",
+                                         self.keys[4]: "ch"}
+        self.config[self.sections[2]] = {self.keys[5]: "0.65"}
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
     @classmethod
     def set_frame_extraction_frequency(cls, frequency: int) -> None:
         cls.frame_extraction_frequency = frequency
-        cls.config["Frame extraction"]["frame_extraction_frequency"] = str(cls.frame_extraction_frequency)
-        logger.debug(f"frame_extraction_frequency set to: {cls.frame_extraction_frequency}")
+        cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
+        logger.debug(f"{cls.keys[0]} set to: {cls.frame_extraction_frequency}")
 
     @classmethod
     def set_frame_extraction_chunk_size(cls, chunk_size: int) -> None:
         cls.frame_extraction_chunk_size = chunk_size
-        cls.config["Frame extraction"]["frame_extraction_chunk_size"] = str(cls.frame_extraction_chunk_size)
-        logger.debug(f"frame_extraction_chunk_size set to: {cls.frame_extraction_chunk_size}")
+        cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
+        logger.debug(f"{cls.keys[1]} set to: {cls.frame_extraction_chunk_size}")
 
     @classmethod
     def set_text_extraction_chunk_size(cls, chunk_size: int) -> None:
         cls.text_extraction_chunk_size = chunk_size
-        cls.config["Text extraction"]["text_extraction_chunk_size"] = str(cls.text_extraction_chunk_size)
-        logger.debug(f"text_extraction_chunk_size set to: {cls.text_extraction_chunk_size}")
+        cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
+        logger.debug(f"{cls.keys[2]} set to: {cls.text_extraction_chunk_size}")
 
     @classmethod
     def set_ocr_max_processes(cls, max_processes: int) -> None:
         cls.ocr_max_processes = max_processes
-        cls.config["Text extraction"]["ocr_max_processes"] = str(cls.ocr_max_processes)
-        logger.debug(f"ocr_max_processes set to: {cls.ocr_max_processes}")
+        cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_max_processes)
+        logger.debug(f"{cls.keys[3]} set to: {cls.ocr_max_processes}")
 
     @classmethod
     def set_ocr_rec_language(cls, language: str) -> None:
         cls.ocr_rec_language = language
-        cls.config["Text extraction"]["ocr_rec_language"] = cls.ocr_rec_language
-        logger.debug(f"ocr_rec_language set to: {cls.ocr_rec_language}")
+        cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
+        logger.debug(f"{cls.keys[4]} set to: {cls.ocr_rec_language}")
 
     @classmethod
     def set_text_similarity_threshold(cls, threshold: float) -> None:
         cls.text_similarity_threshold = threshold
-        cls.config["Subtitle generator"]["text_similarity_threshold"] = str(cls.text_similarity_threshold)
-        logger.debug(f"text_similarity_threshold set to: {cls.text_similarity_threshold}")
+        cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
+        logger.debug(f"{cls.keys[5]} set to: {cls.text_similarity_threshold}")
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=25):
