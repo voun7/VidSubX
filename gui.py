@@ -484,6 +484,7 @@ class PreferencesUI(Toplevel):
         # Add tabs to notebook
         self._frame_extraction_tab()
         self._text_extraction_tab()
+        self._subtitle_generator_tab()
 
     def _frame_extraction_tab(self) -> None:
         """
@@ -502,6 +503,15 @@ class PreferencesUI(Toplevel):
         text_extraction_frame.grid(column=0, row=0)
 
         self.window_tabs.add(text_extraction_frame, text="Text Extraction")
+
+    def _subtitle_generator_tab(self) -> None:
+        """
+        Creates widgets in the Subtitle generator preferences tab frame
+        """
+        subtitle_generator_frame = ttk.Frame(self.window_tabs)
+        subtitle_generator_frame.grid(column=0, row=0)
+
+        self.window_tabs.add(subtitle_generator_frame, text="Subtitle Generator")
 
 
 if __name__ == '__main__':
