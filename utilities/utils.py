@@ -65,38 +65,50 @@ class Config:
 
     @classmethod
     def set_frame_extraction_frequency(cls, frequency: int) -> None:
-        cls.frame_extraction_frequency = frequency
-        cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
+        cls.frame_extraction_frequency = frequency  # Write into memory
+        cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)  # Write into file
+        with open(cls.config_file, 'w') as configfile:
+            cls.config.write(configfile)
         logger.debug(f"{cls.keys[0]} set to: {cls.frame_extraction_frequency}")
 
     @classmethod
     def set_frame_extraction_chunk_size(cls, chunk_size: int) -> None:
         cls.frame_extraction_chunk_size = chunk_size
         cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
+        with open(cls.config_file, 'w') as configfile:
+            cls.config.write(configfile)
         logger.debug(f"{cls.keys[1]} set to: {cls.frame_extraction_chunk_size}")
 
     @classmethod
     def set_text_extraction_chunk_size(cls, chunk_size: int) -> None:
         cls.text_extraction_chunk_size = chunk_size
         cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
+        with open(cls.config_file, 'w') as configfile:
+            cls.config.write(configfile)
         logger.debug(f"{cls.keys[2]} set to: {cls.text_extraction_chunk_size}")
 
     @classmethod
     def set_ocr_max_processes(cls, max_processes: int) -> None:
         cls.ocr_max_processes = max_processes
         cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_max_processes)
+        with open(cls.config_file, 'w') as configfile:
+            cls.config.write(configfile)
         logger.debug(f"{cls.keys[3]} set to: {cls.ocr_max_processes}")
 
     @classmethod
     def set_ocr_rec_language(cls, language: str) -> None:
         cls.ocr_rec_language = language
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
+        with open(cls.config_file, 'w') as configfile:
+            cls.config.write(configfile)
         logger.debug(f"{cls.keys[4]} set to: {cls.ocr_rec_language}")
 
     @classmethod
     def set_text_similarity_threshold(cls, threshold: float) -> None:
         cls.text_similarity_threshold = threshold
         cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
+        with open(cls.config_file, 'w') as configfile:
+            cls.config.write(configfile)
         logger.debug(f"{cls.keys[5]} set to: {cls.text_similarity_threshold}")
 
 
