@@ -493,6 +493,10 @@ class PreferencesUI(Toplevel):
         frame_extraction_frame = ttk.Frame(self.window_tabs)
         frame_extraction_frame.grid(column=0, row=0)
 
+        ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency").grid(column=0, row=0)
+
+        ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size").grid(column=0, row=1)
+
         self.window_tabs.add(frame_extraction_frame, text="Frame Extraction")
 
     def _text_extraction_tab(self) -> None:
@@ -502,6 +506,12 @@ class PreferencesUI(Toplevel):
         text_extraction_frame = ttk.Frame(self.window_tabs)
         text_extraction_frame.grid(column=0, row=0)
 
+        ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size").grid(column=0, row=0)
+
+        ttk.Label(text_extraction_frame, text="OCR Max Processes").grid(column=0, row=1)
+
+        ttk.Label(text_extraction_frame, text="OCR Recognition Language").grid(column=0, row=2)
+
         self.window_tabs.add(text_extraction_frame, text="Text Extraction")
 
     def _subtitle_generator_tab(self) -> None:
@@ -510,6 +520,8 @@ class PreferencesUI(Toplevel):
         """
         subtitle_generator_frame = ttk.Frame(self.window_tabs)
         subtitle_generator_frame.grid(column=0, row=0)
+
+        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold").grid(column=0, row=0)
 
         self.window_tabs.add(subtitle_generator_frame, text="Subtitle Generator")
 
