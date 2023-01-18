@@ -526,7 +526,8 @@ class PreferencesUI(Toplevel):
         ttk.Label(text_extraction_frame, text="OCR Recognition Language").grid(column=0, row=2)
         ocr_rec_language = StringVar()
         languages = ["ch", "en"]
-        ocr_rec_language_box = ttk.Combobox(text_extraction_frame, textvariable=ocr_rec_language, values=languages)
+        ocr_rec_language_box = ttk.Combobox(text_extraction_frame, textvariable=ocr_rec_language, values=languages,
+                                            state="readonly")
         ocr_rec_language_box.grid(column=1, row=2)
 
         self.window_tabs.add(text_extraction_frame, text="Text Extraction")
