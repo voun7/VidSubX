@@ -479,7 +479,7 @@ class PreferencesUI(Toplevel):
         self.resizable(FALSE, FALSE)
 
         # Create notebook that will contain tab frames
-        self.window_tabs = ttk.Notebook(self, width=600, height=400)
+        self.window_tabs = ttk.Notebook(self, width=400, height=200)
         self.window_tabs.grid(column=0, row=0)
 
         # Add tabs to notebook
@@ -494,9 +494,15 @@ class PreferencesUI(Toplevel):
         frame_extraction_frame = ttk.Frame(self.window_tabs)
         frame_extraction_frame.grid(column=0, row=0)
 
-        ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency").grid(column=0, row=0)
+        ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0)
+        extraction_frequency = IntVar()
+        extraction_frequency_entry = ttk.Entry(frame_extraction_frame, textvariable=extraction_frequency)
+        extraction_frequency_entry.grid(column=1, row=0)
 
-        ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size").grid(column=0, row=1)
+        ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
+        frame_extraction_chunk_size = IntVar()
+        frame_extraction_chunk_size_entry = ttk.Entry(frame_extraction_frame, textvariable=frame_extraction_chunk_size)
+        frame_extraction_chunk_size_entry.grid(column=1, row=1)
 
         self.window_tabs.add(frame_extraction_frame, text="Frame Extraction")
 
@@ -507,11 +513,21 @@ class PreferencesUI(Toplevel):
         text_extraction_frame = ttk.Frame(self.window_tabs)
         text_extraction_frame.grid(column=0, row=0)
 
-        ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size").grid(column=0, row=0)
+        ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0)
+        text_extraction_chunk_size = IntVar()
+        text_extraction_chunk_size_entry = ttk.Entry(text_extraction_frame, textvariable=text_extraction_chunk_size)
+        text_extraction_chunk_size_entry.grid(column=1, row=0)
 
         ttk.Label(text_extraction_frame, text="OCR Max Processes").grid(column=0, row=1)
+        ocr_max_processes = IntVar()
+        ocr_max_processes_box = ttk.Spinbox(text_extraction_frame, from_=1.0, to=10, textvariable=ocr_max_processes)
+        ocr_max_processes_box.grid(column=1, row=1)
 
         ttk.Label(text_extraction_frame, text="OCR Recognition Language").grid(column=0, row=2)
+        ocr_rec_language = StringVar()
+        languages = ["ch", "en"]
+        ocr_rec_language_box = ttk.Combobox(text_extraction_frame, textvariable=ocr_rec_language, values=languages)
+        ocr_rec_language_box.grid(column=1, row=2)
 
         self.window_tabs.add(text_extraction_frame, text="Text Extraction")
 
@@ -522,7 +538,10 @@ class PreferencesUI(Toplevel):
         subtitle_generator_frame = ttk.Frame(self.window_tabs)
         subtitle_generator_frame.grid(column=0, row=0)
 
-        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold").grid(column=0, row=0)
+        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0)
+        text_similarity_threshold = DoubleVar()
+        text_similarity_threshold_box = ttk.Entry(subtitle_generator_frame, textvariable=text_similarity_threshold)
+        text_similarity_threshold_box.grid(column=1, row=0)
 
         self.window_tabs.add(subtitle_generator_frame, text="Subtitle Generator")
 
