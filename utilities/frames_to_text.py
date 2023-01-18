@@ -7,7 +7,7 @@ from paddleocr import PaddleOCR
 
 logger = logging.getLogger(__name__)
 
-paddle_ocr = PaddleOCR(use_angle_cls=True, lang=utils.Config.ocr_rec_language, drop_score=0.8, show_log=False)
+paddle_ocr = PaddleOCR(use_angle_cls=True, lang=utils.Config.ocr_rec_language, show_log=False)
 
 
 def extract_text(text_output: Path, files: list) -> int:
