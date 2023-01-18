@@ -493,6 +493,7 @@ class PreferencesUI(Toplevel):
         """
         frame_extraction_frame = ttk.Frame(self.window_tabs)
         frame_extraction_frame.grid(column=0, row=0)
+        self.window_tabs.add(frame_extraction_frame, text="Frame Extraction")
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0)
         extraction_frequency = IntVar()
@@ -504,14 +505,13 @@ class PreferencesUI(Toplevel):
         frame_extraction_chunk_size_entry = ttk.Entry(frame_extraction_frame, textvariable=frame_extraction_chunk_size)
         frame_extraction_chunk_size_entry.grid(column=1, row=1)
 
-        self.window_tabs.add(frame_extraction_frame, text="Frame Extraction")
-
     def _text_extraction_tab(self) -> None:
         """
         Creates widgets in the Text extraction preferences tab frame
         """
         text_extraction_frame = ttk.Frame(self.window_tabs)
         text_extraction_frame.grid(column=0, row=0)
+        self.window_tabs.add(text_extraction_frame, text="Text Extraction")
 
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0)
         text_extraction_chunk_size = IntVar()
@@ -530,21 +530,18 @@ class PreferencesUI(Toplevel):
                                             state="readonly")
         ocr_rec_language_box.grid(column=1, row=2)
 
-        self.window_tabs.add(text_extraction_frame, text="Text Extraction")
-
     def _subtitle_generator_tab(self) -> None:
         """
         Creates widgets in the Subtitle generator preferences tab frame
         """
         subtitle_generator_frame = ttk.Frame(self.window_tabs)
         subtitle_generator_frame.grid(column=0, row=0)
+        self.window_tabs.add(subtitle_generator_frame, text="Subtitle Generator")
 
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0)
         text_similarity_threshold = DoubleVar()
         text_similarity_threshold_box = ttk.Entry(subtitle_generator_frame, textvariable=text_similarity_threshold)
         text_similarity_threshold_box.grid(column=1, row=0)
-
-        self.window_tabs.add(subtitle_generator_frame, text="Subtitle Generator")
 
 
 if __name__ == '__main__':
