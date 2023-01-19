@@ -46,14 +46,13 @@ class SubtitleExtractorGUI:
 
         # Create main frame that will contain other frames.
         self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 15))
+        # Main frame's position in root window.
+        self.main_frame.grid(column=0, row=0, sticky="N, S, E, W")
 
         # Frames created in main frame.
         self._video_frame()
         self._work_frame()
         self._output_frame()
-
-        # Main frame's position in root window.
-        self.main_frame.grid(column=0, row=0, sticky="N, S, E, W")
 
     def _menu_bar(self) -> None:
         # Remove dashed lines that come default with tkinter menu bar.
