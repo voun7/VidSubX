@@ -477,14 +477,28 @@ class PreferencesUI(Toplevel):
         self.title("Preferences")
         self.resizable(FALSE, FALSE)
 
+        # Create main frame that will contain notebook.
+        main_frame = ttk.Frame(self, padding=(5, 5, 5, 5))
+        main_frame.grid(column=0, row=0)
+
         # Create notebook that will contain tab frames
-        self.window_tabs = ttk.Notebook(self, width=400, height=200)
-        self.window_tabs.grid(column=0, row=0)
+        self.notebook_tab = ttk.Notebook(main_frame, width=400, height=200)
+        self.notebook_tab.grid(column=0, row=0)
 
         # Add tabs to notebook
         self._frame_extraction_tab()
         self._text_extraction_tab()
         self._subtitle_generator_tab()
+
+        # Add buttons to window
+        button_frame = ttk.Frame(main_frame)
+        button_frame.grid(column=0, row=1, sticky="E")
+
+        self.ok_button = ttk.Button(button_frame, text="Ok")
+        self.ok_button.grid(column=0, row=0, padx=4, pady=4)
+
+        self.cancel_button = ttk.Button(button_frame, text="Cancel")
+        self.cancel_button.grid(column=1, row=0, padx=4, pady=4)
 
     def _frame_extraction_tab(self) -> None:
         """
