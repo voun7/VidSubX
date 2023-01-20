@@ -64,25 +64,25 @@ class Config:
         cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
 
     @classmethod
-    def set_config(cls, **args):
+    def set_config(cls, **kwargs):
         # Write into memory
-        cls.frame_extraction_frequency = args.get("frame_extraction_frequency", cls.frame_extraction_frequency)
+        cls.frame_extraction_frequency = kwargs.get("frame_extraction_frequency", cls.frame_extraction_frequency)
         # Write into file
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
 
-        cls.frame_extraction_chunk_size = args.get("frame_extraction_chunk_size", cls.frame_extraction_chunk_size)
+        cls.frame_extraction_chunk_size = kwargs.get("frame_extraction_chunk_size", cls.frame_extraction_chunk_size)
         cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
 
-        cls.text_extraction_chunk_size = args.get("text_extraction_chunk_size", cls.text_extraction_chunk_size)
+        cls.text_extraction_chunk_size = kwargs.get("text_extraction_chunk_size", cls.text_extraction_chunk_size)
         cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
 
-        cls.ocr_max_processes = args.get("ocr_max_processes", cls.ocr_max_processes)
+        cls.ocr_max_processes = kwargs.get("ocr_max_processes", cls.ocr_max_processes)
         cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_max_processes)
 
-        cls.ocr_rec_language = args.get("ocr_rec_language", cls.ocr_rec_language)
+        cls.ocr_rec_language = kwargs.get("ocr_rec_language", cls.ocr_rec_language)
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
 
-        cls.text_similarity_threshold = args.get("text_similarity_threshold", cls.text_similarity_threshold)
+        cls.text_similarity_threshold = kwargs.get("text_similarity_threshold", cls.text_similarity_threshold)
         cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
 
         with open(cls.config_file, 'w') as configfile:
