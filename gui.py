@@ -562,7 +562,15 @@ class PreferencesUI(Toplevel):
         text_similarity_threshold_box.grid(column=1, row=0)
 
     def _save_settings(self):
-        pass
+        utils.Config.set_config(
+            frame_extraction_frequency=self.frame_extraction_frequency.get(),
+            frame_extraction_chunk_size=self.frame_extraction_chunk_size.get(),
+            text_extraction_chunk_size=self.text_extraction_chunk_size.get(),
+            ocr_max_processes=self.ocr_max_processes.get(),
+            ocr_rec_language=self.ocr_rec_language.get(),
+            text_similarity_threshold=self.text_similarity_threshold.get()
+        )
+        self.destroy()
 
 
 if __name__ == '__main__':
