@@ -549,6 +549,7 @@ class PreferencesUI(Toplevel):
             text_extraction_frame,
             from_=1.0, to=10,
             textvariable=self.ocr_max_processes,
+            state="readonly",
             width=8
         )
         ocr_max_processes_box.grid(column=1, row=1)
@@ -560,7 +561,8 @@ class PreferencesUI(Toplevel):
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
             values=languages,
-            state="readonly", width=8
+            state="readonly",
+            width=8
         )
         ocr_rec_language_box.grid(column=1, row=2)
 
