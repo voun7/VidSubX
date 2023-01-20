@@ -509,8 +509,9 @@ class PreferencesUI(Toplevel):
         self.notebook_tab.add(frame_extraction_frame, text="Frame Extraction")
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0, padx=25, pady=20)
-        self.extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
-        extraction_frequency_entry = ttk.Entry(frame_extraction_frame, textvariable=self.extraction_frequency, width=10)
+        self.frame_extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
+        extraction_frequency_entry = ttk.Entry(frame_extraction_frame, textvariable=self.frame_extraction_frequency,
+                                               width=10)
         extraction_frequency_entry.grid(column=1, row=0)
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
