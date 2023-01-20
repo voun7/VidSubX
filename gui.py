@@ -482,7 +482,7 @@ class PreferencesUI(Toplevel):
         main_frame.grid(column=0, row=0)
 
         # Create notebook that will contain tab frames
-        self.notebook_tab = ttk.Notebook(main_frame, width=400, height=200)
+        self.notebook_tab = ttk.Notebook(main_frame)
         self.notebook_tab.grid(column=0, row=0)
 
         # Add tabs to notebook
