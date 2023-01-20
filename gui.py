@@ -510,13 +510,13 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0, padx=14, pady=14)
         self.extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
-        extraction_frequency_entry = ttk.Entry(frame_extraction_frame, textvariable=self.extraction_frequency)
+        extraction_frequency_entry = ttk.Entry(frame_extraction_frame, textvariable=self.extraction_frequency, width=10)
         extraction_frequency_entry.grid(column=1, row=0)
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1, padx=14, pady=14)
         self.frame_extraction_chunk_size = IntVar(value=utils.Config.frame_extraction_chunk_size)
         frame_extraction_chunk_size_entry = ttk.Entry(frame_extraction_frame,
-                                                      textvariable=self.frame_extraction_chunk_size)
+                                                      textvariable=self.frame_extraction_chunk_size, width=10)
         frame_extraction_chunk_size_entry.grid(column=1, row=1)
 
     def _text_extraction_tab(self) -> None:
@@ -530,20 +530,20 @@ class PreferencesUI(Toplevel):
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0, padx=4, pady=14)
         self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
         text_extraction_chunk_size_entry = ttk.Entry(text_extraction_frame,
-                                                     textvariable=self.text_extraction_chunk_size)
+                                                     textvariable=self.text_extraction_chunk_size, width=10)
         text_extraction_chunk_size_entry.grid(column=1, row=0)
 
         ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1, padx=4, pady=14)
         self.ocr_max_processes = IntVar(value=utils.Config.ocr_max_processes)
         ocr_max_processes_box = ttk.Spinbox(text_extraction_frame, from_=1.0, to=10,
-                                            textvariable=self.ocr_max_processes)
+                                            textvariable=self.ocr_max_processes, width=8)
         ocr_max_processes_box.grid(column=1, row=1)
 
         ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(column=0, row=2, padx=4, pady=14)
         self.ocr_rec_language = StringVar(value=utils.Config.ocr_rec_language)
         languages = ["ch", "en"]
         ocr_rec_language_box = ttk.Combobox(text_extraction_frame, textvariable=self.ocr_rec_language, values=languages,
-                                            state="readonly")
+                                            state="readonly", width=8)
         ocr_rec_language_box.grid(column=1, row=2)
 
     def _subtitle_generator_tab(self) -> None:
@@ -556,7 +556,8 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=20, pady=14)
         self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
-        text_similarity_threshold_box = ttk.Entry(subtitle_generator_frame, textvariable=self.text_similarity_threshold)
+        text_similarity_threshold_box = ttk.Entry(subtitle_generator_frame, textvariable=self.text_similarity_threshold,
+                                                  width=10)
         text_similarity_threshold_box.grid(column=1, row=0)
 
     def _save_settings(self):
