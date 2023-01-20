@@ -494,10 +494,10 @@ class PreferencesUI(Toplevel):
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(column=0, row=1, sticky="E")
 
-        self.ok_button = ttk.Button(button_frame, text="Ok")
+        self.ok_button = ttk.Button(button_frame, text="Ok", command=self._save_settings)
         self.ok_button.grid(column=0, row=0, padx=4, pady=4)
 
-        self.cancel_button = ttk.Button(button_frame, text="Cancel")
+        self.cancel_button = ttk.Button(button_frame, text="Cancel", command=self.destroy)
         self.cancel_button.grid(column=1, row=0, padx=4, pady=4)
 
     def _frame_extraction_tab(self) -> None:
@@ -555,6 +555,9 @@ class PreferencesUI(Toplevel):
         text_similarity_threshold = DoubleVar()
         text_similarity_threshold_box = ttk.Entry(subtitle_generator_frame, textvariable=text_similarity_threshold)
         text_similarity_threshold_box.grid(column=1, row=0)
+
+    def _save_settings(self):
+        pass
 
 
 if __name__ == '__main__':
