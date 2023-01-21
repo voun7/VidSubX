@@ -597,6 +597,7 @@ class PreferencesUI(Toplevel):
         text_similarity_threshold_box.grid(column=1, row=0)
 
     def _set_reset_button(self, *args):
+        logger.debug(f"Reset button set by -> {args}")
         default_values = (
             utils.Config.default_frame_extraction_frequency,
             utils.Config.default_frame_extraction_chunk_size,
