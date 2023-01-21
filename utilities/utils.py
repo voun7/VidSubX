@@ -26,7 +26,7 @@ class Process:
 
 
 class Config:
-    config_file = Path("utilities/config.ini")
+    config_file = Path(__file__).parent / "config.ini"
     config = ConfigParser()
     config.read(config_file)
 
