@@ -596,7 +596,11 @@ class PreferencesUI(Toplevel):
         )
         text_similarity_threshold_box.grid(column=1, row=0)
 
-    def _set_reset_button(self, *args):
+    def _set_reset_button(self, *args) -> None:
+        """
+        Set the reset button based on the value of the text variables.
+        :param args: Info of the variable that called the method.
+        """
         logger.debug(f"Reset button set by -> {args}")
         default_values = (
             utils.Config.default_frame_extraction_frequency,
@@ -620,7 +624,10 @@ class PreferencesUI(Toplevel):
         else:
             self.reset_button.configure(state="normal")
 
-    def _reset_settings(self):
+    def _reset_settings(self) -> None:
+        """
+        Change the values of the text variables to the default values.
+        """
         self.frame_extraction_frequency.set(utils.Config.default_frame_extraction_frequency)
         self.frame_extraction_chunk_size.set(utils.Config.default_frame_extraction_chunk_size)
         self.text_extraction_chunk_size.set(utils.Config.default_text_extraction_chunk_size)
@@ -628,7 +635,10 @@ class PreferencesUI(Toplevel):
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
 
-    def _save_settings(self):
+    def _save_settings(self) -> None:
+        """
+        Save the values of the text variables to the config file.
+        """
         utils.Config.set_config(
             frame_extraction_frequency=self.frame_extraction_frequency.get(),
             frame_extraction_chunk_size=self.frame_extraction_chunk_size.get(),
