@@ -73,20 +73,16 @@ class Config:
 
     @classmethod
     def set_config(cls, **kwargs):
-        # Write into memory
+        # Write into memory & file
         cls.frame_extraction_frequency = kwargs.get("frame_extraction_frequency", cls.frame_extraction_frequency)
-        # Write into file
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
-
         cls.frame_extraction_chunk_size = kwargs.get("frame_extraction_chunk_size", cls.frame_extraction_chunk_size)
         cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
 
         cls.text_extraction_chunk_size = kwargs.get("text_extraction_chunk_size", cls.text_extraction_chunk_size)
         cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
-
         cls.ocr_max_processes = kwargs.get("ocr_max_processes", cls.ocr_max_processes)
         cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_max_processes)
-
         cls.ocr_rec_language = kwargs.get("ocr_rec_language", cls.ocr_rec_language)
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
 
