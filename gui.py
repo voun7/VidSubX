@@ -494,11 +494,14 @@ class PreferencesUI(Toplevel):
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(column=0, row=1, sticky="E")
 
-        self.ok_button = ttk.Button(button_frame, text="Ok", command=self._save_settings)
-        self.ok_button.grid(column=0, row=0, padx=4, pady=4)
+        self.reset_button = ttk.Button(button_frame, text="Reset", command=self._reset_settings)  # state="disabled",
+        self.reset_button.grid(column=0, row=0, padx=4, pady=4)
 
-        self.cancel_button = ttk.Button(button_frame, text="Cancel", command=self.destroy)
-        self.cancel_button.grid(column=1, row=0, padx=4, pady=4)
+        ok_button = ttk.Button(button_frame, text="Ok", command=self._save_settings)
+        ok_button.grid(column=1, row=0, padx=4, pady=4)
+
+        cancel_button = ttk.Button(button_frame, text="Cancel", command=self.destroy)
+        cancel_button.grid(column=2, row=0, padx=4, pady=4)
 
     def _frame_extraction_tab(self) -> None:
         """
@@ -582,6 +585,37 @@ class PreferencesUI(Toplevel):
             width=10
         )
         text_similarity_threshold_box.grid(column=1, row=0)
+
+    def _set_reset_button(self):
+        default_values = (
+            utils.Config.default_frame_extraction_frequency,
+            utils.Config.default_frame_extraction_chunk_size,
+            utils.Config.default_text_extraction_chunk_size,
+            utils.Config.default_ocr_max_processes,
+            utils.Config.default_ocr_rec_language,
+            utils.Config.default_text_similarity_threshold
+        )
+        values = (
+            self.frame_extraction_frequency.get(),
+            self.frame_extraction_chunk_size.get(),
+            self.text_extraction_chunk_size.get(),
+            self.ocr_max_processes.get(),
+            self.ocr_rec_language.get(),
+            self.text_similarity_threshold.get()
+        )
+
+        if default_values == values:
+            self.reset_button.configure(state="disabled")
+        else:
+            self.reset_button.configure(state="normal")
+
+    def _reset_settings(self):
+        self.frame_extraction_frequency.set(utils.Config.default_frame_extraction_frequency)
+        self.frame_extraction_chunk_size.set(utils.Config.default_frame_extraction_chunk_size)
+        self.text_extraction_chunk_size.set(utils.Config.default_text_extraction_chunk_size)
+        self.ocr_max_processes.set(utils.Config.default_ocr_max_processes)
+        self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
+        self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
 
     def _save_settings(self):
         utils.Config.set_config(
