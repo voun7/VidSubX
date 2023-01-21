@@ -504,6 +504,9 @@ class PreferencesUI(Toplevel):
         cancel_button = ttk.Button(button_frame, text="Cancel", command=self.destroy)
         cancel_button.grid(column=2, row=0, padx=4, pady=4)
 
+        # Set the reset button when layout is created
+        self._set_reset_button()
+
     def _frame_extraction_tab(self) -> None:
         """
         Creates widgets in the Frame extraction preferences tab frame
@@ -514,6 +517,7 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0, padx=25, pady=20)
         self.frame_extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
+        self.frame_extraction_frequency.trace_add("write", self._set_reset_button)
         extraction_frequency_entry = ttk.Entry(
             frame_extraction_frame,
             textvariable=self.frame_extraction_frequency,
@@ -523,6 +527,7 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
         self.frame_extraction_chunk_size = IntVar(value=utils.Config.frame_extraction_chunk_size)
+        self.frame_extraction_chunk_size.trace_add("write", self._set_reset_button)
         frame_extraction_chunk_size_entry = ttk.Entry(
             frame_extraction_frame,
             textvariable=self.frame_extraction_chunk_size,
@@ -540,6 +545,7 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0, padx=25, pady=20)
         self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
+        self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
         text_extraction_chunk_size_entry = ttk.Entry(
             text_extraction_frame,
             textvariable=self.text_extraction_chunk_size,
@@ -549,6 +555,7 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1, padx=25)
         self.ocr_max_processes = IntVar(value=utils.Config.ocr_max_processes)
+        self.ocr_max_processes.trace_add("write", self._set_reset_button)
         ocr_max_processes_box = ttk.Spinbox(
             text_extraction_frame,
             from_=1.0, to=10,
@@ -560,6 +567,7 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(column=0, row=2, padx=25, pady=20)
         self.ocr_rec_language = StringVar(value=utils.Config.ocr_rec_language)
+        self.ocr_rec_language.trace_add("write", self._set_reset_button)
         languages = ["ch", "en"]
         ocr_rec_language_box = ttk.Combobox(
             text_extraction_frame,
@@ -580,6 +588,7 @@ class PreferencesUI(Toplevel):
 
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=30, pady=20)
         self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
+        self.text_similarity_threshold.trace_add("write", self._set_reset_button)
         text_similarity_threshold_box = ttk.Entry(
             subtitle_generator_frame,
             textvariable=self.text_similarity_threshold,
@@ -587,7 +596,7 @@ class PreferencesUI(Toplevel):
         )
         text_similarity_threshold_box.grid(column=1, row=0)
 
-    def _set_reset_button(self):
+    def _set_reset_button(self, *args):
         default_values = (
             utils.Config.default_frame_extraction_frequency,
             utils.Config.default_frame_extraction_chunk_size,
