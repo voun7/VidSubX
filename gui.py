@@ -560,7 +560,7 @@ class PreferencesUI(Toplevel):
         self.ocr_max_processes.trace_add("write", self._set_reset_button)
         ocr_max_processes_box = ttk.Spinbox(
             text_extraction_frame,
-            from_=1.0, to=10,
+            from_=1.0, to=24,
             textvariable=self.ocr_max_processes,
             state="readonly",
             width=8
