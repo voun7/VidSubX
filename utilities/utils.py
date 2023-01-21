@@ -34,6 +34,14 @@ class Config:
     keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
             "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold"]
 
+    # Default values
+    default_frame_extraction_frequency = 2
+    default_frame_extraction_chunk_size = 250
+    default_text_extraction_chunk_size = 150
+    default_ocr_max_processes = 4
+    default_ocr_rec_language = "ch"
+    default_text_similarity_threshold = 0.65
+
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
     text_extraction_chunk_size = ocr_max_processes = ocr_rec_language = None
@@ -45,12 +53,12 @@ class Config:
         self.load_config()
 
     def create_default_config_file(self) -> None:
-        self.config[self.sections[0]] = {self.keys[0]: "2",
-                                         self.keys[1]: "250"}
-        self.config[self.sections[1]] = {self.keys[2]: "150",
-                                         self.keys[3]: "4",
-                                         self.keys[4]: "ch"}
-        self.config[self.sections[2]] = {self.keys[5]: "0.65"}
+        self.config[self.sections[0]] = {self.keys[0]: str(self.default_frame_extraction_frequency),
+                                         self.keys[1]: self.default_frame_extraction_chunk_size}
+        self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_chunk_size,
+                                         self.keys[3]: self.default_ocr_max_processes,
+                                         self.keys[4]: self.default_ocr_rec_language}
+        self.config[self.sections[2]] = {self.keys[5]: str(self.default_text_similarity_threshold)}
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
