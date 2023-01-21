@@ -253,7 +253,6 @@ class SubtitleExtractor:
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
-        logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}")
         logger.info(f"Subtitle Area: {sub_area}")
 
         video_to_frames(self.video_path, self.frame_output, sub_area)
