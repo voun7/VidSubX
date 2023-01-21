@@ -518,10 +518,12 @@ class PreferencesUI(Toplevel):
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0, padx=25, pady=20)
         self.frame_extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
         self.frame_extraction_frequency.trace_add("write", self._set_reset_button)
-        extraction_frequency_entry = ttk.Entry(
+        extraction_frequency_entry = ttk.Spinbox(
             frame_extraction_frame,
+            from_=1.0, to=10,
             textvariable=self.frame_extraction_frequency,
-            width=10
+            state="readonly",
+            width=8
         )
         extraction_frequency_entry.grid(column=1, row=0)
 
