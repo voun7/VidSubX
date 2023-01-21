@@ -494,7 +494,7 @@ class PreferencesUI(Toplevel):
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(column=0, row=1, sticky="E")
 
-        self.reset_button = ttk.Button(button_frame, text="Reset", command=self._reset_settings)  # state="disabled",
+        self.reset_button = ttk.Button(button_frame, text="Reset", command=self._reset_settings, state="disabled")
         self.reset_button.grid(column=0, row=0, padx=4, pady=4)
 
         ok_button = ttk.Button(button_frame, text="Ok", command=self._save_settings)
