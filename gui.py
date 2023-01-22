@@ -647,7 +647,10 @@ class PreferencesUI(Toplevel):
             self.reset_button.configure(state="normal")
 
     @staticmethod
-    def _check_chunk_size(new_val: str):
+    def _check_chunk_size(new_val: str) -> bool:
+        """
+        Check if the value entered into the entry widget is valid.
+        """
         return new_val.isnumeric() or new_val == ""
 
     def _reset_settings(self) -> None:
