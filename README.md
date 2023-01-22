@@ -1,5 +1,5 @@
-# Video_Sub_Extractor
-Program that extracts hardsubs from video and creates external subtitle
+# Video Sub Extractor
+Program that extracts hardsubs from video and creates external subtitle.
 
 Installation steps:
 
