@@ -621,10 +621,21 @@ class PreferencesUI(Toplevel):
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_similarity_threshold
         )
+
+        try:
+            frame_extraction_chunk_size = self.frame_extraction_chunk_size.get()
+        except TclError:
+            frame_extraction_chunk_size = 0
+
+        try:
+            text_extraction_chunk_size = self.text_extraction_chunk_size.get()
+        except TclError:
+            text_extraction_chunk_size = 0
+
         values = (
             self.frame_extraction_frequency.get(),
-            self.frame_extraction_chunk_size.get(),
-            self.text_extraction_chunk_size.get(),
+            frame_extraction_chunk_size,
+            text_extraction_chunk_size,
             self.ocr_max_processes.get(),
             self.ocr_rec_language.get(),
             self.text_similarity_threshold.get()
@@ -654,14 +665,17 @@ class PreferencesUI(Toplevel):
         """
         Save the values of the text variables to the config file.
         """
-        utils.Config.set_config(
-            frame_extraction_frequency=self.frame_extraction_frequency.get(),
-            frame_extraction_chunk_size=self.frame_extraction_chunk_size.get(),
-            text_extraction_chunk_size=self.text_extraction_chunk_size.get(),
-            ocr_max_processes=self.ocr_max_processes.get(),
-            ocr_rec_language=self.ocr_rec_language.get(),
-            text_similarity_threshold=self.text_similarity_threshold.get()
-        )
+        try:
+            utils.Config.set_config(
+                frame_extraction_frequency=self.frame_extraction_frequency.get(),
+                frame_extraction_chunk_size=self.frame_extraction_chunk_size.get(),
+                text_extraction_chunk_size=self.text_extraction_chunk_size.get(),
+                ocr_max_processes=self.ocr_max_processes.get(),
+                ocr_rec_language=self.ocr_rec_language.get(),
+                text_similarity_threshold=self.text_similarity_threshold.get()
+            )
+        except TclError:
+            logger.warning("Empty value not saved!")
         self.destroy()
 
 
