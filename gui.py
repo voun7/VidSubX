@@ -530,9 +530,12 @@ class PreferencesUI(Toplevel):
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
         self.frame_extraction_chunk_size = IntVar(value=utils.Config.frame_extraction_chunk_size)
         self.frame_extraction_chunk_size.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
         frame_extraction_chunk_size_entry = ttk.Entry(
             frame_extraction_frame,
             textvariable=self.frame_extraction_chunk_size,
+            validate='key',
+            validatecommand=check_int,
             width=10
         )
         frame_extraction_chunk_size_entry.grid(column=1, row=1)
@@ -548,9 +551,12 @@ class PreferencesUI(Toplevel):
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0, padx=25, pady=20)
         self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
         self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
         text_extraction_chunk_size_entry = ttk.Entry(
             text_extraction_frame,
             textvariable=self.text_extraction_chunk_size,
+            validate='key',
+            validatecommand=check_int,
             width=10
         )
         text_extraction_chunk_size_entry.grid(column=1, row=0)
@@ -591,9 +597,12 @@ class PreferencesUI(Toplevel):
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=30, pady=20)
         self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
         self.text_similarity_threshold.trace_add("write", self._set_reset_button)
+        check_float = (self.register(self._check_float), '%P')
         text_similarity_threshold_box = ttk.Entry(
             subtitle_generator_frame,
             textvariable=self.text_similarity_threshold,
+            validate='key',
+            validatecommand=check_float,
             width=10
         )
         text_similarity_threshold_box.grid(column=1, row=0)
@@ -625,6 +634,18 @@ class PreferencesUI(Toplevel):
             self.reset_button.configure(state="disabled")
         else:
             self.reset_button.configure(state="normal")
+
+    @staticmethod
+    def _check_integer(new_val: str):
+        return new_val.isnumeric()
+
+    @staticmethod
+    def _check_float(new_val: str):
+        try:
+            float(new_val)
+            return True and 0 < float(new_val) < 1.0
+        except ValueError:
+            return False
 
     def _reset_settings(self) -> None:
         """
