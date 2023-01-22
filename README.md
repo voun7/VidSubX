@@ -13,7 +13,7 @@ https://conda.io/projects/conda/en/stable/user-guide/install/download.html
 ```
 conda install paddlepaddle-gpu==2.4.1 cudatoolkit=11.7 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
 ```
-Test if its working
+Test if paddlepaddle installation its working:
 ```
 import paddle
 paddle.utils.run_check()
