@@ -3,7 +3,7 @@ Program that extracts hardsubs from video and creates external subtitle.
 
 Installation steps:
 
-1st install paddlepaddle gpu
+1st Install paddlepaddle gpu
 
 ```
 conda install paddlepaddle-gpu==2.4.1 cudatoolkit=11.7 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
@@ -12,4 +12,24 @@ Test if its working
 ```
 import paddle
 paddle.utils.run_check()
+```
+
+2nd Install the following:
+```
+pip install opencv-python == 4.7.0.68
+```
+```
+pip install natsort == 8.2.0
+```
+```
+pip install fastnumbers == 3.2.1
+```
+```
+pip install tqdm == 4.64.1
+```
+```
+pip install Shapely == 2.0.0
+```
+```
+pip install pyclipper == 1.3.0.post4
 ```
