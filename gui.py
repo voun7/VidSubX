@@ -594,16 +594,16 @@ class PreferencesUI(Toplevel):
         subtitle_generator_frame.grid(column=0, row=0)
         self.notebook_tab.add(subtitle_generator_frame, text="Subtitle Generator")
 
-        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=30, pady=20)
+        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=32, pady=20)
         self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
         self.text_similarity_threshold.trace_add("write", self._set_reset_button)
-        check_float = (self.register(self._check_float), '%P')
-        text_similarity_threshold_box = ttk.Entry(
+        text_similarity_threshold_box = ttk.Spinbox(
             subtitle_generator_frame,
+            from_=0, to=1.0,
+            increment=0.05,
             textvariable=self.text_similarity_threshold,
-            validate='key',
-            validatecommand=check_float,
-            width=10
+            state="readonly",
+            width=8
         )
         text_similarity_threshold_box.grid(column=1, row=0)
 
