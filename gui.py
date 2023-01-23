@@ -36,8 +36,9 @@ class SubtitleExtractorGUI:
         """
         Use ttk to create frames for gui.
         """
-        # Window title
+        # Window title and icon
         self.root.title("Video Subtitle Extractor")
+        self.root.iconbitmap("icon.ico")
         # Do not allow window to be resizable.
         self.root.resizable(FALSE, FALSE)
 
@@ -476,6 +477,7 @@ class PreferencesUI(Toplevel):
         Create layout for preferences window.
         """
         self.title("Preferences")
+        self.iconbitmap("icon.ico")
         self.resizable(FALSE, FALSE)
 
         # Create main frame that will contain notebook.
