@@ -247,6 +247,7 @@ class SubtitleExtractorGUI:
             self._set_sub_area(def_sub)
             x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
             self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
+            self.canvas.event_generate("<Button-1>")
         else:
             self.canvas.coords(self.current_sub_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.current_sub_rect)
