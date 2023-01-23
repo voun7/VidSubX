@@ -38,7 +38,7 @@ class SubtitleExtractorGUI:
         """
         # Window title and icon
         self.root.title("Video Subtitle Extractor")
-        self.root.iconbitmap("icon.ico")
+        self.root.iconbitmap("VSE.ico")
         # Do not allow window to be resizable.
         self.root.resizable(FALSE, FALSE)
 
@@ -477,7 +477,7 @@ class PreferencesUI(Toplevel):
         Create layout for preferences window.
         """
         self.title("Preferences")
-        self.iconbitmap("icon.ico")
+        self.iconbitmap("VSE.ico")
         self.resizable(FALSE, FALSE)
 
         # Create main frame that will contain notebook.
