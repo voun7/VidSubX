@@ -706,24 +706,6 @@ def main():
                 result = engine(new_img_path, img_idx=index)
                 save_structure_res(result, args.output, img_name, index)
 
-                if args.recovery and result != []:
-                    from copy import deepcopy
-                    from ppstructure.recovery.recovery_to_doc import sorted_layout_boxes
-                    h, w, _ = img.shape
-                    result_cp = deepcopy(result)
-                    result_sorted = sorted_layout_boxes(result_cp, w)
-                    all_res += result_sorted
-
-            if args.recovery and all_res != []:
-                try:
-                    from ppstructure.recovery.recovery_to_doc import convert_info_docx
-                    convert_info_docx(img, all_res, args.output, img_name)
-                except Exception as ex:
-                    logger.error(
-                        "error in layout recovery image:{}, err msg: {}".format(
-                            img_name, ex))
-                    continue
-
             for item in all_res:
                 item.pop('img')
                 item.pop('res')

@@ -140,11 +140,6 @@ class TableSystem(object):
         return dt_boxes, rec_res, det_elapse, rec_elapse
 
 
-def to_excel(html_table, excel_path):
-    from tablepyxl import tablepyxl
-    tablepyxl.document_to_xl(html_table, excel_path)
-
-
 def main(args):
     image_file_list = get_image_file_list(args.image_dir)
     image_file_list = image_file_list[args.process_id::args.total_process_num]

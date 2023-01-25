@@ -33,7 +33,7 @@ from ppocr.utils.logging import get_logger
 from ppocr.utils.visual import draw_ser_results, draw_re_results
 from tools.infer.predict_system import TextSystem
 from ppstructure.layout.predict_layout import LayoutPredictor
-from ppstructure.table.predict_table import TableSystem, to_excel
+from ppstructure.table.predict_table import TableSystem
 from ppstructure.utility import parse_args, draw_structure_result
 
 logger = get_logger()
