@@ -8,7 +8,7 @@ a = Analysis(
     ['gui.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[("utilities/config.ini",'utilities')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
