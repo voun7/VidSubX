@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import numpy as np
-from scipy.special import softmax
+# from scipy.special import softmax
 
 
 def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
