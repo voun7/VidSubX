@@ -21,7 +21,7 @@ import sys
 import numpy as np
 import paddle
 
-from .locality_aware_nms import nms_locality
+from custom_paddleocr.ppocr.postprocess.locality_aware_nms import nms_locality
 
 
 class SASTPostProcess(object):

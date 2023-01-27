@@ -15,7 +15,7 @@
 import numpy as np
 import paddle
 
-from .rec_postprocess import AttnLabelDecode
+from custom_paddleocr.ppocr.postprocess.rec_postprocess import AttnLabelDecode
 
 
 class TableLabelDecode(AttnLabelDecode):

@@ -21,7 +21,7 @@ import numpy as np
 import paddle
 
 from custom_paddleocr.ppocr.utils.utility import check_install
-from .locality_aware_nms import nms_locality
+from custom_paddleocr.ppocr.postprocess.locality_aware_nms import nms_locality
 
 
 class EASTPostProcess(object):

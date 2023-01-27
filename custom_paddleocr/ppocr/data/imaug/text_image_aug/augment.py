@@ -17,7 +17,7 @@ https://github.com/RubanSeven/Text-Image-Augmentation-python/blob/master/augment
 """
 
 import numpy as np
-from .warp_mls import WarpMLS
+from custom_paddleocr.ppocr.data.imaug.text_image_aug.warp_mls import WarpMLS
 
 
 def tia_distort(src, segment=4):
