@@ -21,10 +21,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import numpy as np
 import cv2
-from shapely.geometry import Polygon
+import numpy as np
 import pyclipper
+from shapely.geometry import Polygon
 
 __all__ = ['MakeShrinkMap']
 
@@ -73,7 +73,7 @@ class MakeShrinkMap(object):
                 for ratio in possible_ratios:
                     # print(f"Change shrink ratio to {ratio}")
                     distance = polygon_shape.area * (
-                        1 - np.power(ratio, 2)) / polygon_shape.length
+                            1 - np.power(ratio, 2)) / polygon_shape.length
                     shrinked = padding.Execute(-distance)
                     if len(shrinked) == 1:
                         break

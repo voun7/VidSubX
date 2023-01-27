@@ -11,26 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
-
-os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
-
-import cv2
 import copy
-import numpy as np
 import math
+import os
 import time
 import traceback
 
-import tools.infer.utility as utility
-from ppocr.postprocess import build_post_process
-from ppocr.utils.logging import get_logger
-from ppocr.utils.utility import get_image_file_list, check_and_read
+import cv2
+import numpy as np
+
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.ppocr.postprocess import build_post_process
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+
+os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 logger = get_logger()
 

@@ -18,15 +18,14 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import copy
-import numpy as np
-import string
-from shapely.geometry import LineString, Point, Polygon
 import json
-import copy
 from random import sample
 
-from ppocr.utils.logging import get_logger
-from ppocr.data.imaug.vqa.augment import order_by_tbyx
+import numpy as np
+from shapely.geometry import LineString, Point, Polygon
+
+from custom_paddleocr.ppocr.data.imaug.vqa.augment import order_by_tbyx
+from custom_paddleocr.ppocr.utils.logging import get_logger
 
 
 class ClsLabelEncode(object):
@@ -573,7 +572,7 @@ class SEEDLabelEncode(BaseRecLabelEncode):
             return None
         data['length'] = np.array(len(text)) + 1  # conclude eos
         text = text + [len(self.character) - 3] + [len(self.character) - 2] * (
-            self.max_text_len - len(text) - 1)
+                self.max_text_len - len(text) - 1)
         data['label'] = np.array(text)
         return data
 
@@ -677,7 +676,7 @@ class TableLabelEncode(AttnLabelEncode):
             "['<b>', '<i>', ' ', '</i>', '</b>']": '<eb8></eb8>',
             "['<i>', '</i>']": '<eb9></eb9>',
             "['<b>', ' ', '\\u2028', ' ', '\\u2028', ' ', '</b>']":
-            '<eb10></eb10>',
+                '<eb10></eb10>',
         }
 
     @property
@@ -723,7 +722,7 @@ class TableLabelEncode(AttnLabelEncode):
         for i, token in enumerate(structure):
             if self.idx2char[token] in self.td_token:
                 if 'bbox' in cells[bbox_idx] and len(cells[bbox_idx][
-                        'tokens']) > 0:
+                                                         'tokens']) > 0:
                     bbox = cells[bbox_idx]['bbox'].copy()
                     bbox = np.array(bbox, dtype=np.float32).reshape(-1)
                     bboxes[i] = bbox
@@ -921,7 +920,7 @@ class PRENLabelEncode(BaseRecLabelEncode):
         text_list.append(self.end_idx)
         if len(text_list) < self.max_text_len:
             text_list += [self.padding_idx] * (
-                self.max_text_len - len(text_list))
+                    self.max_text_len - len(text_list))
         return text_list
 
     def __call__(self, data):
@@ -950,7 +949,7 @@ class VQATokenLabelEncode(object):
                  **kwargs):
         super(VQATokenLabelEncode, self).__init__()
         from paddlenlp.transformers import LayoutXLMTokenizer, LayoutLMTokenizer, LayoutLMv2Tokenizer
-        from ppocr.utils.utility import load_vqa_bio_label_maps
+        from custom_paddleocr.ppocr.utils.utility import load_vqa_bio_label_maps
         tokenizer_dict = {
             'LayoutXLM': {
                 'class': LayoutXLMTokenizer,
@@ -1018,7 +1017,7 @@ class VQATokenLabelEncode(object):
         for idx in range(len(ocr_info)):
             if "bbox" not in ocr_info[idx]:
                 ocr_info[idx]["bbox"] = self.trans_poly_to_bbox(ocr_info[idx][
-                    "points"])
+                                                                    "points"])
 
         if self.order_method == "tb-yx":
             ocr_info = order_by_tbyx(ocr_info)
@@ -1100,7 +1099,7 @@ class VQATokenLabelEncode(object):
                     entities.append({
                         "start": len(input_ids_list),
                         "end":
-                        len(input_ids_list) + len(encode_res["input_ids"]),
+                            len(input_ids_list) + len(encode_res["input_ids"]),
                         "label": label.upper(),
                     })
             else:

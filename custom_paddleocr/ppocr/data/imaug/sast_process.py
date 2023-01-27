@@ -1,26 +1,24 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 This part code is refered from: 
 https://github.com/songdejia/EAST/blob/master/data_utils.py
 """
 import math
+
 import cv2
 import numpy as np
-import json
-import sys
-import os
 
 __all__ = ['SASTProcessTrain']
 
@@ -67,9 +65,9 @@ class SASTProcessTrain(object):
             min_dist = 1e4
             for i in range(4):
                 dist = np.linalg.norm(box[(i + 0) % 4] - poly[0]) + \
-                    np.linalg.norm(box[(i + 1) % 4] - poly[point_num // 2 - 1]) + \
-                    np.linalg.norm(box[(i + 2) % 4] - poly[point_num // 2]) + \
-                    np.linalg.norm(box[(i + 3) % 4] - poly[-1])
+                       np.linalg.norm(box[(i + 1) % 4] - poly[point_num // 2 - 1]) + \
+                       np.linalg.norm(box[(i + 2) % 4] - poly[point_num // 2]) + \
+                       np.linalg.norm(box[(i + 3) % 4] - poly[-1])
                 if dist < min_dist:
                     min_dist = dist
                     first_point_idx = i
@@ -172,7 +170,7 @@ class SASTProcessTrain(object):
             # if xmax - xmin < ARGS.min_crop_side_ratio * w or \
             #   ymax - ymin < ARGS.min_crop_side_ratio * h:
             if xmax - xmin < self.min_crop_size or \
-            ymax - ymin < self.min_crop_size:
+                    ymax - ymin < self.min_crop_size:
                 # area too small
                 continue
             if polys.shape[0] != 0:
@@ -185,7 +183,7 @@ class SASTProcessTrain(object):
             if len(selected_polys) == 0:
                 # no text in this area
                 if crop_background:
-                    return im[ymin : ymax + 1, xmin : xmax + 1, :], \
+                    return im[ymin: ymax + 1, xmin: xmax + 1, :], \
                         polys[selected_polys], tags[selected_polys], hv_tags[selected_polys]
                 else:
                     continue
@@ -216,9 +214,9 @@ class SASTProcessTrain(object):
 
         for quad in poly_quads:
             direct_vector_full = (
-                (quad[1] + quad[2]) - (quad[0] + quad[3])) / 2.0
+                                         (quad[1] + quad[2]) - (quad[0] + quad[3])) / 2.0
             direct_vector = direct_vector_full / (
-                np.linalg.norm(direct_vector_full) + 1e-6) * norm_width
+                    np.linalg.norm(direct_vector_full) + 1e-6) * norm_width
             direction_label = tuple(
                 map(float, [
                     direct_vector[0], direct_vector[1], 1.0 / (average_height +
@@ -257,12 +255,12 @@ class SASTProcessTrain(object):
         score_map = np.zeros(
             (
                 h,
-                w, ), dtype=np.float32)
+                w,), dtype=np.float32)
         tbo_map = np.zeros((h, w, 5), dtype=np.float32)
         training_mask = np.ones(
             (
                 h,
-                w, ), dtype=np.float32)
+                w,), dtype=np.float32)
         direction_map = np.ones((h, w, 3)) * np.array([0, 0, 1]).reshape(
             [1, 1, 3]).astype(np.float32)
 
@@ -273,14 +271,14 @@ class SASTProcessTrain(object):
             # generate min_area_quad
             min_area_quad, center_point = self.gen_min_area_quad_from_poly(poly)
             min_area_quad_h = 0.5 * (
-                np.linalg.norm(min_area_quad[0] - min_area_quad[3]) +
-                np.linalg.norm(min_area_quad[1] - min_area_quad[2]))
+                    np.linalg.norm(min_area_quad[0] - min_area_quad[3]) +
+                    np.linalg.norm(min_area_quad[1] - min_area_quad[2]))
             min_area_quad_w = 0.5 * (
-                np.linalg.norm(min_area_quad[0] - min_area_quad[1]) +
-                np.linalg.norm(min_area_quad[2] - min_area_quad[3]))
+                    np.linalg.norm(min_area_quad[0] - min_area_quad[1]) +
+                    np.linalg.norm(min_area_quad[2] - min_area_quad[3]))
 
             if min(min_area_quad_h, min_area_quad_w) < self.min_text_size * ds_ratio \
-                or min(min_area_quad_h, min_area_quad_w) > self.max_text_size * ds_ratio:
+                    or min(min_area_quad_h, min_area_quad_w) > self.max_text_size * ds_ratio:
                 continue
 
             if tag:
@@ -348,11 +346,11 @@ class SASTProcessTrain(object):
             # generate min_area_quad
             min_area_quad, center_point = self.gen_min_area_quad_from_poly(poly)
             min_area_quad_h = 0.5 * (
-                np.linalg.norm(min_area_quad[0] - min_area_quad[3]) +
-                np.linalg.norm(min_area_quad[1] - min_area_quad[2]))
+                    np.linalg.norm(min_area_quad[0] - min_area_quad[3]) +
+                    np.linalg.norm(min_area_quad[1] - min_area_quad[2]))
             min_area_quad_w = 0.5 * (
-                np.linalg.norm(min_area_quad[0] - min_area_quad[1]) +
-                np.linalg.norm(min_area_quad[2] - min_area_quad[3]))
+                    np.linalg.norm(min_area_quad[0] - min_area_quad[1]) +
+                    np.linalg.norm(min_area_quad[2] - min_area_quad[3]))
 
             # generate tcl map and text, 128 * 128
             tcl_poly = self.poly2tcl(poly, tcl_ratio)
@@ -416,7 +414,7 @@ class SASTProcessTrain(object):
             vector_1 = poly[0] - poly[1]
             vector_2 = poly[1] - poly[2]
             cos_theta = np.dot(vector_1, vector_2) / (
-                np.linalg.norm(vector_1) * np.linalg.norm(vector_2) + 1e-6)
+                    np.linalg.norm(vector_1) * np.linalg.norm(vector_2) + 1e-6)
             theta = np.arccos(np.round(cos_theta, decimals=4))
 
             if abs(theta) > (70 / 180 * math.pi):
@@ -443,9 +441,9 @@ class SASTProcessTrain(object):
             min_dist = 1e4
             for i in range(4):
                 dist = np.linalg.norm(box[(i + 0) % 4] - poly[0]) + \
-                    np.linalg.norm(box[(i + 1) % 4] - poly[point_num // 2 - 1]) + \
-                    np.linalg.norm(box[(i + 2) % 4] - poly[point_num // 2]) + \
-                    np.linalg.norm(box[(i + 3) % 4] - poly[-1])
+                       np.linalg.norm(box[(i + 1) % 4] - poly[point_num // 2 - 1]) + \
+                       np.linalg.norm(box[(i + 2) % 4] - poly[point_num // 2]) + \
+                       np.linalg.norm(box[(i + 3) % 4] - poly[-1])
                 if dist < min_dist:
                     min_dist = dist
                     first_point_idx = i
@@ -560,8 +558,8 @@ class SASTProcessTrain(object):
         d = a1 * b2 - a2 * b1
 
         if d == 0:
-            #print("line1", line1)
-            #print("line2", line2)
+            # print("line1", line1)
+            # print("line2", line2)
             print('Cross point does not exist')
             return np.array([0, 0], dtype=np.float32)
         else:
@@ -645,7 +643,7 @@ class SASTProcessTrain(object):
         for idx in range(quad_num):
             # reshape and adjust to clock-wise
             quad_list.append((np.array(point_pair_list)[[idx, idx + 1]]
-                              ).reshape(4, 2)[[0, 2, 3, 1]])
+                             ).reshape(4, 2)[[0, 2, 3, 1]])
 
         return np.array(quad_list)
 
@@ -665,7 +663,7 @@ class SASTProcessTrain(object):
         if text_polys.shape[0] == 0:
             return None
 
-        #set aspect ratio and keep area fix
+        # set aspect ratio and keep area fix
         asp_scales = np.arange(1.0, 1.55, 0.1)
         asp_scale = np.random.choice(asp_scales)
 
@@ -688,19 +686,19 @@ class SASTProcessTrain(object):
         if min(h, w) < 16:
             return None
 
-        #no background
+        # no background
         im, text_polys, text_tags, hv_tags = self.crop_area(im, \
-            text_polys, text_tags, hv_tags, crop_background=False)
+                                                            text_polys, text_tags, hv_tags, crop_background=False)
 
         if text_polys.shape[0] == 0:
             return None
-        #continue for all ignore case
+        # continue for all ignore case
         if np.sum((text_tags * 1.0)) >= text_tags.size:
             return None
         new_h, new_w, _ = im.shape
         if (new_h is None) or (new_w is None):
             return None
-        #resize image
+        # resize image
         std_ratio = float(self.input_size) / max(new_w, new_h)
         rand_scales = np.array(
             [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.0, 1.0, 1.0, 1.0])
@@ -709,16 +707,16 @@ class SASTProcessTrain(object):
         text_polys[:, :, 0] *= rz_scale
         text_polys[:, :, 1] *= rz_scale
 
-        #add gaussian blur
+        # add gaussian blur
         if np.random.rand() < 0.1 * 0.5:
             ks = np.random.permutation(5)[0] + 1
             ks = int(ks / 2) * 2 + 1
             im = cv2.GaussianBlur(im, ksize=(ks, ks), sigmaX=0, sigmaY=0)
-        #add brighter
+        # add brighter
         if np.random.rand() < 0.1 * 0.5:
             im = im * (1.0 + np.random.rand() * 0.5)
             im = np.clip(im, 0.0, 255.0)
-        #add darker
+        # add darker
         if np.random.rand() < 0.1 * 0.5:
             im = im * (1.0 - np.random.rand() * 0.5)
             im = np.clip(im, 0.0, 255.0)

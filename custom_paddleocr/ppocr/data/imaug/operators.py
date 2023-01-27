@@ -19,11 +19,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import math
 import sys
-import six
+
 import cv2
 import numpy as np
-import math
+import six
 from PIL import Image
 
 
@@ -91,7 +92,7 @@ class NormalizeImage(object):
         assert isinstance(img,
                           np.ndarray), "invalid input 'img' in NormalizeImage"
         data['image'] = (
-            img.astype('float32') * self.scale - self.mean) / self.std
+                                img.astype('float32') * self.scale - self.mean) / self.std
         return data
 
 
@@ -151,7 +152,7 @@ class Pad(object):
         if self.size:
             resize_h2, resize_w2 = self.size
             assert (
-                img_h < resize_h2 and img_w < resize_w2
+                    img_h < resize_h2 and img_w < resize_w2
             ), '(h, w) of target size should be greater than (img_h, img_w)'
         else:
             resize_h2 = max(

@@ -12,25 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
-from PIL import Image
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, __dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
-
-os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+import time
+import traceback
 
 import cv2
 import numpy as np
-import math
-import time
-import traceback
-import paddle
+from PIL import Image
 
-import tools.infer.utility as utility
-from ppocr.postprocess import build_post_process
-from ppocr.utils.logging import get_logger
-from ppocr.utils.utility import get_image_file_list, check_and_read
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+
+os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 logger = get_logger()
 
@@ -52,7 +45,7 @@ class TextSR(object):
                 model_precision=args.precision,
                 batch_size=args.sr_batch_num,
                 data_shape="dynamic",
-                save_path=None,  #args.save_log_path,
+                save_path=None,  # args.save_log_path,
                 inference_config=self.config,
                 pids=pid,
                 process_name=None,
@@ -137,7 +130,7 @@ def main(args):
                 fm_sr = (sr_img[i] * 255).transpose(1, 2, 0).astype(np.uint8)
                 fm_lr = (lr_img[i] * 255).transpose(1, 2, 0).astype(np.uint8)
                 img_name_pure = os.path.split(valid_image_file_list[
-                    beg_no * args.sr_batch_num + i])[-1]
+                                                  beg_no * args.sr_batch_num + i])[-1]
                 cv2.imwrite("infer_result/sr_{}".format(img_name_pure),
                             fm_sr[:, :, ::-1])
                 logger.info("The visualized image saved in infer_result/sr_{}".

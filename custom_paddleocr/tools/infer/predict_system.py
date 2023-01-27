@@ -11,30 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
+import json
+import logging
 import os
-import sys
 import subprocess
+import sys
+import time
 
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+import cv2
+import numpy as np
+from PIL import Image
+
+import custom_paddleocr.tools.infer.predict_cls as predict_cls
+import custom_paddleocr.tools.infer.predict_det as predict_det
+import custom_paddleocr.tools.infer.predict_rec as predict_rec
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+from custom_paddleocr.tools.infer.utility import draw_ocr_box_txt, get_rotate_crop_image, get_minarea_rect_crop
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
-import cv2
-import copy
-import numpy as np
-import json
-import time
-import logging
-from PIL import Image
-import tools.infer.utility as utility
-import tools.infer.predict_rec as predict_rec
-import tools.infer.predict_det as predict_det
-import tools.infer.predict_cls as predict_cls
-from ppocr.utils.utility import get_image_file_list, check_and_read
-from ppocr.utils.logging import get_logger
-from tools.infer.utility import draw_ocr_box_txt, get_rotate_crop_image, get_minarea_rect_crop
 logger = get_logger()
 
 
@@ -57,10 +55,7 @@ class TextSystem(object):
         os.makedirs(output_dir, exist_ok=True)
         bbox_num = len(img_crop_list)
         for bno in range(bbox_num):
-            cv2.imwrite(
-                os.path.join(output_dir,
-                             f"mg_crop_{bno+self.crop_image_res_index}.jpg"),
-                img_crop_list[bno])
+            cv2.imwrite(os.path.join(output_dir, f"mg_crop_{bno + self.crop_image_res_index}.jpg"), img_crop_list[bno])
             logger.debug(f"{bno}, {rec_res[bno]}")
         self.crop_image_res_index += bbox_num
 
@@ -70,8 +65,7 @@ class TextSystem(object):
         ori_im = img.copy()
         dt_boxes, elapse = self.text_detector(img)
         time_dict['det'] = elapse
-        logger.debug("dt_boxes num : {}, elapse : {}".format(
-            len(dt_boxes), elapse))
+        logger.debug("dt_boxes num : {}, elapse : {}".format(len(dt_boxes), elapse))
         if dt_boxes is None:
             return None, None
         img_crop_list = []
@@ -86,8 +80,7 @@ class TextSystem(object):
                 img_crop = get_minarea_rect_crop(ori_im, tmp_box)
             img_crop_list.append(img_crop)
         if self.use_angle_cls and cls:
-            img_crop_list, angle_list, elapse = self.text_classifier(
-                img_crop_list)
+            img_crop_list, angle_list, elapse = self.text_classifier(img_crop_list)
             time_dict['cls'] = elapse
             logger.debug("cls num  : {}, elapse : {}".format(
                 len(img_crop_list), elapse))
@@ -97,8 +90,7 @@ class TextSystem(object):
         logger.debug("rec_res num  : {}, elapse : {}".format(
             len(rec_res), elapse))
         if self.args.save_crop_res:
-            self.draw_crop_rec_res(self.args.crop_res_save_dir, img_crop_list,
-                                   rec_res)
+            self.draw_crop_rec_res(self.args.crop_res_save_dir, img_crop_list, rec_res)
         filter_boxes, filter_rec_res = [], []
         for box, rec_result in zip(dt_boxes, rec_res):
             text, score = rec_result
@@ -124,8 +116,7 @@ def sorted_boxes(dt_boxes):
 
     for i in range(num_boxes - 1):
         for j in range(i, -1, -1):
-            if abs(_boxes[j + 1][0][1] - _boxes[j][0][1]) < 10 and \
-                    (_boxes[j + 1][0][0] < _boxes[j][0][0]):
+            if abs(_boxes[j + 1][0][1] - _boxes[j][0][1]) < 10 and (_boxes[j + 1][0][0] < _boxes[j][0][0]):
                 tmp = _boxes[j]
                 _boxes[j] = _boxes[j + 1]
                 _boxes[j + 1] = tmp
@@ -196,12 +187,10 @@ def main(args):
                 "points": np.array(dt_boxes[i]).astype(np.int32).tolist(),
             } for i in range(len(dt_boxes))]
             if len(imgs) > 1:
-                save_pred = os.path.basename(image_file) + '_' + str(
-                    index) + "\t" + json.dumps(
-                        res, ensure_ascii=False) + "\n"
+                save_pred = os.path.basename(image_file) + '_' + str(index) + "\t" + \
+                            json.dumps(res, ensure_ascii=False) + "\n"
             else:
-                save_pred = os.path.basename(image_file) + "\t" + json.dumps(
-                    res, ensure_ascii=False) + "\n"
+                save_pred = os.path.basename(image_file) + "\t" + json.dumps(res, ensure_ascii=False) + "\n"
             save_results.append(save_pred)
 
             if is_visualize:

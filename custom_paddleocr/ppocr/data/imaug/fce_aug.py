@@ -15,12 +15,13 @@
 This code is refer from:
 https://github.com/open-mmlab/mmocr/blob/main/mmocr/datasets/pipelines/transforms.py
 """
-import numpy as np
-from PIL import Image, ImageDraw
-import cv2
-from shapely.geometry import Polygon
 import math
-from ppocr.utils.poly_nms import poly_intersection
+
+import cv2
+import numpy as np
+from shapely.geometry import Polygon
+
+from custom_paddleocr.ppocr.utils.poly_nms import poly_intersection
 
 
 class RandomScaling:
@@ -337,8 +338,8 @@ class RandomCropPolyInstances:
             for ind, polygon in enumerate(polygons):
                 if (polygon[:, ::2] > -4).all() and (
                         polygon[:, ::2] < w + 4).all() and (
-                            polygon[:, 1::2] > -4).all() and (
-                                polygon[:, 1::2] < h + 4).all():
+                        polygon[:, 1::2] > -4).all() and (
+                        polygon[:, 1::2] < h + 4).all():
                     polygon[:, ::2] = np.clip(polygon[:, ::2], 0, w)
                     polygon[:, 1::2] = np.clip(polygon[:, 1::2], 0, h)
                     valid_masks_list.append(polygon)

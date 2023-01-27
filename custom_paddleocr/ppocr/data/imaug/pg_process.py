@@ -13,10 +13,12 @@
 # limitations under the License.
 
 import math
+
 import cv2
 import numpy as np
+
 # from skimage.morphology._skeletonize import thin
-from ppocr.utils.e2e_utils.extract_textpoint_fast import sort_and_expand_with_direction_v2
+from custom_paddleocr.ppocr.utils.e2e_utils.extract_textpoint_fast import sort_and_expand_with_direction_v2
 
 __all__ = ['PGProcessTrain']
 
@@ -207,7 +209,7 @@ class PGProcessTrain(object):
                         txts_tmp.append(txts[selected_poly])
                     txts = txts_tmp
                     return im[ymin: ymax + 1, xmin: xmax + 1, :], \
-                           polys[selected_polys], tags[selected_polys], hv_tags[selected_polys], txts
+                        polys[selected_polys], tags[selected_polys], hv_tags[selected_polys], txts
                 else:
                     continue
             im = im[ymin:ymax + 1, xmin:xmax + 1, :]
@@ -244,18 +246,18 @@ class PGProcessTrain(object):
         tmp_image = np.zeros(
             shape=(
                 max_h,
-                max_w, ), dtype='float32')
+                max_w,), dtype='float32')
         cv2.polylines(tmp_image, [np.array(key_point_xys).astype('int32')],
                       False, 1.0)
         ys, xs = np.where(tmp_image > 0)
         xy_text = np.array(list(zip(xs, ys)), dtype='float32')
 
         left_center_pt = (
-            (min_area_quad[0] - min_area_quad[1]) / 2.0).reshape(1, 2)
+                (min_area_quad[0] - min_area_quad[1]) / 2.0).reshape(1, 2)
         right_center_pt = (
-            (min_area_quad[1] - min_area_quad[2]) / 2.0).reshape(1, 2)
+                (min_area_quad[1] - min_area_quad[2]) / 2.0).reshape(1, 2)
         proj_unit_vec = (right_center_pt - left_center_pt) / (
-            np.linalg.norm(right_center_pt - left_center_pt) + 1e-6)
+                np.linalg.norm(right_center_pt - left_center_pt) + 1e-6)
         proj_unit_vec_tile = np.tile(proj_unit_vec,
                                      (xy_text.shape[0], 1))  # (n, 2)
         left_center_pt_tile = np.tile(left_center_pt,
@@ -285,7 +287,7 @@ class PGProcessTrain(object):
 
         # padding to fixed length
         pos_l = np.zeros((self.tcl_len, 3), dtype=np.int32)
-        pos_l[:, 0] = np.ones((self.tcl_len, )) * img_id
+        pos_l[:, 0] = np.ones((self.tcl_len,)) * img_id
         pos_m = np.zeros((self.tcl_len, 1), dtype=np.float32)
         pos_l[:keep, 1:] = np.round(pos_info).astype(np.int32)
         pos_m[:keep] = 1.0
@@ -374,7 +376,7 @@ class PGProcessTrain(object):
 
         # padding to fixed length
         pos_l = np.zeros((self.tcl_len, 3), dtype=np.int32)
-        pos_l[:, 0] = np.ones((self.tcl_len, )) * img_id
+        pos_l[:, 0] = np.ones((self.tcl_len,)) * img_id
         pos_m = np.zeros((self.tcl_len, 1), dtype=np.float32)
         pos_l[:keep, 1:] = np.round(pos_info).astype(np.int32)
         pos_m[:keep] = 1.0
@@ -397,9 +399,9 @@ class PGProcessTrain(object):
         k = 1
         for quad in poly_quads:
             direct_vector_full = (
-                (quad[1] + quad[2]) - (quad[0] + quad[3])) / 2.0
+                                         (quad[1] + quad[2]) - (quad[0] + quad[3])) / 2.0
             direct_vector = direct_vector_full / (
-                np.linalg.norm(direct_vector_full) + 1e-6) * norm_width
+                    np.linalg.norm(direct_vector_full) + 1e-6) * norm_width
             direction_label = tuple(
                 map(float,
                     [direct_vector[0], direct_vector[1], 1.0 / average_height]))
@@ -436,23 +438,23 @@ class PGProcessTrain(object):
         score_map_big = np.zeros(
             (
                 h,
-                w, ), dtype=np.float32)
+                w,), dtype=np.float32)
         h, w = int(h * ds_ratio), int(w * ds_ratio)
         polys = polys * ds_ratio
 
         score_map = np.zeros(
             (
                 h,
-                w, ), dtype=np.float32)
+                w,), dtype=np.float32)
         score_label_map = np.zeros(
             (
                 h,
-                w, ), dtype=np.float32)
+                w,), dtype=np.float32)
         tbo_map = np.zeros((h, w, 5), dtype=np.float32)
         training_mask = np.ones(
             (
                 h,
-                w, ), dtype=np.float32)
+                w,), dtype=np.float32)
         direction_map = np.ones((h, w, 3)) * np.array([0, 0, 1]).reshape(
             [1, 1, 3]).astype(np.float32)
 
@@ -466,11 +468,11 @@ class PGProcessTrain(object):
             # generate min_area_quad
             min_area_quad, center_point = self.gen_min_area_quad_from_poly(poly)
             min_area_quad_h = 0.5 * (
-                np.linalg.norm(min_area_quad[0] - min_area_quad[3]) +
-                np.linalg.norm(min_area_quad[1] - min_area_quad[2]))
+                    np.linalg.norm(min_area_quad[0] - min_area_quad[3]) +
+                    np.linalg.norm(min_area_quad[1] - min_area_quad[2]))
             min_area_quad_w = 0.5 * (
-                np.linalg.norm(min_area_quad[0] - min_area_quad[1]) +
-                np.linalg.norm(min_area_quad[2] - min_area_quad[3]))
+                    np.linalg.norm(min_area_quad[0] - min_area_quad[1]) +
+                    np.linalg.norm(min_area_quad[2] - min_area_quad[3]))
 
             if min(min_area_quad_h, min_area_quad_w) < self.min_text_size * ds_ratio \
                     or min(min_area_quad_h, min_area_quad_w) > self.max_text_size * ds_ratio:
@@ -569,7 +571,7 @@ class PGProcessTrain(object):
         score_map = np.array(score_map_big_resized > 1e-3, dtype='float32')
 
         return score_map, score_label_map, tbo_map, direction_map, training_mask, \
-               pos_list, pos_mask, label_list, score_label_map_text_label_list
+            pos_list, pos_mask, label_list, score_label_map_text_label_list
 
     def adjust_point(self, poly):
         """
@@ -589,7 +591,7 @@ class PGProcessTrain(object):
             vector_1 = poly[0] - poly[1]
             vector_2 = poly[1] - poly[2]
             cos_theta = np.dot(vector_1, vector_2) / (
-                np.linalg.norm(vector_1) * np.linalg.norm(vector_2) + 1e-6)
+                    np.linalg.norm(vector_1) * np.linalg.norm(vector_2) + 1e-6)
             theta = np.arccos(np.round(cos_theta, decimals=4))
 
             if abs(theta) > (70 / 180 * math.pi):
@@ -825,7 +827,7 @@ class PGProcessTrain(object):
         for idx in range(quad_num):
             # reshape and adjust to clock-wise
             quad_list.append((np.array(point_pair_list)[[idx, idx + 1]]
-                              ).reshape(4, 2)[[0, 2, 3, 1]])
+                             ).reshape(4, 2)[[0, 2, 3, 1]])
 
         return np.array(quad_list)
 
@@ -853,9 +855,9 @@ class PGProcessTrain(object):
             for j in range(4):  # 16->4
                 sx, sy = wordBB[j][0], wordBB[j][1]
                 dx = math.cos(rot_angle) * (sx - cx) - math.sin(rot_angle) * (
-                    sy - cy) + ncx
+                        sy - cy) + ncx
                 dy = math.sin(rot_angle) * (sx - cx) + math.cos(rot_angle) * (
-                    sy - cy) + ncy
+                        sy - cy) + ncy
                 poly.append([dx, dy])
             dst_polys.append(poly)
         return dst_im, np.array(dst_polys, dtype=np.float32)
@@ -971,11 +973,11 @@ class PGProcessTrain(object):
         text_polys[:, :, 1] += sh
 
         score_map, score_label_map, border_map, direction_map, training_mask, \
-        pos_list, pos_mask, label_list, score_label_map_text_label = self.generate_tcl_ctc_label(input_size,
-                                                                                                 input_size,
-                                                                                                 text_polys,
-                                                                                                 text_tags,
-                                                                                                 text_strs, 0.25)
+            pos_list, pos_mask, label_list, score_label_map_text_label = self.generate_tcl_ctc_label(input_size,
+                                                                                                     input_size,
+                                                                                                     text_polys,
+                                                                                                     text_tags,
+                                                                                                     text_strs, 0.25)
         if len(label_list) <= 0:  # eliminate negative samples
             return None
         pos_list_temp = np.zeros([64, 3])

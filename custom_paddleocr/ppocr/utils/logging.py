@@ -16,10 +16,11 @@ This code is refer from:
 https://github.com/WenmuZhou/PytorchOCR/blob/master/torchocr/utils/logging.py
 """
 
+import functools
+import logging
 import os
 import sys
-import logging
-import functools
+
 import paddle.distributed as dist
 
 logger_initialized = {}

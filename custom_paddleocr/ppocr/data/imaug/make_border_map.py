@@ -21,14 +21,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import numpy as np
-import cv2
+import warnings
 
-np.seterr(divide='ignore', invalid='ignore')
+import cv2
+import numpy as np
 import pyclipper
 from shapely.geometry import Polygon
-import sys
-import warnings
+
+np.seterr(divide='ignore', invalid='ignore')
 
 warnings.simplefilter("ignore")
 
@@ -73,7 +73,7 @@ class MakeBorderMap(object):
         if polygon_shape.area <= 0:
             return
         distance = polygon_shape.area * (
-            1 - np.power(self.shrink_ratio, 2)) / polygon_shape.length
+                1 - np.power(self.shrink_ratio, 2)) / polygon_shape.length
         subject = [tuple(l) for l in polygon]
         padding = pyclipper.PyclipperOffset()
         padding.AddPath(subject, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
@@ -112,7 +112,7 @@ class MakeBorderMap(object):
         ymax_valid = min(max(0, ymax), canvas.shape[0] - 1)
         canvas[ymin_valid:ymax_valid + 1, xmin_valid:xmax_valid + 1] = np.fmax(
             1 - distance_map[ymin_valid - ymin:ymax_valid - ymax + height,
-                             xmin_valid - xmin:xmax_valid - xmax + width],
+                xmin_valid - xmin:xmax_valid - xmax + width],
             canvas[ymin_valid:ymax_valid + 1, xmin_valid:xmax_valid + 1])
 
     def _distance(self, xs, ys, point_1, point_2):
@@ -131,7 +131,7 @@ class MakeBorderMap(object):
             point_1[1] - point_2[1])
 
         cosin = (square_distance - square_distance_1 - square_distance_2) / (
-            2 * np.sqrt(square_distance_1 * square_distance_2))
+                2 * np.sqrt(square_distance_1 * square_distance_2))
         square_sin = 1 - np.square(cosin)
         square_sin = np.nan_to_num(square_sin)
         result = np.sqrt(square_distance_1 * square_distance_2 * square_sin /
@@ -148,7 +148,7 @@ class MakeBorderMap(object):
             round(point_1[0] + (point_1[0] - point_2[0]) * (1 + shrink_ratio))),
                       int(
                           round(point_1[1] + (point_1[1] - point_2[1]) * (
-                              1 + shrink_ratio))))
+                                  1 + shrink_ratio))))
         cv2.line(
             result,
             tuple(ex_point_1),
@@ -161,7 +161,7 @@ class MakeBorderMap(object):
             round(point_2[0] + (point_2[0] - point_1[0]) * (1 + shrink_ratio))),
                       int(
                           round(point_2[1] + (point_2[1] - point_1[1]) * (
-                              1 + shrink_ratio))))
+                                  1 + shrink_ratio))))
         cv2.line(
             result,
             tuple(ex_point_2),

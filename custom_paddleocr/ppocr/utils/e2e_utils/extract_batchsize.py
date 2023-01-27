@@ -1,6 +1,7 @@
-import paddle
-import numpy as np
 import copy
+
+import numpy as np
+import paddle
 
 
 def org_tcl_rois(batch_size, pos_lists, pos_masks, label_lists, tcl_bs):

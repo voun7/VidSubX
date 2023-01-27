@@ -45,7 +45,7 @@ def iou(a, b, mask, n_class=2, reduce=True):
     b = b.reshape([batch_size, -1])
     mask = mask.reshape([batch_size, -1])
 
-    iou = paddle.zeros((batch_size, ), dtype='float32')
+    iou = paddle.zeros((batch_size,), dtype='float32')
     for i in range(batch_size):
         iou[i] = iou_single(a[i], b[i], mask[i], n_class)
 

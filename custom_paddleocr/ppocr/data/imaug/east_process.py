@@ -1,26 +1,24 @@
-#copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
+# copyright (c) 2020 PaddlePaddle Authors. All Rights Reserve.
 #
-#Licensed under the Apache License, Version 2.0 (the "License");
-#you may not use this file except in compliance with the License.
-#You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
 #
-#Unless required by applicable law or agreed to in writing, software
-#distributed under the License is distributed on an "AS IS" BASIS,
-#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#See the License for the specific language governing permissions and
-#limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 This code is refered from: 
 https://github.com/songdejia/EAST/blob/master/data_utils.py
 """
 import math
+
 import cv2
 import numpy as np
-import json
-import sys
-import os
 
 __all__ = ['EASTProcessTrain']
 
@@ -83,10 +81,10 @@ class EASTProcessTrain(object):
             poly = []
             for j in range(4):
                 sx, sy = wordBB[j][0], wordBB[j][1]
-                dx = math.cos(rot_angle) * (sx - cx)\
-                    - math.sin(rot_angle) * (sy - cy) + ncx
-                dy = math.sin(rot_angle) * (sx - cx)\
-                    + math.cos(rot_angle) * (sy - cy) + ncy
+                dx = math.cos(rot_angle) * (sx - cx) \
+                     - math.sin(rot_angle) * (sy - cy) + ncx
+                dy = math.sin(rot_angle) * (sx - cx) \
+                     + math.cos(rot_angle) * (sy - cy) + ncy
                 poly.append([dx, dy])
             dst_polys.append(poly)
         dst_polys = np.array(dst_polys, dtype=np.float32)
@@ -122,13 +120,13 @@ class EASTProcessTrain(object):
         validated_tags = []
         for poly, tag in zip(polys, tags):
             p_area = self.polygon_area(poly)
-            #invalid poly
+            # invalid poly
             if abs(p_area) < 1:
                 continue
             if p_area > 0:
-                #'poly in wrong direction'
+                # 'poly in wrong direction'
                 if not tag:
-                    tag = True  #reversed cases should be ignore
+                    tag = True  # reversed cases should be ignore
                 poly = poly[(0, 3, 2, 1), :]
             validated_polys.append(poly)
             validated_tags.append(tag)
@@ -277,9 +275,9 @@ class EASTProcessTrain(object):
             poly[:, 1] = np.minimum(np.maximum(poly[:, 1], 0), h)
             for pno in range(4):
                 geo_channel_beg = pno * 2
-                geo_map[y_in_poly, x_in_poly, geo_channel_beg] =\
+                geo_map[y_in_poly, x_in_poly, geo_channel_beg] = \
                     x_in_poly - poly[pno, 0]
-                geo_map[y_in_poly, x_in_poly, geo_channel_beg+1] =\
+                geo_map[y_in_poly, x_in_poly, geo_channel_beg + 1] = \
                     y_in_poly - poly[pno, 1]
             geo_map[y_in_poly, x_in_poly, 8] = \
                 1.0 / max(min(poly_h, poly_w), 1.0)
@@ -326,14 +324,14 @@ class EASTProcessTrain(object):
             ymin = np.clip(ymin, 0, h - 1)
             ymax = np.clip(ymax, 0, h - 1)
             if xmax - xmin < self.min_crop_side_ratio * w or \
-               ymax - ymin < self.min_crop_side_ratio * h:
+                    ymax - ymin < self.min_crop_side_ratio * h:
                 # area too small
                 continue
             if polys.shape[0] != 0:
-                poly_axis_in_area = (polys[:, :, 0] >= xmin)\
-                    & (polys[:, :, 0] <= xmax)\
-                    & (polys[:, :, 1] >= ymin)\
-                    & (polys[:, :, 1] <= ymax)
+                poly_axis_in_area = (polys[:, :, 0] >= xmin) \
+                                    & (polys[:, :, 0] <= xmax) \
+                                    & (polys[:, :, 1] >= ymin) \
+                                    & (polys[:, :, 1] <= ymax)
                 selected_polys = np.where(
                     np.sum(poly_axis_in_area, axis=1) == 4)[0]
             else:
@@ -377,7 +375,7 @@ class EASTProcessTrain(object):
 
         if text_polys.shape[0] == 0:
             return None
-        #continue for all ignore case
+        # continue for all ignore case
         if np.sum((text_tags * 1.0)) >= text_tags.size:
             return None
         # pad and resize image
@@ -401,7 +399,7 @@ class EASTProcessTrain(object):
         if text_polys.shape[0] == 0:
             return None
 
-        #add rotate cases
+        # add rotate cases
         if np.random.rand() < 0.5:
             im, text_polys = self.rotate_im_poly(im, text_polys)
         h, w, _ = im.shape

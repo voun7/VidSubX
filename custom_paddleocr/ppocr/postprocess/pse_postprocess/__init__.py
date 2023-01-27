@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .pse_postprocess import PSEPostProcess
+from custom_paddleocr.ppocr.postprocess.pse_postprocess.pse_postprocess import PSEPostProcess

@@ -20,12 +20,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
-import os.path as osp
-import numpy as np
 import cv2
+import numpy as np
 import paddle
-import pyclipper
 
 
 class CTPostProcess(object):
@@ -82,8 +79,7 @@ class CTPostProcess(object):
 
             for i in range(1, label_num):
                 ind = (label_kernel == i)
-                if ind.sum(
-                ) < 10:  # pixel number less than 10, treated as background
+                if ind.sum() < 10:  # pixel number less than 10, treated as background
                     label_kernel[ind] = 0
 
             label = np.zeros_like(label_kernel)
@@ -91,13 +87,11 @@ class CTPostProcess(object):
             pixels = self.coord[:, :h, :w].reshape(2, -1)
             points = pixels.transpose([1, 0]).astype(np.float32)
 
-            off_points = (points + 10. / 4. * loc[:, pixels[1], pixels[0]].T
-                          ).astype(np.int32)
+            off_points = (points + 10. / 4. * loc[:, pixels[1], pixels[0]].T).astype(np.int32)
             off_points[:, 0] = np.clip(off_points[:, 0], 0, label.shape[1] - 1)
             off_points[:, 1] = np.clip(off_points[:, 1], 0, label.shape[0] - 1)
 
-            label[pixels[1], pixels[0]] = label_kernel[off_points[:, 1],
-                                                       off_points[:, 0]]
+            label[pixels[1], pixels[0]] = label_kernel[off_points[:, 1], off_points[:, 0]]
             label[label_kernel > 0] = label_kernel[label_kernel > 0]
 
             score_pocket = [0.0]

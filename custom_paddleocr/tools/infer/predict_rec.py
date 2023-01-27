@@ -11,26 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import math
 import os
-import sys
-from PIL import Image
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
-
-os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+import time
+import traceback
 
 import cv2
 import numpy as np
-import math
-import time
-import traceback
-import paddle
+from PIL import Image
 
-import tools.infer.utility as utility
-from ppocr.postprocess import build_post_process
-from ppocr.utils.logging import get_logger
-from ppocr.utils.utility import get_image_file_list, check_and_read
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.ppocr.postprocess import build_post_process
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+
+os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 logger = get_logger()
 
@@ -129,7 +124,7 @@ class TextRecognizer(object):
                 model_precision=args.precision,
                 batch_size=args.rec_batch_num,
                 data_shape="dynamic",
-                save_path=None,  #args.save_log_path,
+                save_path=None,  # args.save_log_path,
                 inference_config=self.config,
                 pids=pid,
                 process_name=None,
@@ -352,7 +347,7 @@ class TextRecognizer(object):
         mean = np.array([0.485, 0.456, 0.406])
         std = np.array([0.229, 0.224, 0.225])
         resized_image = (
-            resized_image - mean[None, None, ...]) / std[None, None, ...]
+                                resized_image - mean[None, None, ...]) / std[None, None, ...]
         resized_image = resized_image.transpose((2, 0, 1))
         resized_image = resized_image.astype('float32')
 

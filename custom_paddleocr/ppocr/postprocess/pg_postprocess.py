@@ -16,13 +16,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import sys
 
-__dir__ = os.path.dirname(__file__)
-sys.path.append(__dir__)
-sys.path.append(os.path.join(__dir__, '..'))
-from ppocr.utils.e2e_utils.pgnet_pp_utils import PGNet_PostProcess
+from custom_paddleocr.ppocr.utils.e2e_utils.pgnet_pp_utils import PGNet_PostProcess
 
 
 class PGPostProcess(object):

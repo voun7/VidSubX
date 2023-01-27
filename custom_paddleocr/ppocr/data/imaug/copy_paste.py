@@ -11,16 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import copy
-import cv2
 import random
+
+import cv2
 import numpy as np
 from PIL import Image
 from shapely.geometry import Polygon
 
-from ppocr.data.imaug.iaa_augment import IaaAugment
-from ppocr.data.imaug.random_crop_data import is_poly_outside_rect
-from tools.infer.utility import get_rotate_crop_image
+from custom_paddleocr.ppocr.data.imaug.iaa_augment import IaaAugment
+from custom_paddleocr.ppocr.data.imaug.random_crop_data import is_poly_outside_rect
+from custom_paddleocr.tools.infer.utility import get_rotate_crop_image
 
 
 class CopyPaste(object):
@@ -44,8 +44,7 @@ class CopyPaste(object):
         ext_ignores = ext_data['ignore_tags']
 
         indexs = [i for i in range(len(ext_ignores)) if not ext_ignores[i]]
-        select_num = max(
-            1, min(int(self.objects_paste_ratio * len(ext_polys)), 30))
+        select_num = max(1, min(int(self.objects_paste_ratio * len(ext_polys)), 30))
 
         random.shuffle(indexs)
         select_idxs = indexs[:select_num]
@@ -60,7 +59,7 @@ class CopyPaste(object):
 
             src_img, box = self.paste_img(src_img, box_img, src_polys)
             if box is not None:
-                box = box.tolist() 
+                box = box.tolist()
                 for _ in range(len(box), point_num):
                     box.append(box[-1])
                 src_polys.append(box)
@@ -90,8 +89,7 @@ class CopyPaste(object):
         if src_w - box_w < 0 or src_h - box_h < 0:
             return src_img, None
 
-        paste_x, paste_y = self.select_coord(src_polys, box, src_w - box_w,
-                                             src_h - box_h)
+        paste_x, paste_y = self.select_coord(src_polys, box, src_w - box_w, src_h - box_h)
         if paste_x is None:
             return src_img, None
         box[:, 0] += paste_x
@@ -103,8 +101,7 @@ class CopyPaste(object):
 
     def select_coord(self, src_polys, box, endx, endy):
         if self.limit_paste:
-            xmin, ymin, xmax, ymax = box[:, 0].min(), box[:, 1].min(
-            ), box[:, 0].max(), box[:, 1].max()
+            xmin, ymin, xmax, ymax = box[:, 0].min(), box[:, 1].min(), box[:, 0].max(), box[:, 1].max()
             for _ in range(50):
                 paste_x = random.randint(0, endx)
                 paste_y = random.randint(0, endy)
@@ -115,8 +112,7 @@ class CopyPaste(object):
 
                 num_poly_in_rect = 0
                 for poly in src_polys:
-                    if not is_poly_outside_rect(poly, xmin1, ymin1,
-                                                xmax1 - xmin1, ymax1 - ymin1):
+                    if not is_poly_outside_rect(poly, xmin1, ymin1, xmax1 - xmin1, ymax1 - ymin1):
                         num_poly_in_rect += 1
                         break
                 if num_poly_in_rect == 0:

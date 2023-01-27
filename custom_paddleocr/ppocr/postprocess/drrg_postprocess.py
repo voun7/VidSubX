@@ -19,10 +19,10 @@ https://github.com/open-mmlab/mmocr/blob/main/mmocr/models/textdet/postprocess/d
 import functools
 import operator
 
+import cv2
 import numpy as np
 import paddle
 from numpy.linalg import norm
-import cv2
 
 
 class Node:
@@ -62,8 +62,7 @@ def graph_propagation(edges, scores, text_comps, edge_len_thr=50.):
             if distance > edge_len_thr:
                 scores[i] = 0
         if (edge[0], edge[1]) in score_dict:
-            score_dict[edge[0], edge[1]] = 0.5 * (
-                score_dict[edge[0], edge[1]] + scores[i])
+            score_dict[edge[0], edge[1]] = 0.5 * (score_dict[edge[0], edge[1]] + scores[i])
         else:
             score_dict[edge[0], edge[1]] = scores[i]
 
@@ -94,8 +93,7 @@ def connected_components(nodes, score_dict, link_thr):
             node = node_queue.pop(0)
             neighbors = set([
                 neighbor for neighbor in node.links
-                if score_dict[tuple(sorted([node.ind, neighbor.ind]))] >=
-                link_thr
+                if score_dict[tuple(sorted([node.ind, neighbor.ind]))] >= link_thr
             ])
             neighbors.difference_update(cluster)
             nodes.difference_update(neighbors)
@@ -137,7 +135,7 @@ def remove_single(text_comps, comp_pred_labels):
 
 
 def norm2(point1, point2):
-    return ((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)**0.5
+    return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
 
 
 def min_connect_path(points):

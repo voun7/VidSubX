@@ -11,11 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import random
-import ast
-from PIL import Image, ImageDraw, ImageFont
-import numpy as np
-from tools.infer.utility import draw_ocr_box_txt, str2bool, init_args as infer_args
+
+from custom_paddleocr.tools.infer.utility import str2bool, init_args as infer_args
 
 
 def init_args():
@@ -100,57 +97,3 @@ def init_args():
         help='Whether to use pdf2docx api')
 
     return parser
-
-
-def parse_args():
-    parser = init_args()
-    return parser.parse_args()
-
-
-def draw_structure_result(image, result, font_path):
-    if isinstance(image, np.ndarray):
-        image = Image.fromarray(image)
-    boxes, txts, scores = [], [], []
-
-    img_layout = image.copy()
-    draw_layout = ImageDraw.Draw(img_layout)
-    text_color = (255, 255, 255)
-    text_background_color = (80, 127, 255)
-    catid2color = {}
-    font_size = 15
-    font = ImageFont.truetype(font_path, font_size, encoding="utf-8")
-
-    for region in result:
-        if region['type'] not in catid2color:
-            box_color = (random.randint(0, 255), random.randint(0, 255),
-                         random.randint(0, 255))
-            catid2color[region['type']] = box_color
-        else:
-            box_color = catid2color[region['type']]
-        box_layout = region['bbox']
-        draw_layout.rectangle(
-            [(box_layout[0], box_layout[1]), (box_layout[2], box_layout[3])],
-            outline=box_color,
-            width=3)
-        text_w, text_h = font.getsize(region['type'])
-        draw_layout.rectangle(
-            [(box_layout[0], box_layout[1]),
-             (box_layout[0] + text_w, box_layout[1] + text_h)],
-            fill=text_background_color)
-        draw_layout.text(
-            (box_layout[0], box_layout[1]),
-            region['type'],
-            fill=text_color,
-            font=font)
-
-        if region['type'] == 'table':
-            pass
-        else:
-            for text_result in region['res']:
-                boxes.append(np.array(text_result['text_region']))
-                txts.append(text_result['text'])
-                scores.append(text_result['confidence'])
-
-    im_show = draw_ocr_box_txt(
-        img_layout, boxes, txts, scores, font_path=font_path, drop_score=0)
-    return im_show

@@ -16,36 +16,29 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from .iaa_augment import IaaAugment
-from .make_border_map import MakeBorderMap
-from .make_shrink_map import MakeShrinkMap
-from .random_crop_data import EastRandomCropData, RandomCropImgMask
-from .make_pse_gt import MakePseGt
-
-
-
-from .rec_img_aug import BaseDataAugmentation, RecAug, RecConAug, RecResizeImg, ClsResizeImg, \
-    SRNRecResizeImg, GrayRecResizeImg, SARRecResizeImg, PRENResizeImg, \
-    ABINetRecResizeImg, SVTRRecResizeImg, ABINetRecAug, VLRecResizeImg, SPINRecResizeImg, RobustScannerRecResizeImg, \
-    RFLRecResizeImg
-from .ssl_img_aug import SSLRotateResize
-from .randaugment import RandAugment
-from .copy_paste import CopyPaste
-from .ColorJitter import ColorJitter
-from .operators import *
-from .label_ops import *
-
-from .east_process import *
-from .sast_process import *
-from .pg_process import *
-from .table_ops import *
-
-from .vqa import *
-
-from .fce_aug import *
-from .fce_targets import FCENetTargets
-from .ct_process import *
-from .drrg_targets import DRRGTargets
+from custom_paddleocr.ppocr.data.imaug.ColorJitter import ColorJitter
+from custom_paddleocr.ppocr.data.imaug.copy_paste import CopyPaste
+from custom_paddleocr.ppocr.data.imaug.ct_process import *
+from custom_paddleocr.ppocr.data.imaug.drrg_targets import DRRGTargets
+from custom_paddleocr.ppocr.data.imaug.east_process import *
+from custom_paddleocr.ppocr.data.imaug.fce_aug import *
+from custom_paddleocr.ppocr.data.imaug.fce_targets import FCENetTargets
+from custom_paddleocr.ppocr.data.imaug.iaa_augment import IaaAugment
+from custom_paddleocr.ppocr.data.imaug.label_ops import *
+from custom_paddleocr.ppocr.data.imaug.make_border_map import MakeBorderMap
+from custom_paddleocr.ppocr.data.imaug.make_pse_gt import MakePseGt
+from custom_paddleocr.ppocr.data.imaug.make_shrink_map import MakeShrinkMap
+from custom_paddleocr.ppocr.data.imaug.operators import *
+from custom_paddleocr.ppocr.data.imaug.pg_process import *
+from custom_paddleocr.ppocr.data.imaug.randaugment import RandAugment
+from custom_paddleocr.ppocr.data.imaug.random_crop_data import EastRandomCropData, RandomCropImgMask
+from custom_paddleocr.ppocr.data.imaug.rec_img_aug import BaseDataAugmentation, RecAug, RecConAug, RecResizeImg, \
+    ClsResizeImg, SRNRecResizeImg, GrayRecResizeImg, SARRecResizeImg, PRENResizeImg, ABINetRecResizeImg, \
+    SVTRRecResizeImg, ABINetRecAug, VLRecResizeImg, SPINRecResizeImg, RobustScannerRecResizeImg, RFLRecResizeImg
+from custom_paddleocr.ppocr.data.imaug.sast_process import *
+from custom_paddleocr.ppocr.data.imaug.ssl_img_aug import SSLRotateResize
+from custom_paddleocr.ppocr.data.imaug.table_ops import *
+from custom_paddleocr.ppocr.data.imaug.vqa import *
 
 
 def transform(data, ops=None):

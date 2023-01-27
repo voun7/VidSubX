@@ -11,26 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import os
 import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
-
-os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+import time
 
 import cv2
 import numpy as np
-import time
-import sys
 
-import tools.infer.utility as utility
-from ppocr.utils.logging import get_logger
-from ppocr.utils.utility import get_image_file_list, check_and_read
-from ppocr.data import create_operators, transform
-from ppocr.postprocess import build_post_process
-import json
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.ppocr.data import create_operators, transform
+from custom_paddleocr.ppocr.postprocess import build_post_process
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+
+os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
+
 logger = get_logger()
 
 
@@ -81,7 +77,7 @@ class TextDetector(object):
                 'NormalizeImage': {
                     'std': [1.0, 1.0, 1.0],
                     'mean':
-                    [0.48109378172549, 0.45752457890196, 0.40787054090196],
+                        [0.48109378172549, 0.45752457890196, 0.40787054090196],
                     'scale': '1./255.',
                     'order': 'hwc'
                 }
@@ -316,12 +312,10 @@ if __name__ == "__main__":
             elapse = time.time() - st
             total_time += elapse
             if len(imgs) > 1:
-                save_pred = os.path.basename(image_file) + '_' + str(
-                    index) + "\t" + str(
+                save_pred = os.path.basename(image_file) + '_' + str(index) + "\t" + str(
                         json.dumps([x.tolist() for x in dt_boxes])) + "\n"
             else:
-                save_pred = os.path.basename(image_file) + "\t" + str(
-                    json.dumps([x.tolist() for x in dt_boxes])) + "\n"
+                save_pred = os.path.basename(image_file) + "\t" + str(json.dumps([x.tolist() for x in dt_boxes])) + "\n"
             save_results.append(save_pred)
             logger.info(save_pred)
             if len(imgs) > 1:

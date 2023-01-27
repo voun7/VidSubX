@@ -16,14 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import numpy as np
-from .locality_aware_nms import nms_locality
 import cv2
+import numpy as np
 import paddle
 
-import os
-from ppocr.utils.utility import check_install
-import sys
+from custom_paddleocr.ppocr.utils.utility import check_install
+from .locality_aware_nms import nms_locality
 
 
 class EASTPostProcess(object):
@@ -71,7 +69,7 @@ class EASTPostProcess(object):
             return []
         # sort the text boxes via the y axis
         xy_text = xy_text[np.argsort(xy_text[:, 0])]
-        #restore quad proposals
+        # restore quad proposals
         text_box_restored = self.restore_rectangle_quad(
             xy_text[:, ::-1] * 4, geo_map[xy_text[:, 0], xy_text[:, 1], :])
         boxes = np.zeros((text_box_restored.shape[0], 9), dtype=np.float32)
@@ -92,8 +90,7 @@ class EASTPostProcess(object):
         #   this is different from the orginal paper.
         for i, box in enumerate(boxes):
             mask = np.zeros_like(score_map, dtype=np.uint8)
-            cv2.fillPoly(mask, box[:8].reshape(
-                (-1, 4, 2)).astype(np.int32) // 4, 1)
+            cv2.fillPoly(mask, box[:8].reshape((-1, 4, 2)).astype(np.int32) // 4, 1)
             boxes[i, 8] = cv2.mean(score_map, mask)[0]
         boxes = boxes[boxes[:, 8] > cover_thresh]
         return boxes
@@ -103,8 +100,7 @@ class EASTPostProcess(object):
         Sort polygons.
         """
         min_axis = np.argmin(np.sum(p, axis=1))
-        p = p[[min_axis, (min_axis + 1) % 4,\
-            (min_axis + 2) % 4, (min_axis + 3) % 4]]
+        p = p[[min_axis, (min_axis + 1) % 4, (min_axis + 2) % 4, (min_axis + 3) % 4]]
         if abs(p[0, 0] - p[1, 0]) > abs(p[0, 1] - p[1, 1]):
             return p
         else:
@@ -136,8 +132,7 @@ class EASTPostProcess(object):
                 boxes[:, :, 1] /= ratio_h
                 for i_box, box in enumerate(boxes):
                     box = self.sort_poly(box.astype(np.int32))
-                    if np.linalg.norm(box[0] - box[1]) < 5 \
-                        or np.linalg.norm(box[3] - box[0]) < 5:
+                    if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3] - box[0]) < 5:
                         continue
                     boxes_norm.append(box)
             dt_boxes_list.append({'points': np.array(boxes_norm)})

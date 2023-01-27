@@ -1,6 +1,7 @@
 from distutils.core import setup, Extension
-from Cython.Build import cythonize
+
 import numpy
+from Cython.Build import cythonize
 
 setup(ext_modules=cythonize(Extension(
     'pse',

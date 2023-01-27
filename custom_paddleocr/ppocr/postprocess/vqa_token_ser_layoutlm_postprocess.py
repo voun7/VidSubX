@@ -13,7 +13,8 @@
 # limitations under the License.
 import numpy as np
 import paddle
-from ppocr.utils.utility import load_vqa_bio_label_maps
+
+from custom_paddleocr.ppocr.utils.utility import load_vqa_bio_label_maps
 
 
 class VQASerTokenLayoutLMPostProcess(object):
@@ -59,10 +60,8 @@ class VQASerTokenLayoutLMPostProcess(object):
         for i in range(pred_idxs.shape[0]):
             for j in range(pred_idxs.shape[1]):
                 if label[i, j] != -100:
-                    label_decode_out_list[i].append(self.id2label_map[label[i,
-                                                                            j]])
-                    decode_out_list[i].append(self.id2label_map[pred_idxs[i,
-                                                                          j]])
+                    label_decode_out_list[i].append(self.id2label_map[label[i, j]])
+                    decode_out_list[i].append(self.id2label_map[pred_idxs[i, j]])
         return decode_out_list, label_decode_out_list
 
     def _infer(self, preds, segment_offset_ids, ocr_infos):

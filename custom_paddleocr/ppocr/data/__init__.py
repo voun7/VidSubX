@@ -17,26 +17,18 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import os
-import sys
-import numpy as np
-# import skimage
-import paddle
-import signal
-import random
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.abspath(os.path.join(__dir__, '../..')))
-
 import copy
-from paddle.io import Dataset, DataLoader, BatchSampler, DistributedBatchSampler
-import paddle.distributed as dist
+import os
+# import skimage
+import signal
 
-from ppocr.data.imaug import transform, create_operators
-from ppocr.data.simple_dataset import SimpleDataSet
-from ppocr.data.lmdb_dataset import LMDBDataSet, LMDBDataSetSR
-from ppocr.data.pgnet_dataset import PGDataSet
-from ppocr.data.pubtab_dataset import PubTabDataSet
+from paddle.io import DataLoader, BatchSampler, DistributedBatchSampler
+
+from custom_paddleocr.ppocr.data.imaug import transform, create_operators
+from custom_paddleocr.ppocr.data.lmdb_dataset import LMDBDataSet, LMDBDataSetSR
+from custom_paddleocr.ppocr.data.pgnet_dataset import PGDataSet
+from custom_paddleocr.ppocr.data.pubtab_dataset import PubTabDataSet
+from custom_paddleocr.ppocr.data.simple_dataset import SimpleDataSet
 
 __all__ = ['build_dataloader', 'transform', 'create_operators']
 

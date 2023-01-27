@@ -16,18 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import sys
 
-__dir__ = os.path.dirname(__file__)
-sys.path.append(__dir__)
-sys.path.append(os.path.join(__dir__, '..'))
-
 import numpy as np
-from .locality_aware_nms import nms_locality
 import paddle
-import cv2
-import time
+
+from .locality_aware_nms import nms_locality
 
 
 class SASTPostProcess(object):
@@ -141,7 +135,7 @@ class SASTPostProcess(object):
 
     def nms(self, dets):
         if self.is_python35:
-            from ppocr.utils.utility import check_install
+            from custom_paddleocr.ppocr.utils.utility import check_install
             check_install('lanms', 'lanms-nova')
             import lanms
             dets = lanms.merge_quadrangle_n9(dets, self.nms_thresh)
@@ -195,8 +189,7 @@ class SASTPostProcess(object):
             endpoint=True,
             dtype=np.float32).astype(np.int32)]
 
-        dense_xy_center_line_diff = dense_xy_center_line[
-            1:] - dense_xy_center_line[:-1]
+        dense_xy_center_line_diff = dense_xy_center_line[1:] - dense_xy_center_line[:-1]
         estimate_arc_len = np.sum(
             np.linalg.norm(
                 dense_xy_center_line_diff, axis=1))

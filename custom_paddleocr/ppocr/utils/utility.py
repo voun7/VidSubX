@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib.util
 import logging
 import os
-import imghdr
-import cv2
 import random
+import subprocess
+import sys
+
+import cv2
 import numpy as np
 import paddle
-import importlib.util
-import sys
-import subprocess
 
 
 def print_dict(d, logger, delimiter=0):

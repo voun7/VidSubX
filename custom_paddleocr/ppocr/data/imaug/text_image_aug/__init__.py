@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .augment import tia_perspective, tia_distort, tia_stretch
+from custom_paddleocr.ppocr.data.imaug.text_image_aug.augment import tia_perspective, tia_distort, tia_stretch
 
 __all__ = ['tia_distort', 'tia_stretch', 'tia_perspective']

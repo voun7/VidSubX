@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
 import os
-from paddle.io import Dataset
+import string
+
 # import lmdb
 import cv2
-import string
+import numpy as np
 import six
 from PIL import Image
+from paddle.io import Dataset
 
 from .imaug import transform, create_operators
 
@@ -60,8 +61,8 @@ class LMDBDataSet(Dataset):
                     meminit=False)
                 txn = env.begin(write=False)
                 num_samples = int(txn.get('num-samples'.encode()))
-                lmdb_sets[dataset_idx] = {"dirpath":dirpath, "env":env, \
-                    "txn":txn, "num_samples":num_samples}
+                lmdb_sets[dataset_idx] = {"dirpath": dirpath, "env": env, \
+                                          "txn": txn, "num_samples": num_samples}
                 dataset_idx += 1
         return lmdb_sets
 

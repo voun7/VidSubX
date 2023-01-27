@@ -85,8 +85,7 @@ class MakePseGt(object):
         text_kernel = np.zeros((h, w), dtype=np.float32)
         for i, poly in enumerate(text_polys):
             polygon = Polygon(poly)
-            distance = polygon.area * (1 - shrink_ratio * shrink_ratio) / (
-                polygon.length + 1e-6)
+            distance = polygon.area * (1 - shrink_ratio * shrink_ratio) / (polygon.length + 1e-6)
             subject = [tuple(l) for l in poly]
             pco = pyclipper.PyclipperOffset()
             pco.AddPath(subject, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)

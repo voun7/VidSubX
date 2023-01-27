@@ -15,15 +15,11 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-import paddle
-import os
-import sys
 
-__dir__ = os.path.dirname(__file__)
-sys.path.append(__dir__)
-sys.path.append(os.path.join(__dir__, '..'))
-from extract_textpoint_slow import *
-from extract_textpoint_fast import generate_pivot_list_fast, restore_poly
+import paddle
+
+from custom_paddleocr.ppocr.utils.e2e_utils.extract_textpoint_fast import generate_pivot_list_fast, restore_poly
+from custom_paddleocr.ppocr.utils.e2e_utils.extract_textpoint_slow import *
 
 
 class PGNet_PostProcess(object):
@@ -155,7 +151,7 @@ class PGNet_PostProcess(object):
             if self.valid_set == 'partvgg':
                 middle_point = len(detected_poly) // 2
                 detected_poly = detected_poly[
-                    [0, middle_point - 1, middle_point, -1], :]
+                                [0, middle_point - 1, middle_point, -1], :]
                 poly_list.append(detected_poly)
             elif self.valid_set == 'totaltext':
                 poly_list.append(detected_poly)

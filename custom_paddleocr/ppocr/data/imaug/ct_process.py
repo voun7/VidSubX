@@ -12,22 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import cv2
 import random
-import pyclipper
-import paddle
 
+import cv2
 import numpy as np
-from ppocr.utils.utility import check_install
-
-# import scipy.io as scio
-
+import pyclipper
 from PIL import Image
-import paddle.vision.transforms as transforms
+
+from custom_paddleocr.ppocr.utils.utility import check_install
 
 
-class RandomScale():
+class RandomScale:
     def __init__(self, short_size=640, **kwargs):
         self.short_size = short_size
 
@@ -57,7 +52,7 @@ class RandomScale():
         return data
 
 
-class MakeShrink():
+class MakeShrink:
     def __init__(self, kernel_scale=0.7, **kwargs):
         self.kernel_scale = kernel_scale
 
@@ -114,11 +109,11 @@ class MakeShrink():
 
         for i in range(len(bboxes)):
             bboxes[i] = np.reshape(bboxes[i] * (
-                [scale_factor[0], scale_factor[1]] * (bboxes[i].shape[0] // 2)),
+                    [scale_factor[0], scale_factor[1]] * (bboxes[i].shape[0] // 2)),
                                    (bboxes[i].shape[0] // 2, 2)).astype('int32')
 
         for i in range(len(bboxes)):
-            #different value for different bbox
+            # different value for different bbox
             cv2.drawContours(gt_instance, [bboxes[i]], -1, i + 1, -1)
 
             # set training mask to 0
@@ -167,7 +162,7 @@ class MakeShrink():
         return data
 
 
-class GroupRandomHorizontalFlip():
+class GroupRandomHorizontalFlip:
     def __init__(self, p=0.5, **kwargs):
         self.p = p
 
@@ -181,7 +176,7 @@ class GroupRandomHorizontalFlip():
         return data
 
 
-class GroupRandomRotate():
+class GroupRandomRotate:
     def __init__(self, **kwargs):
         pass
 
@@ -202,7 +197,7 @@ class GroupRandomRotate():
         return data
 
 
-class GroupRandomCropPadding():
+class GroupRandomCropPadding:
     def __init__(self, target_size=(640, 640), **kwargs):
         self.target_size = target_size
 
@@ -255,14 +250,14 @@ class GroupRandomCropPadding():
                     0,
                     p_w - t_w,
                     borderType=cv2.BORDER_CONSTANT,
-                    value=(0, ))
+                    value=(0,))
             n_imgs.append(img_p)
 
         data['image'] = n_imgs
         return data
 
 
-class MakeCentripetalShift():
+class MakeCentripetalShift:
     def __init__(self, **kwargs):
         pass
 
@@ -273,7 +268,7 @@ class MakeCentripetalShift():
         dis = np.sqrt(
             np.sum((As[:, np.newaxis, :].repeat(
                 B, axis=1) - Bs[np.newaxis, :, :].repeat(
-                    A, axis=0))**2,
+                A, axis=0)) ** 2,
                    axis=-1))
 
         ind = np.argmin(dis, axis=-1)
@@ -284,7 +279,7 @@ class MakeCentripetalShift():
         imgs = data['image']
 
         img, gt_instance, training_mask, gt_kernel_instance, gt_kernel, gt_kernel_inner, training_mask_distance = \
-                        imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6]
+            imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6]
 
         max_instance = np.max(gt_instance)  # num bbox
 
@@ -330,7 +325,7 @@ class MakeCentripetalShift():
         return data
 
 
-class ScaleAlignedShort():
+class ScaleAlignedShort:
     def __init__(self, short_size=640, **kwargs):
         self.short_size = short_size
 

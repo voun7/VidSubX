@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import collections
-import numpy as np
 import datetime
+
+import numpy as np
 
 __all__ = ['TrainingStats', 'Time']
 

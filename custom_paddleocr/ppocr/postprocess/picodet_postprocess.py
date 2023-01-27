@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import numpy as np
+
+
 # from scipy.special import softmax
 
 
@@ -139,8 +141,8 @@ class PicoDetPostProcess(object):
         img_shape = np.array(img.shape[2:], dtype=np.float32)
 
         input_shape = np.array(img).astype('float32').shape[2:]
-        ori_shape = np.array((img_shape, )).astype('float32')
-        scale_factor = np.array((scale_factor, )).astype('float32')
+        ori_shape = np.array((img_shape,)).astype('float32')
+        scale_factor = np.array((scale_factor,)).astype('float32')
         return ori_shape, input_shape, scale_factor
 
     def __call__(self, ori_img, img, preds):
@@ -233,7 +235,7 @@ class PicoDetPostProcess(object):
                             np.expand_dims(
                                 np.array(picked_labels),
                                 axis=-1), np.expand_dims(
-                                    picked_box_probs[:, 4], axis=-1),
+                            picked_box_probs[:, 4], axis=-1),
                             picked_box_probs[:, :4]
                         ],
                         axis=1))

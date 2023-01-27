@@ -1,3 +1,2 @@
-from .vdl_logger import VDLLogger
-from .wandb_logger import WandbLogger
-from .loggers import Loggers
+from custom_paddleocr.ppocr.utils.loggers.loggers import Loggers
+from custom_paddleocr.ppocr.utils.loggers.wandb_logger import WandbLogger
