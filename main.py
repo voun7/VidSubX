@@ -179,6 +179,18 @@ class SubtitleExtractor:
 
                 starting_file = file_text = file_duration = None
 
+    def _remove_short_duration_subs(self, divider: str, minimum_duration: int = 150) -> None:
+        """
+        Deletes subtitles that have durations that are shorter than the minimum duration.
+        :param divider: string in file name that separates the time stamps.
+        :param minimum_duration: Minimum allowed time in milliseconds.
+        """
+        for file in self.text_output.iterdir():
+            duration = self._name_to_duration(file.stem, divider)
+            if duration <= minimum_duration:
+                # print(f"Deleting short duration found. \nFile name: {file.name}, \nDuration: {duration}\n")
+                file.unlink()
+
     @staticmethod
     def timecode(frame_no: float) -> str:
         seconds = frame_no // 1000
@@ -220,6 +232,7 @@ class SubtitleExtractor:
         self._remove_duplicate_texts(div1)
         self._merge_adjacent_similar_texts(div1, div2)
         self._remove_duplicate_texts(div2)
+        self._remove_short_duration_subs(div2)
         subtitles = []
         line_code = 0
         for file in natsorted(self.text_output.iterdir()):
