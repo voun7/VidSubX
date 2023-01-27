@@ -16,6 +16,8 @@ conda install paddlepaddle-gpu==2.4.1 cudatoolkit=11.7 -c https://mirrors.tuna.t
 Test if paddlepaddle installation its working:
 ```
 import paddle
+```
+```
 paddle.utils.run_check()
 ```
 
@@ -37,4 +39,7 @@ pip install Shapely
 ```
 ```
 pip install pyclipper
+```
+```
+pip install lmdb
 ```
