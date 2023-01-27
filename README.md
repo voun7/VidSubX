@@ -21,20 +21,20 @@ paddle.utils.run_check()
 
 3rd Install the following in the conda virtual environment:
 ```
-pip install opencv-python == 4.7.0.68
+pip install opencv-python
 ```
 ```
-pip install natsort == 8.2.0
+pip install natsort
 ```
 ```
-pip install fastnumbers == 3.2.1
+pip install fastnumbers
 ```
 ```
-pip install tqdm == 4.64.1
+pip install tqdm
 ```
 ```
-pip install Shapely == 2.0.0
+pip install Shapely
 ```
 ```
-pip install pyclipper == 1.3.0.post4
+pip install pyclipper
 ```
