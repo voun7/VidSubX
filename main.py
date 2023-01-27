@@ -91,6 +91,7 @@ class SubtitleExtractor:
                 if not starting_file:
                     starting_file = file1
             else:
+                # print("Text not equal\n")
                 if not starting_file:  # This condition is used when the file doesn't match the previous or next file.
                     starting_file = file1
                 ending_file = file1
@@ -164,7 +165,7 @@ class SubtitleExtractor:
 
                 new_name = self._similar_text_name_gen(starting_file.stem, ending_file.stem, divider, old_div)
                 new_file_name = f"{self.text_output}/{new_name}"
-                # print(f"New file name: {new_file_name}\n New file text: {file_text}\n")
+                # print(f"New file name: {new_file_name} \nNew file text: {file_text}\n")
                 with open(new_file_name, 'w', encoding="utf-8") as text_file:
                     text_file.write(file_text)
 
@@ -172,7 +173,7 @@ class SubtitleExtractor:
                     new_name = file2.name.replace(old_div, divider)
                     new_file_name = f"{self.text_output}/{new_name}"
                     file_text = file2_text
-                    # print(f"New file name: {new_file_name}\n New file text: {file_text}\n")
+                    # print(f"New file name: {new_file_name} \nNew file text: {file_text}\n")
                     with open(new_file_name, 'w', encoding="utf-8") as text_file:
                         text_file.write(file_text)
 
