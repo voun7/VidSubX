@@ -10,6 +10,7 @@ from natsort import natsorted
 
 import utilities.utils as utils
 from utilities.frames_to_text import frames_to_text
+from utilities.logger_setup import get_logger
 from utilities.video_to_frames import video_to_frames
 
 logger = logging.getLogger(__name__)
@@ -280,10 +281,7 @@ class SubtitleExtractor:
 
 
 if __name__ == '__main__':
-    from utilities.logger_setup import get_logger
-
     get_logger()
-
     logger.debug("\n\nMain program Started.")
     test_video = Path(r"")
     se = SubtitleExtractor()
