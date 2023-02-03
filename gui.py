@@ -16,8 +16,6 @@ from utilities.logger_setup import get_logger
 
 logger = logging.getLogger(__name__)
 
-get_logger()
-
 
 class SubtitleExtractorGUI:
     SubEx = SubtitleExtractor()
@@ -686,6 +684,7 @@ class PreferencesUI(Toplevel):
 
 
 if __name__ == '__main__':
+    get_logger()
     logger.debug("\n\nGUI program Started.")
     rt = Tk()
     SubtitleExtractorGUI(rt)
