@@ -2,6 +2,8 @@ LICENSE
 MANIFEST.in
 README.md
 __init__.py
+build_v4_test_dataset.py
+deal_label.py
 paddleocr.py
 rename_weights.py
 setup.py
