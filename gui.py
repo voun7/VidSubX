@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 import utilities.utils as utils
-from main import SubtitleExtractor
+from main import video_details, default_sub_area, SubtitleExtractor
 from utilities.logger_setup import get_logger
 
 logger = logging.getLogger(__name__)
@@ -191,7 +191,7 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
-        _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
+        _, _, frame_width, frame_height, = video_details(self.current_video)
         frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
         self.canvas.configure(width=frame_width, height=frame_height, bg="white")
 
@@ -240,8 +240,8 @@ class SubtitleExtractorGUI:
         """
         if subtitle_area is None:
             logger.debug("Subtitle coordinates are None.")
-            _, _, frame_width, frame_height, = self.SubEx.video_details(self.current_video)
-            def_sub = self.SubEx.default_sub_area(frame_width, frame_height, subtitle_area)
+            _, _, frame_width, frame_height, = video_details(self.current_video)
+            def_sub = default_sub_area(frame_width, frame_height, subtitle_area)
             self._set_sub_area(def_sub)
             x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
             self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
@@ -280,7 +280,7 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        fps, frame_total, _, _ = self.SubEx.video_details(self.current_video)
+        fps, frame_total, _, _ = video_details(self.current_video)
         duration = (frame_total / fps) - 1
 
         self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
