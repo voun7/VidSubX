@@ -17,6 +17,20 @@ paddle_ocr = PaddleOCR(
 )
 
 
+def extract_bboxes(files: Path) -> list:
+    """
+    Returns the bounding boxes of detected texted in images.
+    :param files: directory with images for detection
+    """
+    boxes = []
+    for file in files.iterdir():
+        result = paddle_ocr.ocr(str(file), rec=False)
+        result = result[0]
+        if result:
+            boxes.append(result)
+    return boxes
+
+
 def extract_text(text_output: Path, files: list) -> int:
     """
     Extract text from a frame using paddle ocr

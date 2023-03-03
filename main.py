@@ -9,7 +9,7 @@ import cv2 as cv
 from natsort import natsorted
 
 import utilities.utils as utils
-from utilities.frames_to_text import frames_to_text
+from utilities.frames_to_text import extract_bboxes, frames_to_text
 from utilities.logger_setup import get_logger
 from utilities.video_to_frames import extract_frames, video_to_frames
 
