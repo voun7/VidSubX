@@ -44,6 +44,16 @@ def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple
         return x1, y1, x2, y2
 
 
+class SubtitleDetector:
+    def __init__(self):
+        # Create cache directory
+        self.vd_output_dir = Path(f"{Path.cwd()}/output")
+        # Extracted video frame storage directory
+        self.frame_output = self.vd_output_dir / "sub detect frames"
+        if not self.frame_output.exists():
+            self.frame_output.mkdir(parents=True)
+
+
 class SubtitleExtractor:
     def __init__(self) -> None:
         """
