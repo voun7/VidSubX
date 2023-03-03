@@ -9,7 +9,7 @@ import utilities.utils as utils
 logger = logging.getLogger(__name__)
 
 
-def extract_frames(video_path: Path, frames_dir: Path, key_area: tuple, start: int, end: int, every: int) -> int:
+def extract_frames(video_path: Path | str, frames_dir: Path, key_area: tuple, start: int, end: int, every: int) -> int:
     """
     Extract frames from a video using OpenCVs VideoCapture
     :param video_path: path of the video
