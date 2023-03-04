@@ -95,17 +95,11 @@ class SubtitleDetector:
             shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
 
-    def get_sub_area(self) -> tuple:
+    @staticmethod
+    def _get_max_boundaries(bboxes: list) -> tuple:
         """
-        Returns the area containing the subtitle in the video.
+        Look through all the boundary boxes and use the max value to increase the new boundary size.
         """
-        # Empty cache at the beginning of program run before it recreates itself.
-        self._empty_cache()
-        if not self.frame_output.exists():
-            self.frame_output.mkdir(parents=True)
-
-        self._get_key_frames()
-        bboxes = extract_bboxes(self.frame_output)
         new_top_left_x = new_top_left_y = new_bottom_right_x = new_bottom_right_y = None
         for bbox in bboxes:
             top_left_x = int(bbox[0][0][0])
@@ -122,9 +116,21 @@ class SubtitleDetector:
             if not new_bottom_right_y or bottom_right_y > new_bottom_right_y:
                 new_bottom_right_y = bottom_right_y
 
-        top_left = (new_top_left_x, new_top_left_y)
-        bottom_right = (new_bottom_right_x, new_bottom_right_y)
+        return (new_top_left_x, new_top_left_y), (new_bottom_right_x, new_bottom_right_y)
 
+    def get_sub_area(self) -> tuple:
+        """
+        Returns the area containing the subtitle in the video.
+        """
+        # Empty cache at the beginning of program run before it recreates itself.
+        self._empty_cache()
+        if not self.frame_output.exists():
+            self.frame_output.mkdir(parents=True)
+
+        self._get_key_frames()
+        bboxes = extract_bboxes(self.frame_output)
+
+        top_left, bottom_right = self._get_max_boundaries(bboxes)
         top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
         top_left, bottom_right = self._reposition_sub_area(top_left, bottom_right)
 
