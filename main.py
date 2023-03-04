@@ -45,7 +45,9 @@ def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple
 
 
 class SubtitleDetector:
-    def __init__(self):
+    def __init__(self, video_file):
+        self.video_file = video_file
+        self.fps, self.frame_total, self.frame_width, self.frame_height = video_details(self.video_file)
         # Create cache directory
         self.vd_output_dir = Path(f"{Path.cwd()}/output")
         # Extracted video frame storage directory
@@ -53,25 +55,23 @@ class SubtitleDetector:
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
 
-    def get_key_frames(self, video: str, split_div: int = 6, no_of_frames: int = 200) -> None:
+    def get_key_frames(self, split_div: int = 6, no_of_frames: int = 200) -> None:
         """
         Extract specific parts of video that may contain subtitles.
-        :param video: path to video file.
         :param split_div: section video should be split into
         :param no_of_frames: how many frame to look through after splits
         """
-        fps, frame_total, frame_width, frame_height, = video_details(video)
-        split_point = int(frame_total / split_div)
+        split_point = int(self.frame_total / split_div)
 
         # split the frames into chunk lists
-        frame_chunks = [[i, i + no_of_frames] for i in range(split_point, frame_total, split_point)]
+        frame_chunks = [[i, i + no_of_frames] for i in range(split_point, self.frame_total, split_point)]
         # make sure last chunk has correct end frame, also handles case chunk_size < total
-        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_total - 1)
-
-        key_area = default_sub_area(frame_width, frame_height, None)
+        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], self.frame_total - 1)
+        # part of the video to look for texts.
+        key_area = default_sub_area(self.frame_width, self.frame_height, None)
 
         for frames in frame_chunks:
-            extract_frames(video, self.frame_output, key_area, frames[0], frames[1], fps)
+            extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], self.fps)
 
 
 class SubtitleExtractor:
