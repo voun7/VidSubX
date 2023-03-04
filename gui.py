@@ -422,6 +422,7 @@ class SubtitleExtractorGUI:
         self.run_button.configure(state="normal")
         self.menubar.entryconfig(2, state="normal")
         self.running = False
+        self._set_video(self._video_indexer()[0])
         end = time.perf_counter()
         logger.info(f"Done detecting subtitle(s)! Total time: {end - start}\n")
 
