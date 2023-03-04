@@ -18,8 +18,6 @@ logger = logging.getLogger(__name__)
 
 
 class SubtitleExtractorGUI:
-    SubEx = SubtitleExtractor()
-
     def __init__(self, root: ttk) -> None:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -406,6 +404,7 @@ class SubtitleExtractorGUI:
         """
         Use the main module extraction class to extract text from subtitle.
         """
+        sub_ex = SubtitleExtractor()
         queue_len = len(self.video_queue)
         self.progress_bar.configure(maximum=queue_len)
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
@@ -417,7 +416,7 @@ class SubtitleExtractorGUI:
                 self.running = False
                 self._stop_run()
                 return
-            self.SubEx.run(video, sub_area)
+            sub_ex.run(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self.running = False
