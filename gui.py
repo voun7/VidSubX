@@ -1,6 +1,7 @@
 import logging
 import re
 import sys
+import time
 from threading import Thread
 from tkinter import *
 from tkinter import filedialog
@@ -408,6 +409,7 @@ class SubtitleExtractorGUI:
         Detect sub area of videos in the queue and set as new sub area.
         """
         logger.info("Detecting subtitle area in video(s)...")
+        start = time.perf_counter()
         self.run_button.configure(state="disabled")
         self.menubar.entryconfig(2, state="disabled")
         self.running = True
@@ -420,7 +422,8 @@ class SubtitleExtractorGUI:
         self.run_button.configure(state="normal")
         self.menubar.entryconfig(2, state="normal")
         self.running = False
-        logger.info("Done detecting Subtitle(s)!\n")
+        end = time.perf_counter()
+        logger.info(f"Done detecting subtitle(s)! Total time: {end - start}\n")
 
     def run_sub_detection(self) -> None:
         """
