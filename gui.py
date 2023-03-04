@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 import utilities.utils as utils
-from main import video_details, default_sub_area, SubtitleExtractor
+from main import video_details, default_sub_area, SubtitleDetector, SubtitleExtractor
 from utilities.logger_setup import get_logger
 
 logger = logging.getLogger(__name__)
@@ -64,6 +64,7 @@ class SubtitleExtractorGUI:
 
         self.menubar.add_cascade(menu=self.menu_file, label="File")
         self.menubar.add_command(label="Preferences", command=self._preferences)
+        self.menubar.add_command(label="Detect Subtitles", command=self.run_sub_detection, state="disabled")
 
         # Add menu items to file menu.
         self.menu_file.add_command(label="Open file(s)", command=self.open_files)
@@ -354,13 +355,14 @@ class SubtitleExtractorGUI:
             logger.debug("New files have been selected, video queue, and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.progress_bar.configure(value=0)
+            self.menubar.entryconfig(2, state="normal")
             self.set_output()
 
             # Add all opened videos to a queue.
             for filename in filenames:
                 logger.info(f"Opened file: {filename}")
                 self.video_queue[filename] = None
-
+            logger.info("")
             self._set_video()  # Set one of the opened videos to current video.
 
     def console_redirector(self) -> None:
@@ -399,6 +401,27 @@ class SubtitleExtractorGUI:
         self.text_output_widget.insert("end", f"{text}")
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
+
+    def detect_subtitles(self) -> None:
+        """
+        Detect sub area of videos in the queue and set as new sub area.
+        """
+        logger.info("Detecting subtitle area in video(s)...")
+        self.run_button.configure(state="disabled")
+        for video in self.video_queue.keys():
+            logger.info(f"File: {video}")
+            sub_dt = SubtitleDetector(video)
+            new_sub_area = sub_dt.get_sub_area()
+            self.video_queue[video] = new_sub_area
+            logger.info(f"New sub area = {new_sub_area}")
+        self.run_button.configure(state="normal")
+        logger.info("Done detecting Subtitle(s)!\n")
+
+    def run_sub_detection(self) -> None:
+        """
+        Create a thread to run subtitle detection.
+        """
+        Thread(target=self.detect_subtitles, daemon=True).start()
 
     def extract_subtitles(self) -> None:
         """
@@ -445,6 +468,7 @@ class SubtitleExtractorGUI:
             self.run_button.configure(text='Stop', command=self._stop_run)
             self.menu_file.entryconfig(0, state="disabled")
             self.menubar.entryconfig(1, state="disabled")
+            self.menubar.entryconfig(2, state="disabled")
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
