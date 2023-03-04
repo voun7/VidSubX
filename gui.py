@@ -402,7 +402,7 @@ class SubtitleExtractorGUI:
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
-    def extract_subtitle(self) -> None:
+    def extract_subtitles(self) -> None:
         """
         Use the main module extraction class to extract text from subtitle.
         """
@@ -449,7 +449,7 @@ class SubtitleExtractorGUI:
             self.video_scale.configure(state="disabled")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
-            Thread(target=self.extract_subtitle, daemon=True).start()
+            Thread(target=self.extract_subtitles, daemon=True).start()
         elif self.video_queue:
             logger.info("Open new video(s)!")
         else:
