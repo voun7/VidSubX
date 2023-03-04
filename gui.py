@@ -199,8 +199,9 @@ class SubtitleExtractorGUI:
         Set current video subtitle area to new area.
         :param subtitle_area: new subtitle area to be used.
         """
-        self.current_sub_area = subtitle_area
-        self.video_queue[f"{self.current_video}"] = self.current_sub_area
+        if not self.running:  # prevents new sub areas from being set while program has a process running.
+            self.current_sub_area = subtitle_area
+            self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
     def _on_click(self, event):
         """
@@ -408,6 +409,7 @@ class SubtitleExtractorGUI:
         """
         logger.info("Detecting subtitle area in video(s)...")
         self.run_button.configure(state="disabled")
+        self.running = True
         for video in self.video_queue.keys():
             logger.info(f"File: {video}")
             sub_dt = SubtitleDetector(video)
@@ -415,6 +417,7 @@ class SubtitleExtractorGUI:
             self.video_queue[video] = new_sub_area
             logger.info(f"New sub area = {new_sub_area}\n")
         self.run_button.configure(state="normal")
+        self.running = False
         logger.info("Done detecting Subtitle(s)!\n")
 
     def run_sub_detection(self) -> None:
