@@ -409,6 +409,7 @@ class SubtitleExtractorGUI:
         """
         logger.info("Detecting subtitle area in video(s)...")
         self.run_button.configure(state="disabled")
+        self.menubar.entryconfig(2, state="disabled")
         self.running = True
         for video in self.video_queue.keys():
             logger.info(f"File: {video}")
@@ -417,6 +418,7 @@ class SubtitleExtractorGUI:
             self.video_queue[video] = new_sub_area
             logger.info(f"New sub area = {new_sub_area}\n")
         self.run_button.configure(state="normal")
+        self.menubar.entryconfig(2, state="normal")
         self.running = False
         logger.info("Done detecting Subtitle(s)!\n")
 
