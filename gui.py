@@ -357,12 +357,12 @@ class SubtitleExtractorGUI:
             self.progress_bar.configure(value=0)
             self.menubar.entryconfig(2, state="normal")
             self.set_output()
-
+            logger.info("Opening video(s)...")
             # Add all opened videos to a queue.
             for filename in filenames:
                 logger.info(f"Opened file: {filename}")
                 self.video_queue[filename] = None
-            logger.info("")
+            logger.info("All video(s) opened!\n")
             self._set_video()  # Set one of the opened videos to current video.
 
     def console_redirector(self) -> None:
@@ -413,7 +413,7 @@ class SubtitleExtractorGUI:
             sub_dt = SubtitleDetector(video)
             new_sub_area = sub_dt.get_sub_area()
             self.video_queue[video] = new_sub_area
-            logger.info(f"New sub area = {new_sub_area}")
+            logger.info(f"New sub area = {new_sub_area}\n")
         self.run_button.configure(state="normal")
         logger.info("Done detecting Subtitle(s)!\n")
 
