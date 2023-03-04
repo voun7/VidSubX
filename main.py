@@ -53,7 +53,7 @@ class SubtitleDetector:
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "sub detect frames"
 
-    def get_key_frames(self, split_div: int = 6, no_of_frames: int = 200) -> None:
+    def _get_key_frames(self, split_div: int = 6, no_of_frames: int = 200) -> None:
         """
         Extract specific parts of video that may contain subtitles.
         :param split_div: section video should be split into
@@ -71,7 +71,7 @@ class SubtitleDetector:
         for frames in frame_chunks:
             extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], self.fps)
 
-    def pad_sub_area(self, top_left: tuple, bottom_right: tuple, y_padding: int = 5) -> tuple:
+    def _pad_sub_area(self, top_left: tuple, bottom_right: tuple, y_padding: int = 5) -> tuple:
         """
         Prevent boundary box from being too close to text by adding padding.
         """
@@ -80,7 +80,7 @@ class SubtitleDetector:
         bottom_right = bottom_right[0] + x_padding, bottom_right[1] + y_padding
         return top_left, bottom_right
 
-    def reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
+    def _reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
         Reposition the sub area that was change when using key area to detect texts bbox.
         """
@@ -89,7 +89,7 @@ class SubtitleDetector:
         bottom_right = bottom_right[0], bottom_right[1] + y
         return top_left, bottom_right
 
-    def empty_cache(self) -> None:
+    def _empty_cache(self) -> None:
         """
         Delete all cache files produced during subtitle extraction.
         """
@@ -102,11 +102,11 @@ class SubtitleDetector:
         Returns the area containing the subtitle in the video.
         """
         # Empty cache at the beginning of program run before it recreates itself.
-        self.empty_cache()
+        self._empty_cache()
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
 
-        self.get_key_frames()
+        self._get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
         new_top_left_x = new_top_left_y = new_bottom_right_x = new_bottom_right_y = None
         for bbox in bboxes:
@@ -127,10 +127,10 @@ class SubtitleDetector:
         top_left = (new_top_left_x, new_top_left_y)
         bottom_right = (new_bottom_right_x, new_bottom_right_y)
 
-        top_left, bottom_right = self.pad_sub_area(top_left, bottom_right)
-        top_left, bottom_right = self.reposition_sub_area(top_left, bottom_right)
+        top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
+        top_left, bottom_right = self._reposition_sub_area(top_left, bottom_right)
 
-        self.empty_cache()
+        self._empty_cache()
         return top_left[0], top_left[1], bottom_right[0], bottom_right[1]
 
 
