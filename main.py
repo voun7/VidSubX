@@ -70,13 +70,12 @@ class SubtitleDetector:
         for frames in frame_chunks:
             extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], self.fps)
 
-    def _pad_sub_area(self, top_left: tuple, bottom_right: tuple, y_padding: int = 5) -> tuple:
+    def _pad_sub_area(self, top_left: tuple, bottom_right: tuple, x_padding: int = 100, y_padding: int = 10) -> tuple:
         """
         Prevent boundary box from being too close to text by adding padding.
         """
-        x_padding = int(self.frame_width * 0.28)
-        top_left = top_left[0] - x_padding, top_left[1] - y_padding
-        bottom_right = bottom_right[0] + x_padding, bottom_right[1] + y_padding
+        top_left = x_padding, top_left[1] - y_padding
+        bottom_right = self.frame_width - x_padding, bottom_right[1] + y_padding
         return top_left, bottom_right
 
     def _reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
