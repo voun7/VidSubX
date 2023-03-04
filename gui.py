@@ -424,7 +424,7 @@ class SubtitleExtractorGUI:
         self.running = False
         self._set_video(self._video_indexer()[0])
         end = time.perf_counter()
-        logger.info(f"Done detecting subtitle(s)! Total time: {end - start}\n")
+        logger.info(f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s\n")
 
     def run_sub_detection(self) -> None:
         """
