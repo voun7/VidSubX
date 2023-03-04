@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 def video_details(video_path: str) -> tuple:
     """
     Get the video details of the video in path.
-
     :return: video details
     """
     capture = cv.VideoCapture(video_path)
@@ -45,7 +44,7 @@ def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple
 
 
 class SubtitleDetector:
-    def __init__(self, video_file):
+    def __init__(self, video_file: str) -> None:
         self.video_file = video_file
         self.fps, self.frame_total, self.frame_width, self.frame_height = video_details(self.video_file)
         # Create cache directory
