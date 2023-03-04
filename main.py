@@ -52,7 +52,7 @@ class SubtitleDetector:
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "sub detect frames"
 
-    def _get_key_frames(self, split_div: int = 6, no_of_frames: int = 200) -> None:
+    def _get_key_frames(self, split_div: int = 2, no_of_frames: int = 400) -> None:
         """
         Extract specific parts of video that may contain subtitles.
         :param split_div: section video should be split into
