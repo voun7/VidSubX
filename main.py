@@ -117,7 +117,6 @@ class SubtitleDetector:
                 new_bottom_right_x = bottom_right_x
             if not new_bottom_right_y or bottom_right_y > new_bottom_right_y:
                 new_bottom_right_y = bottom_right_y
-
         return (new_top_left_x, new_top_left_y), (new_bottom_right_x, new_bottom_right_y)
 
     def get_sub_area(self) -> tuple:
