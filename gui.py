@@ -563,7 +563,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
         self.frame_extraction_chunk_size = IntVar(value=utils.Config.frame_extraction_chunk_size)
         self.frame_extraction_chunk_size.trace_add("write", self._set_reset_button)
-        check_int = (self.register(self._check_chunk_size), '%P')
+        check_int = (self.register(self._check_integer), '%P')
         frame_extraction_chunk_size_entry = ttk.Entry(
             frame_extraction_frame,
             textvariable=self.frame_extraction_chunk_size,
@@ -584,7 +584,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0, padx=25, pady=20)
         self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
         self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
-        check_int = (self.register(self._check_chunk_size), '%P')
+        check_int = (self.register(self._check_integer), '%P')
         text_extraction_chunk_size_entry = ttk.Entry(
             text_extraction_frame,
             textvariable=self.text_extraction_chunk_size,
@@ -680,7 +680,7 @@ class PreferencesUI(Toplevel):
             self.reset_button.configure(state="normal")
 
     @staticmethod
-    def _check_chunk_size(new_val: str) -> bool:
+    def _check_integer(new_val: str) -> bool:
         """
         Check if the value entered into the entry widget is valid.
         """
