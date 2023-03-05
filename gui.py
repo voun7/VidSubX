@@ -693,12 +693,12 @@ class PreferencesUI(Toplevel):
         no_of_frames_entry.grid(column=1, row=2)
 
         ttk.Label(subtitle_detection_frame, text="X Axis Padding:").grid(column=0, row=3)
-        self.x_padding = IntVar(value=utils.Config.x_padding)
-        self.x_padding.trace_add("write", self._set_reset_button)
+        self.sub_area_x_padding = IntVar(value=utils.Config.sub_area_x_padding)
+        self.sub_area_x_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         x_padding_entry = ttk.Entry(
             subtitle_detection_frame,
-            textvariable=self.x_padding,
+            textvariable=self.sub_area_x_padding,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
@@ -706,12 +706,12 @@ class PreferencesUI(Toplevel):
         x_padding_entry.grid(column=1, row=3)
 
         ttk.Label(subtitle_detection_frame, text="Y Axis Padding:").grid(column=0, row=4, padx=25, pady=20)
-        self.y_padding = IntVar(value=utils.Config.y_padding)
-        self.y_padding.trace_add("write", self._set_reset_button)
+        self.sub_area_y_padding = IntVar(value=utils.Config.sub_area_y_padding)
+        self.sub_area_y_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         y_padding_entry = ttk.Entry(
             subtitle_detection_frame,
-            textvariable=self.y_padding,
+            textvariable=self.sub_area_y_padding,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size

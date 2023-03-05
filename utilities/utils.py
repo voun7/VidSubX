@@ -33,7 +33,7 @@ class Config:
     sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator", "Subtitle Detection"]
     keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
             "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "split_start", "split_stop",
-            "no_of_frames", "x_padding", "y_padding"]
+            "no_of_frames", "sub_area_x_padding", "sub_area_y_padding"]
 
     # Default values
     default_frame_extraction_frequency = 2
@@ -45,15 +45,15 @@ class Config:
     default_split_start = 4
     default_split_stop = 2
     default_no_of_frames = 400
-    default_x_padding = 150
-    default_y_padding = 10
+    default_sub_area_x_padding = 150
+    default_sub_area_y_padding = 10
 
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
     text_extraction_chunk_size = ocr_max_processes = ocr_rec_language = None
     text_similarity_threshold = None
     split_start = split_stop = no_of_frames = None
-    x_padding = y_padding = None
+    sub_area_x_padding = sub_area_y_padding = None
 
     def __init__(self) -> None:
         if not self.config_file.exists():
@@ -70,8 +70,8 @@ class Config:
         self.config[self.sections[3]] = {self.keys[6]: str(self.default_split_start),
                                          self.keys[7]: self.default_split_stop,
                                          self.keys[8]: self.default_no_of_frames,
-                                         self.keys[9]: self.default_x_padding,
-                                         self.keys[10]: self.default_y_padding}
+                                         self.keys[9]: self.default_sub_area_x_padding,
+                                         self.keys[10]: self.default_sub_area_y_padding}
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
@@ -86,8 +86,8 @@ class Config:
         cls.split_start = int(cls.config[cls.sections[3]][cls.keys[6]])
         cls.split_stop = int(cls.config[cls.sections[3]][cls.keys[7]])
         cls.no_of_frames = int(cls.config[cls.sections[3]][cls.keys[8]])
-        cls.x_padding = int(cls.config[cls.sections[3]][cls.keys[9]])
-        cls.y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
+        cls.sub_area_x_padding = int(cls.config[cls.sections[3]][cls.keys[9]])
+        cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
     @classmethod
     def set_config(cls, **kwargs):
@@ -113,10 +113,10 @@ class Config:
         cls.config[cls.sections[3]][cls.keys[7]] = str(cls.split_stop)
         cls.no_of_frames = kwargs.get(cls.keys[8], cls.no_of_frames)
         cls.config[cls.sections[3]][cls.keys[8]] = str(cls.no_of_frames)
-        cls.x_padding = kwargs.get(cls.keys[9], cls.x_padding)
-        cls.config[cls.sections[3]][cls.keys[9]] = str(cls.x_padding)
-        cls.y_padding = kwargs.get(cls.keys[10], cls.y_padding)
-        cls.config[cls.sections[3]][cls.keys[10]] = str(cls.y_padding)
+        cls.sub_area_x_padding = kwargs.get(cls.keys[9], cls.sub_area_x_padding)
+        cls.config[cls.sections[3]][cls.keys[9]] = str(cls.sub_area_x_padding)
+        cls.sub_area_y_padding = kwargs.get(cls.keys[10], cls.sub_area_y_padding)
+        cls.config[cls.sections[3]][cls.keys[10]] = str(cls.sub_area_y_padding)
 
         with open(cls.config_file, 'w') as configfile:
             cls.config.write(configfile)
