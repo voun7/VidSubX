@@ -730,18 +730,42 @@ class PreferencesUI(Toplevel):
             utils.Config.default_text_extraction_chunk_size,
             utils.Config.default_ocr_max_processes,
             utils.Config.default_ocr_rec_language,
-            utils.Config.default_text_similarity_threshold
+            utils.Config.default_text_similarity_threshold,
+            utils.Config.default_split_start,
+            utils.Config.default_split_stop,
+            utils.Config.default_no_of_frames,
+            utils.Config.default_sub_area_x_padding,
+            utils.Config.default_sub_area_y_padding
         )
 
         try:
             frame_extraction_chunk_size = self.frame_extraction_chunk_size.get()
         except TclError:
             frame_extraction_chunk_size = 0
-
         try:
             text_extraction_chunk_size = self.text_extraction_chunk_size.get()
         except TclError:
             text_extraction_chunk_size = 0
+        try:
+            split_start = self.split_start.get()
+        except TclError:
+            split_start = 0
+        try:
+            split_stop = self.split_stop.get()
+        except TclError:
+            split_stop = 0
+        try:
+            no_of_frames = self.no_of_frames.get()
+        except TclError:
+            no_of_frames = 0
+        try:
+            sub_area_x_padding = self.sub_area_x_padding.get()
+        except TclError:
+            sub_area_x_padding = 0
+        try:
+            sub_area_y_padding = self.sub_area_y_padding.get()
+        except TclError:
+            sub_area_y_padding = 0
 
         values = (
             self.frame_extraction_frequency.get(),
@@ -749,7 +773,12 @@ class PreferencesUI(Toplevel):
             text_extraction_chunk_size,
             self.ocr_max_processes.get(),
             self.ocr_rec_language.get(),
-            self.text_similarity_threshold.get()
+            self.text_similarity_threshold.get(),
+            split_start,
+            split_stop,
+            no_of_frames,
+            sub_area_x_padding,
+            sub_area_y_padding
         )
 
         if default_values == values:
