@@ -802,7 +802,7 @@ class PreferencesUI(Toplevel):
                 sub_area_y_padding=self.sub_area_y_padding.get()
             )
         except TclError:
-            logger.warning("Empty value not saved!")
+            logger.warning("An error occurred value(s) not saved!")
         self.destroy()
 
 
