@@ -30,9 +30,10 @@ class Config:
     config = ConfigParser()
     config.read(config_file)
 
-    sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator"]
+    sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator", "Subtitle Detection"]
     keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
-            "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold"]
+            "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "split_start", "split_stop",
+            "no_of_frames", "x_padding", "y_padding"]
 
     # Default values
     default_frame_extraction_frequency = 2
@@ -41,11 +42,18 @@ class Config:
     default_ocr_max_processes = 4
     default_ocr_rec_language = "ch"
     default_text_similarity_threshold = 0.65
+    default_split_start = 4
+    default_split_stop = 2
+    default_no_of_frames = 400
+    default_x_padding = 150
+    default_y_padding = 10
 
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
     text_extraction_chunk_size = ocr_max_processes = ocr_rec_language = None
     text_similarity_threshold = None
+    split_start = split_stop = no_of_frames = None
+    x_padding = y_padding = None
 
     def __init__(self) -> None:
         if not self.config_file.exists():
@@ -59,6 +67,11 @@ class Config:
                                          self.keys[3]: self.default_ocr_max_processes,
                                          self.keys[4]: self.default_ocr_rec_language}
         self.config[self.sections[2]] = {self.keys[5]: str(self.default_text_similarity_threshold)}
+        self.config[self.sections[3]] = {self.keys[6]: str(self.default_split_start),
+                                         self.keys[7]: self.default_split_stop,
+                                         self.keys[8]: self.default_no_of_frames,
+                                         self.keys[9]: self.default_x_padding,
+                                         self.keys[10]: self.default_y_padding}
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
@@ -70,6 +83,11 @@ class Config:
         cls.ocr_max_processes = int(cls.config[cls.sections[1]][cls.keys[3]])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
         cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
+        cls.split_start = int(cls.config[cls.sections[3]][cls.keys[6]])
+        cls.split_stop = int(cls.config[cls.sections[3]][cls.keys[7]])
+        cls.no_of_frames = int(cls.config[cls.sections[3]][cls.keys[8]])
+        cls.x_padding = int(cls.config[cls.sections[3]][cls.keys[9]])
+        cls.y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
     @classmethod
     def set_config(cls, **kwargs):
@@ -88,6 +106,17 @@ class Config:
 
         cls.text_similarity_threshold = kwargs.get("text_similarity_threshold", cls.text_similarity_threshold)
         cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
+
+        cls.split_start = kwargs.get("split_start", cls.split_start)
+        cls.config[cls.sections[3]][cls.keys[6]] = str(cls.split_start)
+        cls.split_stop = kwargs.get("split_stop", cls.split_stop)
+        cls.config[cls.sections[3]][cls.keys[7]] = str(cls.split_stop)
+        cls.no_of_frames = kwargs.get("no_of_frames", cls.no_of_frames)
+        cls.config[cls.sections[3]][cls.keys[8]] = str(cls.no_of_frames)
+        cls.x_padding = kwargs.get("x_padding", cls.x_padding)
+        cls.config[cls.sections[3]][cls.keys[9]] = str(cls.x_padding)
+        cls.y_padding = kwargs.get("y_padding", cls.y_padding)
+        cls.config[cls.sections[3]][cls.keys[10]] = str(cls.y_padding)
 
         with open(cls.config_file, 'w') as configfile:
             cls.config.write(configfile)
