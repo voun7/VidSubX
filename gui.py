@@ -739,47 +739,21 @@ class PreferencesUI(Toplevel):
         )
 
         try:
-            frame_extraction_chunk_size = self.frame_extraction_chunk_size.get()
+            values = (
+                self.frame_extraction_frequency.get(),
+                self.frame_extraction_chunk_size.get(),
+                self.text_extraction_chunk_size.get(),
+                self.ocr_max_processes.get(),
+                self.ocr_rec_language.get(),
+                self.text_similarity_threshold.get(),
+                self.split_start.get(),
+                self.split_stop.get(),
+                self.no_of_frames.get(),
+                self.sub_area_x_padding.get(),
+                self.sub_area_y_padding.get()
+            )
         except TclError:
-            frame_extraction_chunk_size = 0
-        try:
-            text_extraction_chunk_size = self.text_extraction_chunk_size.get()
-        except TclError:
-            text_extraction_chunk_size = 0
-        try:
-            split_start = self.split_start.get()
-        except TclError:
-            split_start = 0
-        try:
-            split_stop = self.split_stop.get()
-        except TclError:
-            split_stop = 0
-        try:
-            no_of_frames = self.no_of_frames.get()
-        except TclError:
-            no_of_frames = 0
-        try:
-            sub_area_x_padding = self.sub_area_x_padding.get()
-        except TclError:
-            sub_area_x_padding = 0
-        try:
-            sub_area_y_padding = self.sub_area_y_padding.get()
-        except TclError:
-            sub_area_y_padding = 0
-
-        values = (
-            self.frame_extraction_frequency.get(),
-            frame_extraction_chunk_size,
-            text_extraction_chunk_size,
-            self.ocr_max_processes.get(),
-            self.ocr_rec_language.get(),
-            self.text_similarity_threshold.get(),
-            split_start,
-            split_stop,
-            no_of_frames,
-            sub_area_x_padding,
-            sub_area_y_padding
-        )
+            values = None
 
         if default_values == values:
             self.reset_button.configure(state="disabled")
