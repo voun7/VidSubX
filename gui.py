@@ -820,7 +820,12 @@ class PreferencesUI(Toplevel):
                 text_extraction_chunk_size=self.text_extraction_chunk_size.get(),
                 ocr_max_processes=self.ocr_max_processes.get(),
                 ocr_rec_language=self.ocr_rec_language.get(),
-                text_similarity_threshold=self.text_similarity_threshold.get()
+                text_similarity_threshold=self.text_similarity_threshold.get(),
+                split_start=self.split_start.get(),
+                split_stop=self.split_stop.get(),
+                no_of_frames=self.no_of_frames.get(),
+                sub_area_x_padding=self.sub_area_x_padding.get(),
+                sub_area_y_padding=self.sub_area_y_padding.get()
             )
         except TclError:
             logger.warning("Empty value not saved!")
