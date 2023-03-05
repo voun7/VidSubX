@@ -52,19 +52,19 @@ class SubtitleDetector:
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "sub detect frames"
 
-    def get_key_frames(self, split_div: int = 2, no_of_frames: int = 400) -> None:
+    def get_key_frames(self, split_start: int = 4, split_stop: int = 2, no_of_frames: int = 400) -> None:
         """
         Extract specific parts of video that may contain subtitles.
-        :param split_div: section video should be split into
+        :param split_start: value used to divide total frame to choose start point
+        :param split_stop: value used to divide total frame to choose end point
         :param no_of_frames: how many frame to look through after splits
         """
-        split_point = int(self.frame_total / split_div)
-
-        # split the frames into chunk lists
-        frame_chunks = [[i, i + no_of_frames] for i in range(split_point, self.frame_total, split_point)]
-        # make sure last chunk has correct end frame, also handles case chunk_size < total
-        frame_chunks[-1][-1] = min(frame_chunks[-1][-1], self.frame_total - 1)
-        logger.debug(f"Frame total = {self.frame_total}")
+        start = int(self.frame_total / split_start)
+        stop = int(self.frame_total / split_stop)
+        step = no_of_frames * split_start
+        # split the frames into chunk lists.
+        frame_chunks = [[i, i + no_of_frames] for i in range(start, stop, step)]
+        logger.debug(f"Frame total = {self.frame_total}, start = {start}, stop = {stop}, step = {step}")
         logger.debug(f"Frame chunks = {frame_chunks}")
         # part of the video to look for texts.
         key_area = default_sub_area(self.frame_width, self.frame_height, None)
