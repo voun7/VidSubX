@@ -803,6 +803,11 @@ class PreferencesUI(Toplevel):
         self.ocr_max_processes.set(utils.Config.default_ocr_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
+        self.split_start.set(utils.Config.default_split_start)
+        self.split_stop.set(utils.Config.default_split_stop)
+        self.no_of_frames.set(utils.Config.default_no_of_frames)
+        self.sub_area_x_padding.set(utils.Config.default_sub_area_x_padding)
+        self.sub_area_y_padding.set(utils.Config.default_sub_area_y_padding)
 
     def _save_settings(self) -> None:
         """
