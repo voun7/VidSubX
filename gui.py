@@ -515,17 +515,21 @@ class PreferencesUI(Toplevel):
         main_frame = ttk.Frame(self, padding=(5, 5, 5, 5))
         main_frame.grid(column=0, row=0)
 
-        # Create notebook that will contain tab frames
+        # Create notebook that will contain tab frames.
         self.notebook_tab = ttk.Notebook(main_frame)
         self.notebook_tab.grid(column=0, row=0)
 
-        # Add tabs to notebook
+        # Shared widget values.
+        self.entry_size = 15
+        self.spinbox_size = 13
+
+        # Add tabs to notebook.
         self._frame_extraction_tab()
         self._text_extraction_tab()
         self._subtitle_generator_tab()
         self._subtitle_detection_tab()
 
-        # Add buttons to window
+        # Add buttons to window.
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(column=0, row=1, sticky="E")
 
@@ -538,7 +542,7 @@ class PreferencesUI(Toplevel):
         cancel_button = ttk.Button(button_frame, text="Cancel", command=self.destroy)
         cancel_button.grid(column=2, row=0, padx=4, pady=4)
 
-        # Set the reset button when layout is created
+        # Set the reset button when layout is created.
         self._set_reset_button()
 
     def _frame_extraction_tab(self) -> None:
@@ -557,7 +561,7 @@ class PreferencesUI(Toplevel):
             from_=1.0, to=10,
             textvariable=self.frame_extraction_frequency,
             state="readonly",
-            width=8
+            width=self.spinbox_size
         )
         extraction_frequency_entry.grid(column=1, row=0)
 
@@ -570,7 +574,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.frame_extraction_chunk_size,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         frame_extraction_chunk_size_entry.grid(column=1, row=1)
 
@@ -591,7 +595,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.text_extraction_chunk_size,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         text_extraction_chunk_size_entry.grid(column=1, row=0)
 
@@ -603,7 +607,7 @@ class PreferencesUI(Toplevel):
             from_=1.0, to=24,
             textvariable=self.ocr_max_processes,
             state="readonly",
-            width=8
+            width=self.spinbox_size
         )
         ocr_max_processes_box.grid(column=1, row=1)
 
@@ -616,7 +620,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.ocr_rec_language,
             values=languages,
             state="readonly",
-            width=8
+            width=13
         )
         ocr_rec_language_box.grid(column=1, row=2)
 
@@ -637,7 +641,7 @@ class PreferencesUI(Toplevel):
             increment=0.05,
             textvariable=self.text_similarity_threshold,
             state="readonly",
-            width=8
+            width=self.spinbox_size
         )
         text_similarity_threshold_box.grid(column=1, row=0)
 
@@ -658,7 +662,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.split_start,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         split_start_entry.grid(column=1, row=0)
 
@@ -671,7 +675,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.split_stop,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         split_stop_entry.grid(column=1, row=1)
 
@@ -684,7 +688,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.no_of_frames,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         no_of_frames_entry.grid(column=1, row=2)
 
@@ -697,7 +701,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.x_padding,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         x_padding_entry.grid(column=1, row=3)
 
@@ -710,7 +714,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.y_padding,
             validate='key',
             validatecommand=check_int,
-            width=10
+            width=self.entry_size
         )
         y_padding_entry.grid(column=1, row=4)
 
