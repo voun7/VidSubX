@@ -523,6 +523,7 @@ class PreferencesUI(Toplevel):
         self._frame_extraction_tab()
         self._text_extraction_tab()
         self._subtitle_generator_tab()
+        self._subtitle_detection_tab()
 
         # Add buttons to window
         button_frame = ttk.Frame(main_frame)
@@ -639,6 +640,79 @@ class PreferencesUI(Toplevel):
             width=8
         )
         text_similarity_threshold_box.grid(column=1, row=0)
+
+    def _subtitle_detection_tab(self):
+        """
+        Creates widgets in the Subtitle detection preferences tab frame
+        """
+        subtitle_detection_frame = ttk.Frame(self.notebook_tab)
+        subtitle_detection_frame.grid(column=0, row=0)
+        self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
+
+        ttk.Label(subtitle_detection_frame, text="Split Start:").grid(column=0, row=0, padx=25, pady=20)
+        self.split_start = IntVar(value=utils.Config.split_start)
+        self.split_start.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
+        split_start_entry = ttk.Entry(
+            subtitle_detection_frame,
+            textvariable=self.split_start,
+            validate='key',
+            validatecommand=check_int,
+            width=10
+        )
+        split_start_entry.grid(column=1, row=0)
+
+        ttk.Label(subtitle_detection_frame, text="Split Stop:").grid(column=0, row=1)
+        self.split_stop = IntVar(value=utils.Config.split_stop)
+        self.split_stop.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
+        split_stop_entry = ttk.Entry(
+            subtitle_detection_frame,
+            textvariable=self.split_stop,
+            validate='key',
+            validatecommand=check_int,
+            width=10
+        )
+        split_stop_entry.grid(column=1, row=1)
+
+        ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, padx=25, pady=20)
+        self.no_of_frames = IntVar(value=utils.Config.no_of_frames)
+        self.no_of_frames.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
+        no_of_frames_entry = ttk.Entry(
+            subtitle_detection_frame,
+            textvariable=self.no_of_frames,
+            validate='key',
+            validatecommand=check_int,
+            width=10
+        )
+        no_of_frames_entry.grid(column=1, row=2)
+
+        ttk.Label(subtitle_detection_frame, text="X Axis Padding:").grid(column=0, row=3)
+        self.x_padding = IntVar(value=utils.Config.x_padding)
+        self.x_padding.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
+        x_padding_entry = ttk.Entry(
+            subtitle_detection_frame,
+            textvariable=self.x_padding,
+            validate='key',
+            validatecommand=check_int,
+            width=10
+        )
+        x_padding_entry.grid(column=1, row=3)
+
+        ttk.Label(subtitle_detection_frame, text="Y Axis Padding:").grid(column=0, row=4, padx=25, pady=20)
+        self.y_padding = IntVar(value=utils.Config.y_padding)
+        self.y_padding.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
+        y_padding_entry = ttk.Entry(
+            subtitle_detection_frame,
+            textvariable=self.y_padding,
+            validate='key',
+            validatecommand=check_int,
+            width=10
+        )
+        y_padding_entry.grid(column=1, row=4)
 
     def _set_reset_button(self, *args) -> None:
         """
