@@ -64,7 +64,8 @@ class SubtitleDetector:
         frame_chunks = [[i, i + no_of_frames] for i in range(split_point, self.frame_total, split_point)]
         # make sure last chunk has correct end frame, also handles case chunk_size < total
         frame_chunks[-1][-1] = min(frame_chunks[-1][-1], self.frame_total - 1)
-        logger.debug(f"Frame chunks: {frame_chunks}")
+        logger.debug(f"Frame total = {self.frame_total}")
+        logger.debug(f"Frame chunks = {frame_chunks}")
         # part of the video to look for texts.
         key_area = default_sub_area(self.frame_width, self.frame_height, None)
 
