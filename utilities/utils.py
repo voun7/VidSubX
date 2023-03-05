@@ -92,30 +92,30 @@ class Config:
     @classmethod
     def set_config(cls, **kwargs):
         # Write into memory & file
-        cls.frame_extraction_frequency = kwargs.get("frame_extraction_frequency", cls.frame_extraction_frequency)
+        cls.frame_extraction_frequency = kwargs.get(cls.keys[0], cls.frame_extraction_frequency)
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
-        cls.frame_extraction_chunk_size = kwargs.get("frame_extraction_chunk_size", cls.frame_extraction_chunk_size)
+        cls.frame_extraction_chunk_size = kwargs.get(cls.keys[1], cls.frame_extraction_chunk_size)
         cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
 
-        cls.text_extraction_chunk_size = kwargs.get("text_extraction_chunk_size", cls.text_extraction_chunk_size)
+        cls.text_extraction_chunk_size = kwargs.get(cls.keys[2], cls.text_extraction_chunk_size)
         cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
-        cls.ocr_max_processes = kwargs.get("ocr_max_processes", cls.ocr_max_processes)
+        cls.ocr_max_processes = kwargs.get(cls.keys[3], cls.ocr_max_processes)
         cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_max_processes)
-        cls.ocr_rec_language = kwargs.get("ocr_rec_language", cls.ocr_rec_language)
+        cls.ocr_rec_language = kwargs.get(cls.keys[4], cls.ocr_rec_language)
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
 
-        cls.text_similarity_threshold = kwargs.get("text_similarity_threshold", cls.text_similarity_threshold)
+        cls.text_similarity_threshold = kwargs.get(cls.keys[5], cls.text_similarity_threshold)
         cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
 
-        cls.split_start = kwargs.get("split_start", cls.split_start)
+        cls.split_start = kwargs.get(cls.keys[6], cls.split_start)
         cls.config[cls.sections[3]][cls.keys[6]] = str(cls.split_start)
-        cls.split_stop = kwargs.get("split_stop", cls.split_stop)
+        cls.split_stop = kwargs.get(cls.keys[7], cls.split_stop)
         cls.config[cls.sections[3]][cls.keys[7]] = str(cls.split_stop)
-        cls.no_of_frames = kwargs.get("no_of_frames", cls.no_of_frames)
+        cls.no_of_frames = kwargs.get(cls.keys[8], cls.no_of_frames)
         cls.config[cls.sections[3]][cls.keys[8]] = str(cls.no_of_frames)
-        cls.x_padding = kwargs.get("x_padding", cls.x_padding)
+        cls.x_padding = kwargs.get(cls.keys[9], cls.x_padding)
         cls.config[cls.sections[3]][cls.keys[9]] = str(cls.x_padding)
-        cls.y_padding = kwargs.get("y_padding", cls.y_padding)
+        cls.y_padding = kwargs.get(cls.keys[10], cls.y_padding)
         cls.config[cls.sections[3]][cls.keys[10]] = str(cls.y_padding)
 
         with open(cls.config_file, 'w') as configfile:
