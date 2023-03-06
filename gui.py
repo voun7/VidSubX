@@ -556,27 +556,25 @@ class PreferencesUI(Toplevel):
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0, padx=25, pady=20)
         self.frame_extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
         self.frame_extraction_frequency.trace_add("write", self._set_reset_button)
-        extraction_frequency_entry = ttk.Spinbox(
+        ttk.Spinbox(
             frame_extraction_frame,
             from_=1.0, to=10,
             textvariable=self.frame_extraction_frequency,
             state="readonly",
             width=self.spinbox_size
-        )
-        extraction_frequency_entry.grid(column=1, row=0)
+        ).grid(column=1, row=0)
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
         self.frame_extraction_chunk_size = IntVar(value=utils.Config.frame_extraction_chunk_size)
         self.frame_extraction_chunk_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        frame_extraction_chunk_size_entry = ttk.Entry(
+        ttk.Entry(
             frame_extraction_frame,
             textvariable=self.frame_extraction_chunk_size,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        frame_extraction_chunk_size_entry.grid(column=1, row=1)
+        ).grid(column=1, row=1)
 
     def _text_extraction_tab(self) -> None:
         """
@@ -590,39 +588,36 @@ class PreferencesUI(Toplevel):
         self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
         self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        text_extraction_chunk_size_entry = ttk.Entry(
+        ttk.Entry(
             text_extraction_frame,
             textvariable=self.text_extraction_chunk_size,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        text_extraction_chunk_size_entry.grid(column=1, row=0)
+        ).grid(column=1, row=0)
 
         ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1, padx=25)
         self.ocr_max_processes = IntVar(value=utils.Config.ocr_max_processes)
         self.ocr_max_processes.trace_add("write", self._set_reset_button)
-        ocr_max_processes_box = ttk.Spinbox(
+        ttk.Spinbox(
             text_extraction_frame,
             from_=1.0, to=24,
             textvariable=self.ocr_max_processes,
             state="readonly",
             width=self.spinbox_size
-        )
-        ocr_max_processes_box.grid(column=1, row=1)
+        ).grid(column=1, row=1)
 
         ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(column=0, row=2, padx=25, pady=20)
         self.ocr_rec_language = StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
         languages = ["ch", "en"]
-        ocr_rec_language_box = ttk.Combobox(
+        ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
             values=languages,
             state="readonly",
             width=13
-        )
-        ocr_rec_language_box.grid(column=1, row=2)
+        ).grid(column=1, row=2)
 
     def _subtitle_generator_tab(self) -> None:
         """
@@ -635,15 +630,14 @@ class PreferencesUI(Toplevel):
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=32, pady=20)
         self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
         self.text_similarity_threshold.trace_add("write", self._set_reset_button)
-        text_similarity_threshold_box = ttk.Spinbox(
+        ttk.Spinbox(
             subtitle_generator_frame,
             from_=0, to=1.0,
             increment=0.05,
             textvariable=self.text_similarity_threshold,
             state="readonly",
             width=self.spinbox_size
-        )
-        text_similarity_threshold_box.grid(column=1, row=0)
+        ).grid(column=1, row=0)
 
     def _subtitle_detection_tab(self):
         """
@@ -657,66 +651,61 @@ class PreferencesUI(Toplevel):
         self.split_start = IntVar(value=utils.Config.split_start)
         self.split_start.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        split_start_entry = ttk.Entry(
+        ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.split_start,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        split_start_entry.grid(column=1, row=0)
+        ).grid(column=1, row=0)
 
         ttk.Label(subtitle_detection_frame, text="Split Stop:").grid(column=0, row=1)
         self.split_stop = IntVar(value=utils.Config.split_stop)
         self.split_stop.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        split_stop_entry = ttk.Entry(
+        ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.split_stop,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        split_stop_entry.grid(column=1, row=1)
+        ).grid(column=1, row=1)
 
         ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, padx=25, pady=20)
         self.no_of_frames = IntVar(value=utils.Config.no_of_frames)
         self.no_of_frames.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        no_of_frames_entry = ttk.Entry(
+        ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.no_of_frames,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        no_of_frames_entry.grid(column=1, row=2)
+        ).grid(column=1, row=2)
 
         ttk.Label(subtitle_detection_frame, text="X Axis Padding:").grid(column=0, row=3)
         self.sub_area_x_padding = IntVar(value=utils.Config.sub_area_x_padding)
         self.sub_area_x_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        x_padding_entry = ttk.Entry(
+        ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.sub_area_x_padding,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        x_padding_entry.grid(column=1, row=3)
+        ).grid(column=1, row=3)
 
         ttk.Label(subtitle_detection_frame, text="Y Axis Padding:").grid(column=0, row=4, padx=25, pady=20)
         self.sub_area_y_padding = IntVar(value=utils.Config.sub_area_y_padding)
         self.sub_area_y_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
-        y_padding_entry = ttk.Entry(
+        ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.sub_area_y_padding,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
-        )
-        y_padding_entry.grid(column=1, row=4)
+        ).grid(column=1, row=4)
 
     def _set_reset_button(self, *args) -> None:
         """
