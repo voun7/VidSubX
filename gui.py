@@ -522,6 +522,8 @@ class PreferencesUI(Toplevel):
         # Shared widget values.
         self.entry_size = 15
         self.spinbox_size = 13
+        self.wgt_x_padding = 40
+        self.wgt_y_padding = 20
 
         # Add tabs to notebook.
         self._frame_extraction_tab()
@@ -553,7 +555,9 @@ class PreferencesUI(Toplevel):
         frame_extraction_frame.grid(column=0, row=0)
         self.notebook_tab.add(frame_extraction_frame, text=utils.Config.sections[0])
 
-        ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(column=0, row=0, padx=25, pady=20)
+        ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(
+            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
         self.frame_extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
         self.frame_extraction_frequency.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
@@ -584,7 +588,9 @@ class PreferencesUI(Toplevel):
         text_extraction_frame.grid(column=0, row=0)
         self.notebook_tab.add(text_extraction_frame, text=utils.Config.sections[1])
 
-        ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(column=0, row=0, padx=25, pady=20)
+        ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(
+            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
         self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
         self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
@@ -596,7 +602,7 @@ class PreferencesUI(Toplevel):
             width=self.entry_size
         ).grid(column=1, row=0)
 
-        ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1, padx=25)
+        ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1)
         self.ocr_max_processes = IntVar(value=utils.Config.ocr_max_processes)
         self.ocr_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
@@ -607,7 +613,9 @@ class PreferencesUI(Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=1)
 
-        ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(column=0, row=2, padx=25, pady=20)
+        ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(
+            column=0, row=2, pady=self.wgt_y_padding
+        )
         self.ocr_rec_language = StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
         languages = ["ch", "en"]
@@ -627,7 +635,9 @@ class PreferencesUI(Toplevel):
         subtitle_generator_frame.grid(column=0, row=0)
         self.notebook_tab.add(subtitle_generator_frame, text=utils.Config.sections[2])
 
-        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(column=0, row=0, padx=32, pady=20)
+        ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(
+            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
         self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
         self.text_similarity_threshold.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
@@ -647,7 +657,9 @@ class PreferencesUI(Toplevel):
         subtitle_detection_frame.grid(column=0, row=0)
         self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
 
-        ttk.Label(subtitle_detection_frame, text="Split Start:").grid(column=0, row=0, padx=25, pady=20)
+        ttk.Label(subtitle_detection_frame, text="Split Start:").grid(
+            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
         self.split_start = IntVar(value=utils.Config.split_start)
         self.split_start.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
@@ -671,7 +683,7 @@ class PreferencesUI(Toplevel):
             width=self.entry_size
         ).grid(column=1, row=1)
 
-        ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, padx=25, pady=20)
+        ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, pady=self.wgt_y_padding)
         self.no_of_frames = IntVar(value=utils.Config.no_of_frames)
         self.no_of_frames.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
@@ -695,7 +707,7 @@ class PreferencesUI(Toplevel):
             width=self.entry_size
         ).grid(column=1, row=3)
 
-        ttk.Label(subtitle_detection_frame, text="Y Axis Padding:").grid(column=0, row=4, padx=25, pady=20)
+        ttk.Label(subtitle_detection_frame, text="Y Axis Padding:").grid(column=0, row=4, pady=self.wgt_y_padding)
         self.sub_area_y_padding = IntVar(value=utils.Config.sub_area_y_padding)
         self.sub_area_y_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
