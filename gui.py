@@ -153,6 +153,7 @@ class SubtitleExtractorGUI:
         logger.debug("Batch layout deactivated")
         self.previous_button.grid_remove()
         self.next_button.grid_remove()
+        self.progress_bar.configure(length=600)
 
     def _set_batch_layout(self) -> None:
         """
