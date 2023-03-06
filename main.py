@@ -52,14 +52,17 @@ class SubtitleDetector:
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "sub detect frames"
 
-    def get_key_frames(self, split_start: int = utils.Config.split_start, split_stop: int = utils.Config.split_stop,
-                       no_of_frames: int = utils.Config.no_of_frames) -> None:
+    def get_key_frames(self) -> None:
         """
         Extract specific parts of video that may contain subtitles.
-        :param split_start: value used to divide total frame to choose start point
-        :param split_stop: value used to divide total frame to choose end point
-        :param no_of_frames: how many frame to look through after splits
         """
+        # value used to divide total frame to choose start point.
+        split_start = utils.Config.split_start
+        # value used to divide total frame to choose end point.
+        split_stop = utils.Config.split_stop
+        # how many frame to look through after splits.
+        no_of_frames = utils.Config.no_of_frames
+
         start = int(self.frame_total / split_start)
         stop = int(self.frame_total / split_stop)
         step = no_of_frames * split_start
@@ -73,11 +76,12 @@ class SubtitleDetector:
         for frames in frame_chunks:
             extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], self.fps)
 
-    def _pad_sub_area(self, top_left: tuple, bottom_right: tuple, x_padding: int = utils.Config.sub_area_x_padding,
-                      y_padding: int = utils.Config.sub_area_y_padding) -> tuple:
+    def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
         Prevent boundary box from being too close to text by adding padding.
         """
+        x_padding = utils.Config.sub_area_x_padding
+        y_padding = utils.Config.sub_area_y_padding
         logger.debug(f"Padding sub area: top_left = {top_left} and bottom_right = {bottom_right} "
                      f"with x_padding = {x_padding}, y_padding = {y_padding}")
         top_left = x_padding, top_left[1] - y_padding
@@ -231,14 +235,14 @@ class SubtitleExtractor:
         duration = float(name_timecode[1]) - float(name_timecode[0])
         return duration
 
-    def _merge_adjacent_similar_texts(self, old_div, divider,
-                                      similarity_threshold: float = utils.Config.text_similarity_threshold) -> None:
+    def _merge_adjacent_similar_texts(self, old_div, divider) -> None:
         """
         Merge texts that are not the same but beside each other and similar.
         The text that has the longest duration becomes the text for all similar texts.
-        :param similarity_threshold: cut off point to determine similarity.
         """
         logger.debug("Merging adjacent similar texts")
+        # cut off point to determine similarity.
+        similarity_threshold = utils.Config.text_similarity_threshold
         no_of_files = len(list(self.text_output.iterdir()))
         counter = 1
         starting_file = file_text = file_duration = None

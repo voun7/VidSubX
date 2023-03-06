@@ -52,15 +52,16 @@ def extract_text(text_output: Path, files: list) -> int:
     return saved_count
 
 
-def frames_to_text(frame_output: Path, text_output: Path, chunk_size: int = utils.Config.text_extraction_chunk_size,
-                   ocr_max_processes: int = utils.Config.ocr_max_processes) -> None:
+def frames_to_text(frame_output: Path, text_output: Path) -> None:
     """
     Extracts the texts from frames using multiprocessing
     :param frame_output: directory of the frames
     :param text_output: directory for extracted texts
-    :param chunk_size: size of files given to each processor
-    :param ocr_max_processes: number of processors to be used
     """
+    # size of files given to each processor.
+    chunk_size = utils.Config.text_extraction_chunk_size
+    # number of processors to be used.
+    ocr_max_processes = utils.Config.ocr_max_processes
     # cancel if process has been cancelled by gui.
     if utils.Process.interrupt_process:
         logger.warning("Text extraction process interrupted!")

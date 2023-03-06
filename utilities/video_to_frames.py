@@ -62,18 +62,18 @@ def extract_frames(video_path: Path | str, frames_dir: Path, key_area: tuple, st
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple,
-                    every: int = utils.Config.frame_extraction_frequency,
-                    chunk_size: int = utils.Config.frame_extraction_chunk_size) -> None:
+def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple) -> None:
     """
     Extracts the frames from a video using multiprocessing
     :param video_path: path to the video
     :param frames_dir: directory to save the frames
     :param key_area: coordinates of the frame containing subtitle
-    :param every: extract every this many frames
-    :param chunk_size: how many frames to split into chunks (one chunk per cpu core process)
     :return: path to the directory where the frames were saved, or None if fails
     """
+    # extract every this many frames.
+    every = utils.Config.frame_extraction_frequency
+    # how many frames to split into chunks (one chunk per cpu core process)
+    chunk_size = utils.Config.frame_extraction_chunk_size
     # cancel if process has been cancelled by gui.
     if utils.Process.interrupt_process:
         logger.warning("Frame extraction process interrupted!")
