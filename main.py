@@ -78,6 +78,7 @@ class SubtitleDetector:
         """
         Prevent boundary box from being too close to text by adding padding.
         """
+        logger.debug(f"Padding sub area with x_padding = {x_padding}, y_padding = {y_padding}")
         top_left = x_padding, top_left[1] - y_padding
         bottom_right = self.frame_width - x_padding, bottom_right[1] + y_padding
         return top_left, bottom_right
