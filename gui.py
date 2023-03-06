@@ -85,10 +85,15 @@ class SubtitleExtractorGUI:
         self.canvas.bind("<Button-1>", self._on_click)
         self.canvas.bind("<B1-Motion>", self._on_motion)
 
-        # Create frame slider widget in video frame.
-        self.video_scale = ttk.Scale(video_frame, command=self._frame_slider, orient=HORIZONTAL, length=600,
-                                     state="disabled")
+        # Create frame slider widget in video frame and label to display value.
+        video_work_frame = ttk.Frame(video_frame)
+        video_work_frame.grid(column=0, row=1)
+        self.video_scale = ttk.Scale(
+            video_work_frame, command=self._frame_slider, orient=HORIZONTAL, length=600, state="disabled"
+        )
         self.video_scale.grid(column=0, row=1)
+        self.scale_value = ttk.Label(video_work_frame)
+        self.scale_value.grid(column=1, row=1, padx=50)
 
     def _work_frame(self) -> None:
         """
@@ -153,7 +158,8 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Setting batch layout")
         self.progress_bar.configure(length=500)
-        self.video_label.configure(state="normal", text=self._video_indexer()[2])
+        self.scale_value.configure(text="")
+        self.video_label.configure(text=self._video_indexer()[2])
         self.previous_button.grid(column=2, row=0, padx=10)
         self.next_button.grid(column=4, row=0, padx=10)
 
@@ -273,6 +279,7 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
+        self.scale_value.configure(text=f"{int(scale_value)}/{video_details(self.current_video)[1]}")
         self._display_video_frame(scale_value)
         self._draw_subtitle_area(self.current_sub_area)
 
