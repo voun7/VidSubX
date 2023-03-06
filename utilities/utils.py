@@ -45,7 +45,7 @@ class Config:
     default_split_start = 4
     default_split_stop = 2
     default_no_of_frames = 400
-    default_sub_area_x_padding = 150
+    default_sub_area_x_padding = 200
     default_sub_area_y_padding = 10
 
     # Initial values
