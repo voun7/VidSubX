@@ -303,9 +303,9 @@ class SubtitleExtractor:
                 file.unlink()
 
     @staticmethod
-    def timecode(frame_no: float) -> str:
-        seconds = frame_no // 1000
-        milliseconds = int(frame_no % 1000)
+    def timecode(frame_no_in_milliseconds: float) -> str:
+        seconds = frame_no_in_milliseconds // 1000
+        milliseconds = int(frame_no_in_milliseconds % 1000)
         minutes = 0
         hours = 0
         if seconds >= 60:
