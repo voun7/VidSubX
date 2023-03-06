@@ -346,7 +346,6 @@ class SubtitleExtractorGUI:
         Open file dialog to select a file or files then call required methods.
         """
         logger.debug("Open button clicked")
-
         title = "Select Video(s)"
         file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
         filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
