@@ -553,6 +553,7 @@ class PreferencesUI(Toplevel):
         """
         frame_extraction_frame = ttk.Frame(self.notebook_tab)
         frame_extraction_frame.grid(column=0, row=0)
+        frame_extraction_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(frame_extraction_frame, text=utils.Config.sections[0])
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(
@@ -586,6 +587,7 @@ class PreferencesUI(Toplevel):
         """
         text_extraction_frame = ttk.Frame(self.notebook_tab)
         text_extraction_frame.grid(column=0, row=0)
+        text_extraction_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(text_extraction_frame, text=utils.Config.sections[1])
 
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(
@@ -633,6 +635,7 @@ class PreferencesUI(Toplevel):
         """
         subtitle_generator_frame = ttk.Frame(self.notebook_tab)
         subtitle_generator_frame.grid(column=0, row=0)
+        subtitle_generator_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_generator_frame, text=utils.Config.sections[2])
 
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(
@@ -655,6 +658,7 @@ class PreferencesUI(Toplevel):
         """
         subtitle_detection_frame = ttk.Frame(self.notebook_tab)
         subtitle_detection_frame.grid(column=0, row=0)
+        subtitle_detection_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
 
         ttk.Label(subtitle_detection_frame, text="Split Start:").grid(
