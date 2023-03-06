@@ -181,10 +181,11 @@ class SubtitleExtractor:
             if divider not in file.name:
                 file.unlink()
 
-    def _merge_adjacent_equal_texts(self, divider) -> None:
+    def _merge_adjacent_equal_texts(self, divider: str) -> None:
         """
         Merge texts that are beside each other and are the exact same.
         Use divider for duration in text name.
+        :param divider: characters for separating time durations in file name
         """
         logger.debug("Merging adjacent equal texts")
         no_of_files = len(list(self.text_output.iterdir()))
@@ -235,10 +236,12 @@ class SubtitleExtractor:
         duration = float(name_timecode[1]) - float(name_timecode[0])
         return duration
 
-    def _merge_adjacent_similar_texts(self, old_div, divider) -> None:
+    def _merge_adjacent_similar_texts(self, old_div: str, divider: str) -> None:
         """
         Merge texts that are not the same but beside each other and similar.
         The text that has the longest duration becomes the text for all similar texts.
+        :param old_div: old characters for separating time durations in file name
+        :param divider: characters for separating time durations in file name
         """
         logger.debug("Merging adjacent similar texts")
         # cut off point to determine similarity.
