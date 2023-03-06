@@ -123,7 +123,7 @@ class SubtitleDetector:
                 new_bottom_right_y = bottom_right_y
         return (new_top_left_x, new_top_left_y), (new_bottom_right_x, new_bottom_right_y)
 
-    def get_sub_area(self) -> tuple:
+    def get_sub_area(self) -> tuple | None:
         """
         Returns the area containing the subtitle in the video.
         """
@@ -136,12 +136,15 @@ class SubtitleDetector:
         bboxes = extract_bboxes(self.frame_output)
         logger.debug(f"bboxes = {bboxes}")
 
-        top_left, bottom_right = self._get_max_boundaries(bboxes)
-        top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
-        top_left, bottom_right = self._reposition_sub_area(top_left, bottom_right)
-
-        self._empty_cache()
-        return top_left[0], top_left[1], bottom_right[0], bottom_right[1]
+        if bboxes:
+            top_left, bottom_right = self._get_max_boundaries(bboxes)
+            top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
+            top_left, bottom_right = self._reposition_sub_area(top_left, bottom_right)
+            self._empty_cache()
+            return top_left[0], top_left[1], bottom_right[0], bottom_right[1]
+        else:
+            self._empty_cache()
+            return None
 
 
 class SubtitleExtractor:
