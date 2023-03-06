@@ -661,9 +661,7 @@ class PreferencesUI(Toplevel):
         subtitle_detection_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
 
-        ttk.Label(subtitle_detection_frame, text="Split Start:").grid(
-            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
-        )
+        ttk.Label(subtitle_detection_frame, text="Split Start:").grid(column=0, row=0, padx=80, pady=self.wgt_y_padding)
         self.split_start = IntVar(value=utils.Config.split_start)
         self.split_start.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
