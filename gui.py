@@ -256,12 +256,12 @@ class SubtitleExtractorGUI:
             self.canvas.coords(self.current_sub_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.current_sub_rect)
 
-    def _display_video_frame(self, frame_no: float | int = 0) -> None:
+    def _display_video_frame(self, millisecond: float = 0.0) -> None:
         """
         Find captured video frame through corresponding second and display on video canvas.
-        :param frame_no: default corresponding frame_no
+        :param millisecond: default corresponding millisecond
         """
-        self.video_capture.set(cv.CAP_PROP_POS_FRAMES, frame_no)
+        self.video_capture.set(cv.CAP_PROP_POS_MSEC, millisecond)
         _, frame = self.video_capture.read()
 
         cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
@@ -278,17 +278,27 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
-        self.scale_value.configure(text=f"{int(scale_value)}/{video_details(self.current_video)[1]}")
+        sub_ex = SubtitleExtractor()
+        current_time = sub_ex.timecode(scale_value).replace(",", ":")
+        total_time = sub_ex.timecode(self.video_duration()).replace(",", ":")
+        self.scale_value.configure(text=f"{current_time}/{total_time}")
         self._display_video_frame(scale_value)
         self._draw_subtitle_area(self.current_sub_area)
+
+    def video_duration(self) -> float:
+        """
+        Returns the total duration of the current_video in milliseconds.
+        """
+        fps, frame_total, _, _ = video_details(self.current_video)
+        milliseconds_duration = ((frame_total / fps) * 1000) - 1000
+        return milliseconds_duration
 
     def _set_frame_slider(self) -> None:
         """
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        frame_count_total = video_details(self.current_video)[1] - 1
-        self.video_scale.configure(state="normal", from_=0, to=frame_count_total, value=0)
+        self.video_scale.configure(state="normal", from_=0.0, to=self.video_duration(), value=0)
 
     def _video_indexer(self) -> tuple:
         """
