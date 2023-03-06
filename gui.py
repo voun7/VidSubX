@@ -158,7 +158,6 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Setting batch layout")
         self.progress_bar.configure(length=500)
-        self.scale_value.configure(text="")
         self.video_label.configure(text=self._video_indexer()[2])
         self.previous_button.grid(column=2, row=0, padx=10)
         self.next_button.grid(column=4, row=0, padx=10)
@@ -342,6 +341,7 @@ class SubtitleExtractorGUI:
         self._set_frame_slider()
         self._display_video_frame()
         self._draw_subtitle_area(self.current_sub_area)
+        self.scale_value.configure(text="")
 
         if len(self.video_queue) > 1:
             self._set_batch_layout()
