@@ -257,12 +257,12 @@ class SubtitleExtractorGUI:
             self.canvas.coords(self.current_sub_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.current_sub_rect)
 
-    def _display_video_frame(self, second: float | int = 0) -> None:
+    def _display_video_frame(self, frame_no: float | int = 0) -> None:
         """
         Find captured video frame through corresponding second and display on video canvas.
-        :param second: default corresponding second
+        :param frame_no: default corresponding frame_no
         """
-        self.video_capture.set(cv.CAP_PROP_POS_MSEC, second * 1000)
+        self.video_capture.set(cv.CAP_PROP_POS_FRAMES, frame_no)
         _, frame = self.video_capture.read()
 
         cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
@@ -288,10 +288,8 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        fps, frame_total, _, _ = video_details(self.current_video)
-        duration = (frame_total / fps) - 1
-
-        self.video_scale.configure(state="normal", from_=0, to=duration, value=0)
+        frame_count_total = video_details(self.current_video)[1] - 1
+        self.video_scale.configure(state="normal", from_=0, to=frame_count_total, value=0)
 
     def _video_indexer(self) -> tuple:
         """
