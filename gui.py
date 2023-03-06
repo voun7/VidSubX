@@ -356,6 +356,7 @@ class SubtitleExtractorGUI:
         if filenames:
             logger.debug("New files have been selected, video queue, and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
+            self.run_button.configure(state="normal")
             self.progress_bar.configure(value=0)
             self.menubar.entryconfig(2, state="normal")
             self.set_output()
