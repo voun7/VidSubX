@@ -2,6 +2,7 @@ import logging
 import re
 import sys
 import time
+from pathlib import Path
 from threading import Thread
 from tkinter import *
 from tkinter import filedialog
@@ -34,7 +35,8 @@ class SubtitleExtractorGUI:
         Use ttk to create frames for gui.
         """
         # Window title and icon
-        self.root.title("Video Subtitle Extractor")
+        self.window_title = "Video Subtitle Extractor"
+        self.root.title(self.window_title)
         self.root.iconbitmap("VSE.ico")
         # Do not allow window to be resizable.
         self.root.resizable(FALSE, FALSE)
@@ -351,6 +353,7 @@ class SubtitleExtractorGUI:
         self._set_frame_slider()
         self._display_video_frame()
         self._draw_subtitle_area(self.current_sub_area)
+        self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
         self.scale_value.configure(text="")
 
         if len(self.video_queue) > 1:
@@ -377,7 +380,7 @@ class SubtitleExtractorGUI:
             logger.info("Opening video(s)...")
             # Add all opened videos to a queue.
             for filename in filenames:
-                logger.info(f"Opened file: {filename}")
+                logger.info(f"Opened file: {Path(filename).name}")
                 self.video_queue[filename] = None
             logger.info("All video(s) opened!\n")
             self._set_video()  # Set one of the opened videos to current video.
