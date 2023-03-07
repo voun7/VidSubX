@@ -46,7 +46,7 @@ class Config:
     default_split_stop = 0.5
     default_no_of_frames = 400
     default_sub_area_x_padding = 200
-    default_sub_area_y_padding = 10
+    default_sub_area_y_padding = 6
 
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
