@@ -600,30 +600,30 @@ class PreferencesUI(Toplevel):
         subtitle_detection_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
 
-        ttk.Label(subtitle_detection_frame, text="Split Start Frame:").grid(
+        ttk.Label(subtitle_detection_frame, text="Split Start Part:").grid(
             column=0, row=0, padx=60, pady=self.wgt_y_padding
         )
-        self.split_start = IntVar(value=utils.Config.split_start)
+        self.split_start = DoubleVar(value=utils.Config.split_start)
         self.split_start.trace_add("write", self._set_reset_button)
-        check_int = (self.register(self._check_integer), '%P')
-        ttk.Entry(
+        ttk.Spinbox(
             subtitle_detection_frame,
+            from_=0, to=0.5,
+            increment=0.05,
             textvariable=self.split_start,
-            validate='key',
-            validatecommand=check_int,
-            width=self.entry_size
+            state="readonly",
+            width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(subtitle_detection_frame, text="Split Stop Frame:").grid(column=0, row=1)
-        self.split_stop = IntVar(value=utils.Config.split_stop)
+        ttk.Label(subtitle_detection_frame, text="Split Stop Part:").grid(column=0, row=1)
+        self.split_stop = DoubleVar(value=utils.Config.split_stop)
         self.split_stop.trace_add("write", self._set_reset_button)
-        check_int = (self.register(self._check_integer), '%P')
-        ttk.Entry(
+        ttk.Spinbox(
             subtitle_detection_frame,
+            from_=0.5, to=1.0,
+            increment=0.05,
             textvariable=self.split_stop,
-            validate='key',
-            validatecommand=check_int,
-            width=self.entry_size
+            state="readonly",
+            width=self.spinbox_size
         ).grid(column=1, row=1)
 
         ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, pady=self.wgt_y_padding)
