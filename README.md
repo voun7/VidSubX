@@ -11,7 +11,7 @@ https://conda.io/projects/conda/en/stable/user-guide/install/download.html
 2nd Install paddlepaddle gpu in the conda virtual environment
 
 ```
-conda install paddlepaddle-gpu==2.4.1 cudatoolkit=11.7 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
+conda install paddlepaddle-gpu==2.4.2 cudatoolkit=11.7 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
 ```
 Test if paddlepaddle installation its working:
 ```
