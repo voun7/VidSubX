@@ -29,7 +29,7 @@ class SubtitleExtractorGUI:
         self.current_video = None
         self.video_capture = None
         self.running = False
-        self.console_redirector()
+        self._console_redirector()
 
     def _create_layout(self) -> None:
         """
@@ -71,7 +71,7 @@ class SubtitleExtractorGUI:
         self.menubar.add_command(label="Detect Subtitles", command=self.run_sub_detection, state="disabled")
 
         # Add menu items to file menu.
-        self.menu_file.add_command(label="Open file(s)", command=self.open_files)
+        self.menu_file.add_command(label="Open file(s)", command=self._open_files)
         self.menu_file.add_command(label="Close", command=self._on_closing)
 
     def _video_frame(self) -> None:
@@ -283,12 +283,12 @@ class SubtitleExtractorGUI:
         """
         scale_value = float(scale_value)
         current_time = self.sub_ex.timecode(scale_value).replace(",", ":")
-        total_time = self.sub_ex.timecode(self.video_duration()).replace(",", ":")
+        total_time = self.sub_ex.timecode(self._video_duration()).replace(",", ":")
         self.scale_value.configure(text=f"{current_time}/{total_time}")
         self._display_video_frame(scale_value)
         self._draw_subtitle_area(self.current_sub_area)
 
-    def video_duration(self) -> float:
+    def _video_duration(self) -> float:
         """
         Returns the total duration of the current_video in milliseconds.
         """
@@ -301,7 +301,7 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        self.video_scale.configure(state="normal", from_=0.0, to=self.video_duration(), value=0)
+        self.video_scale.configure(state="normal", from_=0.0, to=self._video_duration(), value=0)
 
     def _video_indexer(self) -> tuple:
         """
@@ -360,7 +360,7 @@ class SubtitleExtractorGUI:
         if len(self.video_queue) > 1:
             self._set_batch_layout()
 
-    def open_files(self) -> None:
+    def _open_files(self) -> None:
         """
         Open file dialog to select a file or files then call required methods.
         """
@@ -385,7 +385,7 @@ class SubtitleExtractorGUI:
             logger.info("All video(s) opened!\n")
             self._set_video()  # Set one of the opened videos to current video.
 
-    def console_redirector(self) -> None:
+    def _console_redirector(self) -> None:
         """
         Redirect console statements to text widget
         """

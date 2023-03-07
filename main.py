@@ -26,7 +26,7 @@ class SubtitleDetector:
         # Extracted video frame storage directory
         self.frame_output = self.vd_output_dir / "sub detect frames"
 
-    def get_key_frames(self) -> None:
+    def _get_key_frames(self) -> None:
         """
         Extract frames from specific parts of video that may contain subtitles.
         """
@@ -119,7 +119,7 @@ class SubtitleDetector:
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
 
-        self.get_key_frames()
+        self._get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
 
         if bboxes:
