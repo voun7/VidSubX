@@ -429,26 +429,45 @@ class SubtitleExtractorGUI:
         """
         logger.info("Detecting subtitle area in video(s)...")
         start = time.perf_counter()
-        self.run_button.configure(state="disabled")
-        self.menubar.entryconfig(2, state="disabled")
         self.running = True
         for video in self.video_queue.keys():
-            logger.info(f"File: {video}")
+            if utils.Process.interrupt_process:
+                logger.warning("Process interrupted\n")
+                self.running = False
+                self._stop_sub_detection_process()
+                return
+            logger.info(f"File name: {Path(video).name}")
             sub_dt = SubtitleDetector(video)
             new_sub_area = sub_dt.get_sub_area()
             self.video_queue[video] = new_sub_area
             logger.info(f"New sub area = {new_sub_area}\n")
-        self.run_button.configure(state="normal")
-        self.menubar.entryconfig(2, state="normal")
         self.running = False
+        self._stop_sub_detection_process()
         self._set_video(self._video_indexer()[0])
         end = time.perf_counter()
         logger.info(f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s\n")
+
+    def _stop_sub_detection_process(self) -> None:
+        """
+        Stop sub detection from running.
+        """
+        logger.debug("Stop detection button clicked")
+        utils.Process.stop_process()
+        if not self.running:
+            self.run_button.configure(state="normal")
+            self.menu_file.entryconfig(0, state="normal")
+            self.menubar.entryconfig(1, state="normal")
+            self.menubar.entryconfig(2, label="Detect Subtitles", command=self.run_sub_detection)
 
     def run_sub_detection(self) -> None:
         """
         Create a thread to run subtitle detection.
         """
+        utils.Process.start_process()
+        self.run_button.configure(state="disabled")
+        self.menu_file.entryconfig(0, state="disabled")
+        self.menubar.entryconfig(1, state="disabled")
+        self.menubar.entryconfig(2, label="Stop Sub Detection", command=self._stop_sub_detection_process)
         Thread(target=self.detect_subtitles, daemon=True).start()
 
     def extract_subtitles(self) -> None:
@@ -463,7 +482,7 @@ class SubtitleExtractorGUI:
         self.running = True
         for video, sub_area in self.video_queue.items():
             if utils.Process.interrupt_process:
-                logger.warning("Process interrupted")
+                logger.warning("Process interrupted\n")
                 self.running = False
                 self._stop_run()
                 return
