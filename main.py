@@ -314,6 +314,9 @@ class SubtitleExtractor:
 
     @staticmethod
     def timecode(frame_no_in_milliseconds: float) -> str:
+        """
+        Use to frame no in milliseconds to create timecode.
+        """
         seconds = frame_no_in_milliseconds // 1000
         milliseconds = int(frame_no_in_milliseconds % 1000)
         minutes = 0
