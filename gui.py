@@ -106,7 +106,7 @@ class SubtitleExtractorGUI:
         progress_frame.grid(column=0, row=1)
 
         # Create button widget for starting the text extraction.
-        self.run_button = ttk.Button(progress_frame, text="Run", command=self._run)
+        self.run_button = ttk.Button(progress_frame, text="Run", command=self._run_sub_extraction)
         self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
         # Create progress bar widget for showing the text extraction progress.
@@ -484,26 +484,26 @@ class SubtitleExtractorGUI:
             if utils.Process.interrupt_process:
                 logger.warning("Process interrupted\n")
                 self.running = False
-                self._stop_run()
+                self._stop_sub_extraction_process()
                 return
             sub_ex.run(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self.running = False
-        self._stop_run()
+        self._stop_sub_extraction_process()
 
-    def _stop_run(self) -> None:
+    def _stop_sub_extraction_process(self) -> None:
         """
         Stop program from running.
         """
         logger.debug("Stop button clicked")
         utils.Process.stop_process()
         if not self.running:
-            self.run_button.configure(text="Run", command=self._run)
+            self.run_button.configure(text="Run", command=self._run_sub_extraction)
             self.menu_file.entryconfig(0, state="normal")
             self.menubar.entryconfig(1, state="normal")
 
-    def _run(self) -> None:
+    def _run_sub_extraction(self) -> None:
         """
         Start the text extraction from video frames.
         """
@@ -512,7 +512,7 @@ class SubtitleExtractorGUI:
             self.current_video = None
             self.video_capture.release()
             utils.Process.start_process()
-            self.run_button.configure(text='Stop', command=self._stop_run)
+            self.run_button.configure(text='Stop', command=self._stop_sub_extraction_process)
             self.menu_file.entryconfig(0, state="disabled")
             self.menubar.entryconfig(1, state="disabled")
             self.menubar.entryconfig(2, state="disabled")
@@ -529,7 +529,7 @@ class SubtitleExtractorGUI:
         """
         Method called when window is closed.
         """
-        self._stop_run()
+        self._stop_sub_extraction_process()
         self.root.quit()
         exit()
 
