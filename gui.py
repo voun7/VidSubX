@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 import utilities.utils as utils
-from main import video_details, default_sub_area, SubtitleDetector, SubtitleExtractor
+from main import SubtitleDetector, SubtitleExtractor
 from utilities.logger_setup import get_logger
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,7 @@ class SubtitleExtractorGUI:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         self._create_layout()
+        self.sub_ex = SubtitleExtractor()
         self.video_queue = {}
         self.current_video = None
         self.video_capture = None
@@ -199,7 +200,7 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
-        _, _, frame_width, frame_height, = video_details(self.current_video)
+        _, _, frame_width, frame_height, = self.sub_ex.video_details(self.current_video)
         frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
         self.canvas.configure(width=frame_width, height=frame_height, bg="white")
 
@@ -249,8 +250,8 @@ class SubtitleExtractorGUI:
         """
         if subtitle_area is None:
             logger.debug("Subtitle coordinates are None.")
-            _, _, frame_width, frame_height, = video_details(self.current_video)
-            def_sub = default_sub_area(frame_width, frame_height, subtitle_area)
+            _, _, frame_width, frame_height, = self.sub_ex.video_details(self.current_video)
+            def_sub = self.sub_ex.default_sub_area(frame_width, frame_height, subtitle_area)
             self._set_sub_area(def_sub)
             x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
             self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
@@ -281,9 +282,8 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
-        sub_ex = SubtitleExtractor()
-        current_time = sub_ex.timecode(scale_value).replace(",", ":")
-        total_time = sub_ex.timecode(self.video_duration()).replace(",", ":")
+        current_time = self.sub_ex.timecode(scale_value).replace(",", ":")
+        total_time = self.sub_ex.timecode(self.video_duration()).replace(",", ":")
         self.scale_value.configure(text=f"{current_time}/{total_time}")
         self._display_video_frame(scale_value)
         self._draw_subtitle_area(self.current_sub_area)
@@ -292,7 +292,7 @@ class SubtitleExtractorGUI:
         """
         Returns the total duration of the current_video in milliseconds.
         """
-        fps, frame_total, _, _ = video_details(self.current_video)
+        fps, frame_total, _, _ = self.sub_ex.video_details(self.current_video)
         milliseconds_duration = ((frame_total / fps) * 1000) - 1000
         return milliseconds_duration
 
@@ -469,7 +469,6 @@ class SubtitleExtractorGUI:
         """
         Use the main module extraction class to extract text from subtitle.
         """
-        sub_ex = SubtitleExtractor()
         queue_len = len(self.video_queue)
         self.progress_bar.configure(maximum=queue_len)
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
@@ -481,7 +480,7 @@ class SubtitleExtractorGUI:
                 self.running = False
                 self._stop_sub_extraction_process()
                 return
-            sub_ex.run_sub_extraction(video, sub_area)
+            self.sub_ex.run_sub_extraction(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self.running = False

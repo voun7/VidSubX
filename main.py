@@ -16,37 +16,11 @@ from utilities.video_to_frames import extract_frames, video_to_frames
 logger = logging.getLogger(__name__)
 
 
-def video_details(video_path: str) -> tuple:
-    """
-    Get the video details of the video in path.
-    :return: video details
-    """
-    capture = cv.VideoCapture(video_path)
-    fps = capture.get(cv.CAP_PROP_FPS)
-    frame_total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
-    frame_width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
-    capture.release()
-    return fps, frame_total, frame_width, frame_height
-
-
-def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple:
-    """
-    Returns a default subtitle area that can be used if no subtitle is given.
-    :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
-    """
-    if sub_area:
-        return sub_area
-    else:
-        logger.debug("Subtitle area being set to default sub area")
-        x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
-        return x1, y1, x2, y2
-
-
 class SubtitleDetector:
     def __init__(self, video_file: str) -> None:
         self.video_file = video_file
-        self.fps, self.frame_total, self.frame_width, self.frame_height = video_details(self.video_file)
+        self.sub_ex = SubtitleExtractor()
+        self.fps, self.frame_total, self.frame_width, self.frame_height = self.sub_ex.video_details(self.video_file)
         # Create cache directory
         self.vd_output_dir = Path(f"{Path.cwd()}/output")
         # Extracted video frame storage directory
@@ -69,9 +43,8 @@ class SubtitleDetector:
         frame_chunks = [[i, i + no_of_frames] for i in range(start, stop)]
         frame_chunks_len = len(frame_chunks)
         logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
-        sub_ex = SubtitleExtractor()
-        start_duration = sub_ex.timecode((start / self.fps) * 1000).replace(",", ":")
-        stop_duration = sub_ex.timecode((stop / self.fps) * 1000).replace(",", ":")
+        start_duration = self.sub_ex.timecode((start / self.fps) * 1000).replace(",", ":")
+        stop_duration = self.sub_ex.timecode((stop / self.fps) * 1000).replace(",", ":")
         logger.info(f"Split Start = {start_duration}, Split Stop = {stop_duration}")
         if frame_chunks_len > 3:
             middle_chunk = int(frame_chunks_len / 2)
@@ -81,7 +54,7 @@ class SubtitleDetector:
             frame_chunks[-1][-1] = min(frame_chunks[-1][-1], stop - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
         # part of the video to look for texts.
-        key_area = default_sub_area(self.frame_width, self.frame_height, None)
+        key_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height, None)
 
         for frames in frame_chunks:
             extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], self.fps)
@@ -173,6 +146,33 @@ class SubtitleExtractor:
         self.frame_output = self.vd_output_dir / "frames"
         # Extracted text file storage directory
         self.text_output = self.vd_output_dir / "extracted texts"
+
+    @staticmethod
+    def video_details(video_path: str) -> tuple:
+        """
+        Get the video details of the video in path.
+        :return: video details
+        """
+        capture = cv.VideoCapture(video_path)
+        fps = capture.get(cv.CAP_PROP_FPS)
+        frame_total = int(capture.get(cv.CAP_PROP_FRAME_COUNT))
+        frame_width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
+        frame_height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
+        capture.release()
+        return fps, frame_total, frame_width, frame_height
+
+    @staticmethod
+    def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple:
+        """
+        Returns a default subtitle area that can be used if no subtitle is given.
+        :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
+        """
+        if sub_area:
+            return sub_area
+        else:
+            logger.debug("Subtitle area being set to default sub area")
+            x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
+            return x1, y1, x2, y2
 
     def _empty_cache(self) -> None:
         """
@@ -385,8 +385,8 @@ class SubtitleExtractor:
 
         self.video_path = Path(video_path)
 
-        fps, frame_total, frame_width, frame_height = video_details(video_path)
-        sub_area = default_sub_area(frame_width, frame_height, sub_area)
+        fps, frame_total, frame_width, frame_height = self.video_details(video_path)
+        sub_area = self.default_sub_area(frame_width, frame_height, sub_area)
 
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
