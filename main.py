@@ -69,7 +69,10 @@ class SubtitleDetector:
         frame_chunks = [[i, i + no_of_frames] for i in range(start, stop)]
         frame_chunks_len = len(frame_chunks)
         logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
-        logger.debug(f"Starting frame = {start}, Stopping frame = {stop}")
+        sub_ex = SubtitleExtractor()
+        start_duration = sub_ex.timecode((start / self.fps) * 1000).replace(",", ":")
+        stop_duration = sub_ex.timecode((stop / self.fps) * 1000).replace(",", ":")
+        logger.info(f"Split Start = {start_duration}, Split Stop = {stop_duration}")
         if frame_chunks_len > 3:
             middle_chunk = int(frame_chunks_len / 2)
             frame_chunks = [frame_chunks[0], frame_chunks[middle_chunk], frame_chunks[-1]]
