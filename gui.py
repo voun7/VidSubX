@@ -94,7 +94,7 @@ class SubtitleExtractorGUI:
         self.video_scale = ttk.Scale(
             video_work_frame, command=self._frame_slider, orient=HORIZONTAL, length=600, state="disabled"
         )
-        self.video_scale.grid(column=0, row=1, padx=50)
+        self.video_scale.grid(column=0, row=1, padx=60)
         self.scale_value = ttk.Label(video_work_frame)
         self.scale_value.grid(column=1, row=1)
 
