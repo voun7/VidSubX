@@ -374,7 +374,6 @@ class SubtitleExtractorGUI:
         if filenames:
             logger.debug("New files have been selected, video queue, and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
-            self.run_button.configure(state="normal")
             self.progress_bar.configure(value=0)
             self.menubar.entryconfig(2, state="normal")
             self.set_output()
@@ -454,9 +453,7 @@ class SubtitleExtractorGUI:
         logger.debug("Stop detection button clicked")
         utils.Process.stop_process()
         if not self.running:
-            self.run_button.configure(state="normal")
-            self.menu_file.entryconfig(0, state="normal")
-            self.menubar.entryconfig(1, state="normal")
+            self._set_run_state("normal", "detection")
             self.menubar.entryconfig(2, label="Detect Subtitles", command=self.run_sub_detection)
 
     def run_sub_detection(self) -> None:
@@ -464,9 +461,7 @@ class SubtitleExtractorGUI:
         Create a thread to run subtitle detection.
         """
         utils.Process.start_process()
-        self.run_button.configure(state="disabled")
-        self.menu_file.entryconfig(0, state="disabled")
-        self.menubar.entryconfig(1, state="disabled")
+        self._set_run_state("disabled", "detection")
         self.menubar.entryconfig(2, label="Stop Sub Detection", command=self._stop_sub_detection_process)
         Thread(target=self.detect_subtitles, daemon=True).start()
 
@@ -500,8 +495,7 @@ class SubtitleExtractorGUI:
         utils.Process.stop_process()
         if not self.running:
             self.run_button.configure(text="Run", command=self._run_sub_extraction)
-            self.menu_file.entryconfig(0, state="normal")
-            self.menubar.entryconfig(1, state="normal")
+            self._set_run_state("normal")
 
     def _run_sub_extraction(self) -> None:
         """
@@ -513,10 +507,7 @@ class SubtitleExtractorGUI:
             self.video_capture.release()
             utils.Process.start_process()
             self.run_button.configure(text='Stop', command=self._stop_sub_extraction_process)
-            self.menu_file.entryconfig(0, state="disabled")
-            self.menubar.entryconfig(1, state="disabled")
-            self.menubar.entryconfig(2, state="disabled")
-            self.video_scale.configure(state="disabled")
+            self._set_run_state("disabled", "extraction")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
             Thread(target=self.extract_subtitles, daemon=True).start()
@@ -524,6 +515,21 @@ class SubtitleExtractorGUI:
             logger.info("Open new video(s)!")
         else:
             logger.info("No video has been opened!")
+
+    def _set_run_state(self, state: str, process_name: str = None) -> None:
+        """
+        Set state for widgets while process is running.
+        """
+        logger.debug("Setting run state")
+        self.menu_file.entryconfig(0, state=state)
+        self.menubar.entryconfig(1, state=state)
+
+        if process_name == "detection":
+            self.run_button.configure(state=state)
+
+        if process_name == "extraction":
+            self.menubar.entryconfig(2, state=state)
+            self.video_scale.configure(state=state)
 
     def _on_closing(self) -> None:
         """
