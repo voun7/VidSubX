@@ -42,8 +42,8 @@ class Config:
     default_ocr_max_processes = 4
     default_ocr_rec_language = "ch"
     default_text_similarity_threshold = 0.65
-    default_split_start = 4
-    default_split_stop = 2
+    default_split_start = 0.25
+    default_split_stop = 0.5
     default_no_of_frames = 400
     default_sub_area_x_padding = 200
     default_sub_area_y_padding = 10
@@ -83,8 +83,8 @@ class Config:
         cls.ocr_max_processes = int(cls.config[cls.sections[1]][cls.keys[3]])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
         cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
-        cls.split_start = int(cls.config[cls.sections[3]][cls.keys[6]])
-        cls.split_stop = int(cls.config[cls.sections[3]][cls.keys[7]])
+        cls.split_start = float(cls.config[cls.sections[3]][cls.keys[6]])
+        cls.split_stop = float(cls.config[cls.sections[3]][cls.keys[7]])
         cls.no_of_frames = int(cls.config[cls.sections[3]][cls.keys[8]])
         cls.sub_area_x_padding = int(cls.config[cls.sections[3]][cls.keys[9]])
         cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
