@@ -481,7 +481,7 @@ class SubtitleExtractorGUI:
                 self.running = False
                 self._stop_sub_extraction_process()
                 return
-            sub_ex.run(video, sub_area)
+            sub_ex.run_sub_extraction(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self.running = False
