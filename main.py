@@ -121,7 +121,6 @@ class SubtitleDetector:
 
         self.get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
-        logger.debug(f"bboxes = {bboxes}")
 
         if bboxes:
             top_left, bottom_right = self._get_max_boundaries(bboxes)
