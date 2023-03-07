@@ -68,13 +68,14 @@ class SubtitleDetector:
         # split the frames into chunk lists.
         frame_chunks = [[i, i + no_of_frames] for i in range(start, stop)]
         frame_chunks_len = len(frame_chunks)
+        logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
+        logger.debug(f"Starting frame = {start}, Stopping frame = {stop}")
         if frame_chunks_len > 3:
             middle_chunk = int(frame_chunks_len / 2)
             frame_chunks = [frame_chunks[0], frame_chunks[middle_chunk], frame_chunks[-1]]
         last_frame_chunk = frame_chunks[-1][-1]
         if last_frame_chunk > self.frame_total:
             frame_chunks[-1][-1] = min(frame_chunks[-1][-1], stop - 1)
-        logger.debug(f"Frame total = {self.frame_total}, Chunk len = {frame_chunks_len}, start = {start}, stop = {stop}")
         logger.debug(f"Frame chunks = {frame_chunks}")
         # part of the video to look for texts.
         key_area = default_sub_area(self.frame_width, self.frame_height, None)
