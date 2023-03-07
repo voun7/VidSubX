@@ -54,25 +54,27 @@ class SubtitleDetector:
 
     def get_key_frames(self) -> None:
         """
-        Extract specific parts of video that may contain subtitles.
+        Extract frames from specific parts of video that may contain subtitles.
         """
-        # value used to divide total frame to choose start point.
+        # decimal used to multiply total frame to choose start point.
         split_start = utils.Config.split_start
-        # value used to divide total frame to choose end point.
+        # decimal used to multiply total frame to choose end point.
         split_stop = utils.Config.split_stop
         # how many frame to look through after splits.
         no_of_frames = utils.Config.no_of_frames
 
-        start = int(self.frame_total / split_start)
-        stop = int(self.frame_total / split_stop)
-        step = no_of_frames * split_start
+        start = int(self.frame_total * split_start)
+        stop = int(self.frame_total * split_stop)
         # split the frames into chunk lists.
-        frame_chunks = [[i, i + no_of_frames] for i in range(start, stop, step)]
+        frame_chunks = [[i, i + no_of_frames] for i in range(start, stop)]
         frame_chunks_len = len(frame_chunks)
         if frame_chunks_len > 3:
             middle_chunk = int(frame_chunks_len / 2)
             frame_chunks = [frame_chunks[0], frame_chunks[middle_chunk], frame_chunks[-1]]
-        logger.debug(f"Frame total = {self.frame_total}, start = {start}, stop = {stop}, step = {step}")
+        last_frame_chunk = frame_chunks[-1][-1]
+        if last_frame_chunk > self.frame_total:
+            frame_chunks[-1][-1] = min(frame_chunks[-1][-1], stop - 1)
+        logger.debug(f"Frame total = {self.frame_total}, Chunk len = {frame_chunks_len}, start = {start}, stop = {stop}")
         logger.debug(f"Frame chunks = {frame_chunks}")
         # part of the video to look for texts.
         key_area = default_sub_area(self.frame_width, self.frame_height, None)
