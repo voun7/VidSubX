@@ -460,8 +460,8 @@ class SubtitleExtractorGUI:
         self.progress_bar.configure(maximum=queue_len)
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}\n")
+        self.running = True
         for video, sub_area in self.video_queue.items():
-            self.running = True
             if utils.Process.interrupt_process:
                 logger.warning("Process interrupted")
                 self.running = False
