@@ -607,7 +607,7 @@ class PreferencesUI(Toplevel):
         ttk.Spinbox(
             subtitle_detection_frame,
             from_=0, to=0.5,
-            increment=0.05,
+            increment=0.02,
             textvariable=self.split_start,
             state="readonly",
             width=self.spinbox_size
@@ -619,7 +619,7 @@ class PreferencesUI(Toplevel):
         ttk.Spinbox(
             subtitle_detection_frame,
             from_=0.5, to=1.0,
-            increment=0.05,
+            increment=0.02,
             textvariable=self.split_stop,
             state="readonly",
             width=self.spinbox_size
