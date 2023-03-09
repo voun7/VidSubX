@@ -57,7 +57,7 @@ class SubtitleDetector:
         key_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height, None)
 
         for frames in frame_chunks:
-            extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], self.fps)
+            extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], int(self.fps))
 
     def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
