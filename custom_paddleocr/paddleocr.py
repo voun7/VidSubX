@@ -52,7 +52,7 @@ __all__ = [
 SUPPORT_DET_MODEL = ['DB']
 VERSION = '2.6.1.3'
 SUPPORT_REC_MODEL = ['CRNN', 'SVTR_LCNet']
-BASE_DIR = os.path.expanduser("~/.paddleocr/")
+BASE_DIR = os.path.expanduser("~/.custom_paddleocr/")
 
 DEFAULT_OCR_MODEL_VERSION = 'PP-OCRv3'
 SUPPORT_OCR_MODEL_VERSION = ['PP-OCR', 'PP-OCRv2', 'PP-OCRv3']
@@ -465,9 +465,9 @@ def check_img(img):
 class PaddleOCR(predict_system.TextSystem):
     def __init__(self, **kwargs):
         """
-        paddleocr package
+        custom_paddleocr package
         args:
-            **kwargs: other params show in paddleocr --help
+            **kwargs: other params show in custom_paddleocr --help
         """
         params = parse_args(mMain=False)
         params.__dict__.update(**kwargs)
@@ -525,7 +525,7 @@ class PaddleOCR(predict_system.TextSystem):
 
     def ocr(self, img, det=True, rec=True, cls=True):
         """
-        ocr with paddleocr
+        ocr with custom_paddleocr
         args：
             img: img for ocr, support ndarray, img_path and list or ndarray
             det: use text detection or not. If false, only rec will be exec. Default is True

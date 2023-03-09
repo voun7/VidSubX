@@ -1,4 +1,4 @@
-# from paddleocr import PaddleOCR
+# from custom_paddleocr import PaddleOCR
 
 # OCR = PaddleOCR(enable_mkldnn=True, use_angle_cls=False, use_gpu=False)
 # pic = 'doc/imgs/1.jpg'
@@ -8,7 +8,7 @@
 
 import os
 import cv2
-from paddleocr import PPStructure, draw_structure_result, save_structure_res
+from custom_paddleocr import PPStructure, draw_structure_result, save_structure_res
 
 table_engine = PPStructure(layout=False, show_log=True)
 save_folder = './output'
