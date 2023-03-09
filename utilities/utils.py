@@ -44,7 +44,7 @@ class Config:
     default_text_similarity_threshold = 0.65
     default_split_start = 0.25
     default_split_stop = 0.5
-    default_no_of_frames = 400
+    default_no_of_frames = 200
     default_sub_area_x_padding = 200
     default_sub_area_y_padding = 6
 
