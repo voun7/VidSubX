@@ -26,12 +26,6 @@ paddle.utils.run_check()
 pip install opencv-python
 ```
 ```
-pip install natsort
-```
-```
-pip install fastnumbers
-```
-```
 pip install tqdm
 ```
 ```
