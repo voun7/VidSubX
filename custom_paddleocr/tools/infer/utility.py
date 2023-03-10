@@ -13,18 +13,17 @@
 # limitations under the License.
 
 import argparse
+import math
 import os
-import sys
 import platform
+import random
+import sys
+
 import cv2
 import numpy as np
 import paddle
 from PIL import Image, ImageDraw, ImageFont
-import math
 from paddle import inference
-import time
-import random
-from ppocr.utils.logging import get_logger
 
 
 def str2bool(v):
@@ -431,9 +430,9 @@ def draw_ocr_box_txt(image,
 
 def draw_box_txt_fine(img_size, box, txt, font_path="./doc/fonts/simfang.ttf"):
     box_height = int(
-        math.sqrt((box[0][0] - box[3][0])**2 + (box[0][1] - box[3][1])**2))
+        math.sqrt((box[0][0] - box[3][0]) ** 2 + (box[0][1] - box[3][1]) ** 2))
     box_width = int(
-        math.sqrt((box[0][0] - box[1][0])**2 + (box[0][1] - box[1][1])**2))
+        math.sqrt((box[0][0] - box[1][0]) ** 2 + (box[0][1] - box[1][1]) ** 2))
 
     if box_height > 2 * box_width and box_height > 30:
         img_text = Image.new('RGB', (box_height, box_width), (255, 255, 255))

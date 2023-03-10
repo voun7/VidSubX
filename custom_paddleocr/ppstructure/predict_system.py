@@ -13,12 +13,8 @@
 # limitations under the License.
 
 import os
-import sys
 import subprocess
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../')))
+import sys
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 import cv2
@@ -28,13 +24,13 @@ import time
 import logging
 from copy import deepcopy
 
-from ppocr.utils.utility import get_image_file_list, check_and_read
-from ppocr.utils.logging import get_logger
-from ppocr.utils.visual import draw_ser_results, draw_re_results
-from tools.infer.predict_system import TextSystem
-from ppstructure.layout.predict_layout import LayoutPredictor
-from ppstructure.table.predict_table import TableSystem, to_excel
-from ppstructure.utility import parse_args, draw_structure_result
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.visual import draw_ser_results, draw_re_results
+from custom_paddleocr.tools.infer.predict_system import TextSystem
+from custom_paddleocr.ppstructure.layout.predict_layout import LayoutPredictor
+from custom_paddleocr.ppstructure.table.predict_table import TableSystem, to_excel
+from custom_paddleocr.ppstructure.utility import parse_args, draw_structure_result
 
 logger = get_logger()
 
@@ -76,7 +72,7 @@ class StructureSystem(object):
                     self.table_system = TableSystem(args)
 
         elif self.mode == 'kie':
-            from ppstructure.kie.predict_kie_token_ser_re import SerRePredictor
+            from custom_paddleocr.ppstructure.kie.predict_kie_token_ser_re import SerRePredictor
             self.kie_predictor = SerRePredictor(args)
 
     def __call__(self, img, return_ocr_result_in_table=False, img_idx=0):
@@ -199,7 +195,7 @@ def save_structure_res(res, save_folder, img_name, img_idx=0):
             f.write('{}\n'.format(json.dumps(region)))
 
             if region['type'].lower() == 'table' and len(region[
-                    'res']) > 0 and 'html' in region['res']:
+                                                             'res']) > 0 and 'html' in region['res']:
                 excel_path = os.path.join(
                     excel_save_folder,
                     '{}_{}.xlsx'.format(region['bbox'], img_idx))
@@ -226,17 +222,6 @@ def main(args):
         logger.info("[{}/{}] {}".format(i, img_num, image_file))
         img, flag_gif, flag_pdf = check_and_read(image_file)
         img_name = os.path.basename(image_file).split('.')[0]
-
-        if args.recovery and args.use_pdf2docx_api and flag_pdf:
-            from pdf2docx.converter import Converter
-            os.makedirs(args.output, exist_ok=True)
-            docx_file = os.path.join(args.output,
-                                     '{}_api.docx'.format(img_name))
-            cv = Converter(image_file)
-            cv.convert(docx_file)
-            cv.close()
-            logger.info('docx save to {}'.format(docx_file))
-            continue
 
         if not flag_gif and not flag_pdf:
             img = cv2.imread(image_file)
@@ -282,7 +267,7 @@ def main(args):
                 cv2.imwrite(img_save_path, draw_img)
                 logger.info('result save to {}'.format(img_save_path))
             if args.recovery and res != []:
-                from ppstructure.recovery.recovery_to_doc import sorted_layout_boxes, convert_info_docx
+                from custom_paddleocr.ppstructure.recovery.recovery_to_doc import sorted_layout_boxes, convert_info_docx
                 h, w, _ = img.shape
                 res = sorted_layout_boxes(res, w)
                 all_res += res

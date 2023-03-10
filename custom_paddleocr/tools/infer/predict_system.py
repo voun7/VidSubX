@@ -12,12 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
 import subprocess
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+import sys
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
@@ -28,13 +24,14 @@ import json
 import time
 import logging
 from PIL import Image
-import tools.infer.utility as utility
-import tools.infer.predict_rec as predict_rec
-import tools.infer.predict_det as predict_det
-import tools.infer.predict_cls as predict_cls
-from ppocr.utils.utility import get_image_file_list, check_and_read
-from ppocr.utils.logging import get_logger
-from tools.infer.utility import draw_ocr_box_txt, get_rotate_crop_image, get_minarea_rect_crop
+import custom_paddleocr.tools.infer.utility as utility
+import custom_paddleocr.tools.infer.predict_rec as predict_rec
+import custom_paddleocr.tools.infer.predict_det as predict_det
+import custom_paddleocr.tools.infer.predict_cls as predict_cls
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.tools.infer.utility import draw_ocr_box_txt, get_rotate_crop_image, get_minarea_rect_crop
+
 logger = get_logger()
 
 
@@ -59,7 +56,7 @@ class TextSystem(object):
         for bno in range(bbox_num):
             cv2.imwrite(
                 os.path.join(output_dir,
-                             f"mg_crop_{bno+self.crop_image_res_index}.jpg"),
+                             f"mg_crop_{bno + self.crop_image_res_index}.jpg"),
                 img_crop_list[bno])
             logger.debug(f"{bno}, {rec_res[bno]}")
         self.crop_image_res_index += bbox_num
@@ -198,7 +195,7 @@ def main(args):
             if len(imgs) > 1:
                 save_pred = os.path.basename(image_file) + '_' + str(
                     index) + "\t" + json.dumps(
-                        res, ensure_ascii=False) + "\n"
+                    res, ensure_ascii=False) + "\n"
             else:
                 save_pred = os.path.basename(image_file) + "\t" + json.dumps(
                     res, ensure_ascii=False) + "\n"

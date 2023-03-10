@@ -15,10 +15,11 @@
 import os
 import sys
 import tarfile
+
 import requests
 from tqdm import tqdm
 
-from ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.logging import get_logger
 
 
 def download_with_progressbar(url, save_path):
@@ -45,7 +46,7 @@ def maybe_download(model_storage_directory, url):
     if not os.path.exists(
             os.path.join(model_storage_directory, 'inference.pdiparams')
     ) or not os.path.exists(
-            os.path.join(model_storage_directory, 'inference.pdmodel')):
+        os.path.join(model_storage_directory, 'inference.pdmodel')):
         assert url.endswith('.tar'), 'Only supports tar compressed package'
         tmp_path = os.path.join(model_storage_directory, url.split('/')[-1])
         print('download {} to {}'.format(url, tmp_path))
