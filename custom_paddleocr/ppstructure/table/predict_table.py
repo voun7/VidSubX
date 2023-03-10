@@ -15,27 +15,22 @@
 import os
 import sys
 
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '..')))
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
-
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 import cv2
 import copy
 import logging
 import numpy as np
 import time
-import tools.infer.predict_rec as predict_rec
-import tools.infer.predict_det as predict_det
-import tools.infer.utility as utility
-from tools.infer.predict_system import sorted_boxes
-from ppocr.utils.utility import get_image_file_list, check_and_read
-from ppocr.utils.logging import get_logger
-from ppstructure.table.matcher import TableMatch
-from ppstructure.table.table_master_match import TableMasterMatcher
-from ppstructure.utility import parse_args
-import ppstructure.table.predict_structure as predict_strture
+import custom_paddleocr.tools.infer.predict_rec as predict_rec
+import custom_paddleocr.tools.infer.predict_det as predict_det
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.tools.infer.predict_system import sorted_boxes
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppstructure.table.matcher import TableMatch
+from custom_paddleocr.ppstructure.table.table_master_match import TableMasterMatcher
+from custom_paddleocr.ppstructure.utility import parse_args
+import custom_paddleocr.ppstructure.table.predict_structure as predict_strture
 
 logger = get_logger()
 

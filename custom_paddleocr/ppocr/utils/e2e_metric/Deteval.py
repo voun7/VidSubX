@@ -548,7 +548,7 @@ def combine_results(all_data, rec_flag=True):
                 ####search for all detections that overlaps with this groundtruth
                 qualified_sigma_candidates = np.where((
                                                               local_sigma_table[:, det_id] >= tp) & (
-                                                                  gt_flag[0, :] == 0))
+                                                              gt_flag[0, :] == 0))
                 num_qualified_sigma_candidates = qualified_sigma_candidates[
                     0].shape[0]
 

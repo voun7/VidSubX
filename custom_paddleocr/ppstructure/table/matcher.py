@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import numpy as np
-from ppstructure.table.table_master_match import deal_eb_token, deal_bb
+
+from custom_paddleocr.ppstructure.table.table_master_match import deal_eb_token, deal_bb
 
 
 def distance(box_1, box_2):

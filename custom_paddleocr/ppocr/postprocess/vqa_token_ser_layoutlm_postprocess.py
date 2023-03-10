@@ -13,6 +13,7 @@
 # limitations under the License.
 import numpy as np
 import paddle
+
 from custom_paddleocr.ppocr.utils.utility import load_vqa_bio_label_maps
 
 
