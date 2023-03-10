@@ -34,7 +34,7 @@ def intersection_iog(g, p):
     if not g.is_valid or not p.is_valid:
         return 0
     inter = Polygon(g).intersection(Polygon(p)).area
-    #union = g.area + p.area - inter
+    # union = g.area + p.area - inter
     union = p.area
     if union == 0:
         print("p_area is very small")
@@ -126,21 +126,21 @@ def soft_nms(boxes_in, Nt_thres=0.3, threshold=0.8, sigma=0.5, method=2):
         tbox = boxes[i].copy()
         ti = inds[i]
         pos = i + 1
-        #get max box
+        # get max box
         while pos < N:
             if maxscore < boxes[pos, 8]:
                 maxscore = boxes[pos, 8]
                 maxpos = pos
             pos = pos + 1
-        #add max box as a detection
+        # add max box as a detection
         boxes[i, :] = boxes[maxpos, :]
         inds[i] = inds[maxpos]
-        #swap
+        # swap
         boxes[maxpos, :] = tbox
         inds[maxpos] = ti
         tbox = boxes[i].copy()
         pos = i + 1
-        #NMS iteration
+        # NMS iteration
         while pos < N:
             sbox = boxes[pos].copy()
             ts_iou_val = intersection(tbox, sbox)
@@ -151,15 +151,15 @@ def soft_nms(boxes_in, Nt_thres=0.3, threshold=0.8, sigma=0.5, method=2):
                     else:
                         weight = 1
                 elif method == 2:
-                    weight = np.exp(-1.0 * ts_iou_val**2 / sigma)
+                    weight = np.exp(-1.0 * ts_iou_val ** 2 / sigma)
                 else:
                     if ts_iou_val > Nt_thres:
                         weight = 0
                     else:
                         weight = 1
                 boxes[pos, 8] = weight * boxes[pos, 8]
-                #if box score falls below thresold, discard the box by
-                #swaping last box update N
+                # if box score falls below thresold, discard the box by
+                # swaping last box update N
                 if boxes[pos, 8] < threshold:
                     boxes[pos, :] = boxes[N - 1, :]
                     inds[pos] = inds[N - 1]

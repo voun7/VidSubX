@@ -16,16 +16,16 @@ This code is refer from:
 https://github.com/JiaquanYe/TableMASTER-mmocr/blob/master/table_recognition/match.py
 """
 
-import os
-import re
-import cv2
-import glob
 import copy
+import glob
 import math
+import os
 import pickle
-import numpy as np
+import re
 
+import numpy as np
 from shapely.geometry import Polygon, MultiPoint
+
 """
 Useful function in matching.
 """
@@ -133,7 +133,7 @@ def cal_iou(bbox1, bbox2):
 def cal_distance(p1, p2):
     delta_x = p1[0] - p2[0]
     delta_y = p1[1] - p2[1]
-    d = math.sqrt((delta_x**2) + (delta_y**2))
+    d = math.sqrt((delta_x ** 2) + (delta_y ** 2))
     return d
 
 
@@ -484,7 +484,7 @@ def merge_span_token(master_token_list):
             if master_token_list[pointer] == '<td':
                 if master_token_list[pointer + 1].startswith(
                         ' colspan=') or master_token_list[
-                            pointer + 1].startswith(' rowspan='):
+                    pointer + 1].startswith(' rowspan='):
                     """
                     example:
                     pattern <td colspan="3">
@@ -496,7 +496,7 @@ def merge_span_token(master_token_list):
 
                 elif master_token_list[pointer + 2].startswith(
                         ' colspan=') or master_token_list[
-                            pointer + 2].startswith(' rowspan='):
+                    pointer + 2].startswith(' rowspan='):
                     """
                     example:
                     pattern <td rowspan="2" colspan="3">
@@ -686,9 +686,9 @@ def deal_bb(result_token):
         # 1. replace <td> to <td><b>, and </td> to </b></td>
         # 2. it is possible to predict text include <b> or </b> by Text-line recognition,
         #    so we replace <b><b> to <b>, and </b></b> to </b>
-        thead_part = thead_part.replace('<td>', '<td><b>')\
-            .replace('</td>', '</b></td>')\
-            .replace('<b><b>', '<b>')\
+        thead_part = thead_part.replace('<td>', '<td><b>') \
+            .replace('</td>', '</b></td>') \
+            .replace('<b><b>', '<b>') \
             .replace('</b></b>', '</b>')
     else:
         # <thead></thead> include "rowspan" or "colspan" branch 2.
@@ -782,7 +782,8 @@ class Matcher:
                     center_no_match_end2end_indexs]
                 # secondly, iou rule match
                 iou_rule_match_list = \
-                    iou_rule_match(center_no_match_end2end_xyxy, center_no_match_end2end_indexs, structure_master_xyxy_bboxes)
+                    iou_rule_match(center_no_match_end2end_xyxy, center_no_match_end2end_indexs,
+                                   structure_master_xyxy_bboxes)
                 match_list.extend(iou_rule_match_list)
 
             # rule 3: distance rule

@@ -29,8 +29,8 @@ class VQASerTokenChunk(object):
             encoded_inputs_example = {}
             for key in data:
                 if key in [
-                        'label', 'input_ids', 'labels', 'token_type_ids',
-                        'bbox', 'attention_mask'
+                    'label', 'input_ids', 'labels', 'token_type_ids',
+                    'bbox', 'attention_mask'
                 ]:
                     if self.infer_mode and key == 'labels':
                         encoded_inputs_example[key] = data[key]
@@ -69,8 +69,8 @@ class VQAReTokenChunk(object):
             item = {}
             for key in data:
                 if key in [
-                        'label', 'input_ids', 'labels', 'token_type_ids',
-                        'bbox', 'attention_mask'
+                    'label', 'input_ids', 'labels', 'token_type_ids',
+                    'bbox', 'attention_mask'
                 ]:
                     if self.infer_mode and key == 'labels':
                         item[key] = data[key]

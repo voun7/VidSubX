@@ -16,11 +16,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import cv2
-import math
-
-import numpy as np
 from itertools import groupby
+
+import cv2
+import numpy as np
+
+
 # from skimage.morphology._skeletonize import thin
 
 
@@ -373,7 +374,7 @@ def restore_poly(instance_yxs_list, seq_strs, p_border, ratio_w, ratio_h, src_w,
         if valid_set == 'partvgg':
             middle_point = len(detected_poly) // 2
             detected_poly = detected_poly[
-                [0, middle_point - 1, middle_point, -1], :]
+                            [0, middle_point - 1, middle_point, -1], :]
             poly_list.append(detected_poly)
         elif valid_set == 'totaltext':
             poly_list.append(detected_poly)
@@ -433,7 +434,7 @@ def extract_main_direction(pos_list, f_direction):
     point_direction = point_direction[:, ::-1]  # x, y -> y, x
     average_direction = np.mean(point_direction, axis=0, keepdims=True)
     average_direction = average_direction / (
-        np.linalg.norm(average_direction) + 1e-6)
+            np.linalg.norm(average_direction) + 1e-6)
     return average_direction
 
 

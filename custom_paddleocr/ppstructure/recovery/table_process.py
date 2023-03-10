@@ -16,10 +16,11 @@ This code is refer from: https://github.com/weizwx/html2docx/blob/master/htmldoc
 """
 
 import re
-import docx
-from docx import Document
-from bs4 import BeautifulSoup
 from html.parser import HTMLParser
+
+import docx
+from bs4 import BeautifulSoup
+from docx import Document
 
 
 def get_table_rows(table_soup):
@@ -165,7 +166,7 @@ class HtmlToDocx(HTMLParser):
         self.bs = self.options[
             'fix-html']  # whether or not to clean with BeautifulSoup
         self.document = self.doc
-        self.include_tables = True  #TODO add this option back in?
+        self.include_tables = True  # TODO add this option back in?
         self.include_images = self.options['images']
         self.include_styles = self.options['styles']
         self.paragraph = None

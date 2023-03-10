@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 import os
 import subprocess
+import sys
 
 python_path = sys.executable
 
@@ -25,5 +25,3 @@ if subprocess.call(
         'Cannot compile pse: {}, if your system is windows, you need to install all the default components of `desktop development using C++` in visual studio 2019+'.
         format(os.path.dirname(os.path.realpath(__file__))))
 os.chdir(ori_path)
-
-from .pse import pse

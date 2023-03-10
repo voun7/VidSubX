@@ -3,9 +3,9 @@
 
 from openpyxl.cell import cell
 from openpyxl.styles import Font, Alignment, PatternFill, NamedStyle, Border, Side, Color
+from openpyxl.styles.colors import BLACK
 from openpyxl.styles.fills import FILL_SOLID
 from openpyxl.styles.numbers import FORMAT_CURRENCY_USD_SIMPLE, FORMAT_PERCENTAGE
-from openpyxl.styles.colors import BLACK
 
 FORMAT_DATE_MMDDYYYY = 'mm/dd/yyyy'
 
@@ -22,8 +22,10 @@ def style_string_to_dict(style):
     """
     Convert css style string to a python dictionary
     """
+
     def clean_split(string, delim):
         return (s.strip() for s in string.split(delim))
+
     styles = [clean_split(s, ":") for s in style.split(";") if ":" in s]
     return dict(styles)
 
@@ -31,6 +33,7 @@ def style_string_to_dict(style):
 def get_side(style, name):
     return {'border_style': style.get('border-{}-style'.format(name)),
             'color': colormap(style.get('border-{}-color'.format(name)))}
+
 
 known_styles = {}
 
@@ -93,6 +96,7 @@ class StyleDict(dict):
     """
     It's like a dictionary, but it looks for items in the parent dictionary
     """
+
     def __init__(self, *args, **kwargs):
         self.parent = kwargs.pop('parent', None)
         super(StyleDict, self).__init__(*args, **kwargs)
@@ -146,6 +150,7 @@ class Element(object):
     The element is created along with a parent so that the StyleDict that we store
     can point to the parent's StyleDict.
     """
+
     def __init__(self, element, parent=None):
         self.element = element
         self.number_format = None
@@ -179,6 +184,7 @@ class Table(Element):
     This defines a very concrete tree structure for html tables that we expect to deal with. I prefer this compared to
     allowing Element to have an arbitrary number of children and dealing with an abstract element tree.
     """
+
     def __init__(self, table):
         """
         takes an html table object (from lxml)
@@ -194,6 +200,7 @@ class TableHead(Element):
     """
     This class maps to the `<th>` element of the html table.
     """
+
     def __init__(self, head, parent=None):
         super(TableHead, self).__init__(head, parent=parent)
         self.rows = [TableRow(tr, parent=self) for tr in head.findall('tr')]
@@ -203,6 +210,7 @@ class TableBody(Element):
     """
     This class maps to the `<tbody>` element of the html table.
     """
+
     def __init__(self, body, parent=None):
         super(TableBody, self).__init__(body, parent=parent)
         self.rows = [TableRow(tr, parent=self) for tr in body.findall('tr')]
@@ -212,6 +220,7 @@ class TableRow(Element):
     """
     This class maps to the `<tr>` element of the html table.
     """
+
     def __init__(self, tr, parent=None):
         super(TableRow, self).__init__(tr, parent=parent)
         self.cells = [TableCell(cell, parent=self) for cell in tr.findall('th') + tr.findall('td')]

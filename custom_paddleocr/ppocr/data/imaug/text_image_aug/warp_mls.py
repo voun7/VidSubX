@@ -73,8 +73,8 @@ class WarpMLS:
                         break
 
                     w[k] = 1. / (
-                        (i - self.dst_pts[k][0]) * (i - self.dst_pts[k][0]) +
-                        (j - self.dst_pts[k][1]) * (j - self.dst_pts[k][1]))
+                            (i - self.dst_pts[k][0]) * (i - self.dst_pts[k][0]) +
+                            (j - self.dst_pts[k][1]) * (j - self.dst_pts[k][1]))
 
                     sw += w[k]
                     swp = swp + w[k] * np.array(self.dst_pts[k])

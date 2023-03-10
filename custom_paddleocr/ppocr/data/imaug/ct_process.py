@@ -12,19 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import cv2
 import random
-import pyclipper
-import paddle
 
+import cv2
 import numpy as np
-from ppocr.utils.utility import check_install
+import pyclipper
+from PIL import Image
+
+from custom_paddleocr.ppocr.utils.utility import check_install
+
 
 # import scipy.io as scio
-
-from PIL import Image
-import paddle.vision.transforms as transforms
 
 
 class RandomScale():
@@ -114,11 +112,11 @@ class MakeShrink():
 
         for i in range(len(bboxes)):
             bboxes[i] = np.reshape(bboxes[i] * (
-                [scale_factor[0], scale_factor[1]] * (bboxes[i].shape[0] // 2)),
+                    [scale_factor[0], scale_factor[1]] * (bboxes[i].shape[0] // 2)),
                                    (bboxes[i].shape[0] // 2, 2)).astype('int32')
 
         for i in range(len(bboxes)):
-            #different value for different bbox
+            # different value for different bbox
             cv2.drawContours(gt_instance, [bboxes[i]], -1, i + 1, -1)
 
             # set training mask to 0
@@ -255,7 +253,7 @@ class GroupRandomCropPadding():
                     0,
                     p_w - t_w,
                     borderType=cv2.BORDER_CONSTANT,
-                    value=(0, ))
+                    value=(0,))
             n_imgs.append(img_p)
 
         data['image'] = n_imgs
@@ -273,7 +271,7 @@ class MakeCentripetalShift():
         dis = np.sqrt(
             np.sum((As[:, np.newaxis, :].repeat(
                 B, axis=1) - Bs[np.newaxis, :, :].repeat(
-                    A, axis=0))**2,
+                A, axis=0)) ** 2,
                    axis=-1))
 
         ind = np.argmin(dis, axis=-1)
@@ -284,7 +282,7 @@ class MakeCentripetalShift():
         imgs = data['image']
 
         img, gt_instance, training_mask, gt_kernel_instance, gt_kernel, gt_kernel_inner, training_mask_distance = \
-                        imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6]
+            imgs[0], imgs[1], imgs[2], imgs[3], imgs[4], imgs[5], imgs[6]
 
         max_instance = np.max(gt_instance)  # num bbox
 

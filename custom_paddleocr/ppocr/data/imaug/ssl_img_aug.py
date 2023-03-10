@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 import cv2
 import numpy as np
-import random
-from PIL import Image
 
 from .rec_img_aug import resize_norm_img
 

@@ -18,8 +18,9 @@ https://github.com/open-mmlab/mmocr/blob/main/mmocr/datasets/pipelines/textdet_t
 
 import cv2
 import numpy as np
-from ppocr.utils.utility import check_install
 from numpy.linalg import norm
+
+from custom_paddleocr.ppocr.utils.utility import check_install
 
 
 class DRRGTargets(object):
@@ -142,8 +143,9 @@ class DRRGTargets(object):
         else:
             if self.vector_slope(points[1] - points[0]) + self.vector_slope(
                     points[3] - points[2]) < self.vector_slope(points[
-                        2] - points[1]) + self.vector_slope(points[0] - points[
-                            3]):
+                                                                   2] - points[1]) + self.vector_slope(
+                points[0] - points[
+                    3]):
                 horizontal_edge_inds = [[0, 1], [2, 3]]
                 vertical_edge_inds = [[3, 0], [1, 2]]
             else:
@@ -152,11 +154,12 @@ class DRRGTargets(object):
 
             vertical_len_sum = norm(points[vertical_edge_inds[0][0]] - points[
                 vertical_edge_inds[0][1]]) + norm(points[vertical_edge_inds[1][
-                    0]] - points[vertical_edge_inds[1][1]])
+                0]] - points[vertical_edge_inds[1][1]])
             horizontal_len_sum = norm(points[horizontal_edge_inds[0][
                 0]] - points[horizontal_edge_inds[0][1]]) + norm(points[
-                    horizontal_edge_inds[1][0]] - points[horizontal_edge_inds[1]
-                                                         [1]])
+                                                                     horizontal_edge_inds[1][0]] - points[
+                                                                     horizontal_edge_inds[1]
+                                                                     [1]])
 
             if vertical_len_sum > horizontal_len_sum * orientation_thr:
                 head_inds = horizontal_edge_inds[0]
@@ -183,7 +186,7 @@ class DRRGTargets(object):
         sideline2 = pad_points[tail_inds[1]:(head_inds[1] + len(points))]
         sideline_mean_shift = np.mean(
             sideline1, axis=0) - np.mean(
-                sideline2, axis=0)
+            sideline2, axis=0)
 
         if sideline_mean_shift[1] > 0:
             top_sideline, bot_sideline = sideline2, sideline1
@@ -197,8 +200,8 @@ class DRRGTargets(object):
         assert line.ndim == 2
         assert len(line) >= 2
 
-        edges_length = np.sqrt((line[1:, 0] - line[:-1, 0])**2 + (line[
-            1:, 1] - line[:-1, 1])**2)
+        edges_length = np.sqrt((line[1:, 0] - line[:-1, 0]) ** 2 + (line[
+                                                                    1:, 1] - line[:-1, 1]) ** 2)
         total_length = np.sum(edges_length)
         return edges_length, total_length
 
@@ -253,7 +256,7 @@ class DRRGTargets(object):
         assert isinstance(line, tuple)
         point1, point2 = line
         d = abs(np.cross(point2 - point1, point - point1)) / (
-            norm(point2 - point1) + 1e-8)
+                norm(point2 - point1) + 1e-8)
         return d
 
     def draw_center_region_maps(self, top_line, bot_line, center_line,
@@ -268,7 +271,6 @@ class DRRGTargets(object):
 
         h, w = center_region_mask.shape
         for i in range(0, len(center_line) - 1):
-
             top_mid_point = (top_line[i] + top_line[i + 1]) / 2
             bot_mid_point = (bot_line[i] + bot_line[i + 1]) / 2
 
@@ -351,7 +353,7 @@ class DRRGTargets(object):
             num_tail_shrink = int(line_tail_shrink_len // self.resample_step)
             if len(center_line) > num_head_shrink + num_tail_shrink + 2:
                 center_line = center_line[num_head_shrink:len(center_line) -
-                                          num_tail_shrink]
+                                                          num_tail_shrink]
                 resampled_top_line = resampled_top_line[num_head_shrink:len(
                     resampled_top_line) - num_tail_shrink]
                 resampled_bot_line = resampled_bot_line[num_head_shrink:len(
@@ -380,10 +382,9 @@ class DRRGTargets(object):
         max_rand_width = np.clip(max_rand_height * self.comp_w_h_ratio,
                                  self.min_width, self.max_width)
         margin = int(
-            np.sqrt((max_rand_height / 2)**2 + (max_rand_width / 2)**2)) + 1
+            np.sqrt((max_rand_height / 2) ** 2 + (max_rand_width / 2) ** 2)) + 1
 
         if 2 * margin + 1 > min(h, w):
-
             assert min(h, w) > (np.sqrt(2) * (self.min_width + 1))
             max_rand_half_height = max(min(h, w) / 4, self.min_width / 2 + 1)
             min_rand_half_height = max(max_rand_half_height / 4,
@@ -393,7 +394,7 @@ class DRRGTargets(object):
             max_rand_width = np.clip(max_rand_height * self.comp_w_h_ratio,
                                      self.min_width, self.max_width)
             margin = int(
-                np.sqrt((max_rand_height / 2)**2 + (max_rand_width / 2)**2)) + 1
+                np.sqrt((max_rand_height / 2) ** 2 + (max_rand_width / 2) ** 2)) + 1
 
         inner_center_sample_mask = np.zeros_like(center_sample_mask)
         inner_center_sample_mask[margin:h - margin, margin:w - margin] = \
@@ -419,7 +420,7 @@ class DRRGTargets(object):
 
         rand_cos = 2 * np.random.random(size=(len(rand_centers), 1)) - 1
         rand_sin = 2 * np.random.random(size=(len(rand_centers), 1)) - 1
-        scale = np.sqrt(1.0 / (rand_cos**2 + rand_sin**2 + 1e-8))
+        scale = np.sqrt(1.0 / (rand_cos ** 2 + rand_sin ** 2 + 1e-8))
         rand_cos = rand_cos * scale
         rand_sin = rand_sin * scale
 
@@ -460,9 +461,9 @@ class DRRGTargets(object):
         comp_labels = comp_attribs[:, 6].reshape((-1, 1))
 
         x += (np.random.random(size=(len(comp_attribs), 1)) - 0.5) * (
-            h * np.abs(cos) + w * np.abs(sin)) * jitter_level
+                h * np.abs(cos) + w * np.abs(sin)) * jitter_level
         y += (np.random.random(size=(len(comp_attribs), 1)) - 0.5) * (
-            h * np.abs(sin) + w * np.abs(cos)) * jitter_level
+                h * np.abs(sin) + w * np.abs(cos)) * jitter_level
 
         h += (np.random.random(size=(len(comp_attribs), 1)) - 0.5
               ) * h * jitter_level
@@ -474,7 +475,7 @@ class DRRGTargets(object):
         sin += (np.random.random(size=(len(comp_attribs), 1)) - 0.5
                 ) * 2 * jitter_level
 
-        scale = np.sqrt(1.0 / (cos**2 + sin**2 + 1e-8))
+        scale = np.sqrt(1.0 / (cos ** 2 + sin ** 2 + 1e-8))
         cos = cos * scale
         sin = sin * scale
 
@@ -508,8 +509,8 @@ class DRRGTargets(object):
 
         assert isinstance(center_lines, list)
         assert (
-            text_mask.shape == center_region_mask.shape == top_height_map.shape
-            == bot_height_map.shape == sin_map.shape == cos_map.shape)
+                text_mask.shape == center_region_mask.shape == top_height_map.shape
+                == bot_height_map.shape == sin_map.shape == cos_map.shape)
 
         center_lines_mask = np.zeros_like(center_region_mask)
         cv2.polylines(center_lines_mask, center_lines, 0, 1, 1)

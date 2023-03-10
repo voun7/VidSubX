@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-import sys
-import shapely
-from shapely.geometry import Polygon
-import numpy as np
-from collections import defaultdict
-import operator
-from rapidfuzz.distance import Levenshtein
 import argparse
-import json
 import copy
+import json
+import operator
+import os
+from collections import defaultdict
+
+import numpy as np
+import shapely
+from rapidfuzz.distance import Levenshtein
+from shapely.geometry import Polygon
 
 
 def parse_ser_results_fp(fp, fp_type="gt", ignore_background=True):
@@ -169,14 +168,14 @@ def eval_e2e(args):
                         if args.ignore_ser_prediction or gt_label == dt_label:
                             hit += 1
 
-# unmatched dt
+        # unmatched dt
         for tindex, dt_match_flag in enumerate(dt_match):
             if dt_match_flag == False:
                 dt_text = dt_info[tindex]["text"]
                 gt_text = ""
                 ed_sum += ed(args, dt_text, gt_text)
 
-# unmatched gt
+        # unmatched gt
         for tindex, gt_match_flag in enumerate(gt_match):
             if gt_match_flag == False:
                 dt_text = ""

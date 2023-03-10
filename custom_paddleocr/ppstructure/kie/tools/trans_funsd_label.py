@@ -14,10 +14,9 @@
 
 import json
 import os
-import sys
-import cv2
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
 
 
 def trans_poly_to_bbox(poly):
@@ -63,7 +62,7 @@ def load_funsd_label(image_dir, anno_dir):
                 while word_idx < len(words):
                     # switch to a new link
                     if words[word_idx]["box"][0] + 10 <= words[word_idx - 1][
-                            "box"][2]:
+                        "box"][2]:
                         if len("".join(curr_texts[0])) > 0:
                             res.append({
                                 "transcription": " ".join(curr_texts),
@@ -111,7 +110,7 @@ def load_funsd_label(image_dir, anno_dir):
                 for link in r["linking"]:
                     # illegal links will be removed
                     if link[0] not in old_id2new_id_map or link[
-                            1] not in old_id2new_id_map:
+                        1] not in old_id2new_id_map:
                         continue
                     for src in old_id2new_id_map[link[0]]:
                         for dst in old_id2new_id_map[link[1]]:

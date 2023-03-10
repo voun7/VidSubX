@@ -17,10 +17,11 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from PIL import Image, ImageEnhance, ImageOps
-import numpy as np
 import random
+
+import numpy as np
 import six
+from PIL import Image, ImageEnhance, ImageOps
 
 
 class RawRandAugment(object):
@@ -56,7 +57,7 @@ class RawRandAugment(object):
         def rotate_with_fill(img, magnitude):
             rot = img.convert("RGBA").rotate(magnitude)
             return Image.composite(rot,
-                                   Image.new("RGBA", rot.size, (128, ) * 4),
+                                   Image.new("RGBA", rot.size, (128,) * 4),
                                    rot).convert(img.mode)
 
         rnd_ch_op = random.choice

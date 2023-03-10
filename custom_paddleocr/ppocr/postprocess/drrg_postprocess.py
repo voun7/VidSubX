@@ -19,10 +19,10 @@ https://github.com/open-mmlab/mmocr/blob/main/mmocr/models/textdet/postprocess/d
 import functools
 import operator
 
+import cv2
 import numpy as np
 import paddle
 from numpy.linalg import norm
-import cv2
 
 
 class Node:
@@ -63,7 +63,7 @@ def graph_propagation(edges, scores, text_comps, edge_len_thr=50.):
                 scores[i] = 0
         if (edge[0], edge[1]) in score_dict:
             score_dict[edge[0], edge[1]] = 0.5 * (
-                score_dict[edge[0], edge[1]] + scores[i])
+                    score_dict[edge[0], edge[1]] + scores[i])
         else:
             score_dict[edge[0], edge[1]] = scores[i]
 
@@ -136,7 +136,7 @@ def remove_single(text_comps, comp_pred_labels):
 
 
 def norm2(point1, point2):
-    return ((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)**0.5
+    return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
 
 
 def min_connect_path(points):

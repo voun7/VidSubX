@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
 
 os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
@@ -24,13 +19,12 @@ import cv2
 import numpy as np
 import time
 
-import tools.infer.utility as utility
-from ppocr.data import create_operators, transform
-from ppocr.postprocess import build_post_process
-from ppocr.utils.logging import get_logger
-from ppocr.utils.utility import get_image_file_list, check_and_read
-from ppstructure.utility import parse_args
-from picodet_postprocess import PicoDetPostProcess
+import custom_paddleocr.tools.infer.utility as utility
+from custom_paddleocr.ppocr.data import create_operators, transform
+from custom_paddleocr.ppocr.postprocess import build_post_process
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+from custom_paddleocr.ppstructure.utility import parse_args
 
 logger = get_logger()
 
@@ -94,7 +88,7 @@ class LayoutPredictor(object):
                 .copy_to_cpu())
             np_boxes_list.append(
                 self.predictor.get_output_handle(output_names[
-                    out_idx + num_outs]).copy_to_cpu())
+                                                     out_idx + num_outs]).copy_to_cpu())
         preds = dict(boxes=np_score_list, boxes_num=np_boxes_list)
 
         post_preds = self.postprocess_op(ori_im, img, preds)

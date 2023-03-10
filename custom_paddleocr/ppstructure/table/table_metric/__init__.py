@@ -13,4 +13,5 @@
 # limitations under the License.
 
 __all__ = ['TEDS']
+
 from .table_metric import TEDS

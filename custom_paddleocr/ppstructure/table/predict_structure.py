@@ -99,7 +99,7 @@ class TableStructurer(object):
                 model_precision=args.precision,
                 batch_size=1,
                 data_shape="dynamic",
-                save_path=None,  #args.save_log_path,
+                save_path=None,  # args.save_log_path,
                 inference_config=self.config,
                 pids=pid,
                 process_name=None,
@@ -150,8 +150,8 @@ class TableStructurer(object):
         bbox_list = post_result['bbox_batch_list'][0]
         structure_str_list = structure_str_list[0]
         structure_str_list = [
-            '<html>', '<body>', '<table>'
-        ] + structure_str_list + ['</table>', '</body>', '</html>']
+                                 '<html>', '<body>', '<table>'
+                             ] + structure_str_list + ['</table>', '</body>', '</html>']
         elapse = time.time() - starttime
         if self.args.benchmark:
             self.autolog.times.end(stamp=True)

@@ -13,6 +13,7 @@
 # limitations under the License.
 import numpy as np
 from shapely.geometry import Polygon
+
 """
 :param det_x: [1, N] Xs of detection's vertices 
 :param det_y: [1, N] Ys of detection's vertices
@@ -72,7 +73,7 @@ def area_of_union(det_x, det_y, gt_x, gt_y):
 
 def iou(det_x, det_y, gt_x, gt_y):
     return area_of_intersection(det_x, det_y, gt_x, gt_y) / (
-        area_of_union(det_x, det_y, gt_x, gt_y) + 1.0)
+            area_of_union(det_x, det_y, gt_x, gt_y) + 1.0)
 
 
 def iod(det_x, det_y, gt_x, gt_y):
@@ -80,4 +81,4 @@ def iod(det_x, det_y, gt_x, gt_y):
     This helper determine the fraction of intersection area over detection area
     """
     return area_of_intersection(det_x, det_y, gt_x, gt_y) / (
-        area(det_x, det_y) + 1.0)
+            area(det_x, det_y) + 1.0)

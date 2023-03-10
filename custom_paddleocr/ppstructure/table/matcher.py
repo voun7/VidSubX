@@ -106,7 +106,7 @@ class TableMatch:
                 if td_index in matched_index.keys():
                     b_with = False
                     if '<b>' in ocr_contents[matched_index[td_index][
-                            0]] and len(matched_index[td_index]) > 1:
+                        0]] and len(matched_index[td_index]) > 1:
                         b_with = True
                         end_html.extend('<b>')
                     for i, td_index_index in enumerate(matched_index[td_index]):
@@ -123,7 +123,7 @@ class TableMatch:
                             if len(content) == 0:
                                 continue
                             if i != len(matched_index[
-                                    td_index]) - 1 and ' ' != content[-1]:
+                                            td_index]) - 1 and ' ' != content[-1]:
                                 content += ' '
                         end_html.extend(content)
                     if b_with:
@@ -147,7 +147,7 @@ class TableMatch:
                 b_with = False
                 if td_index in matched_index.keys():
                     if '<b>' in ocr_contents[matched_index[td_index][
-                            0]] and len(matched_index[td_index]) > 1:
+                        0]] and len(matched_index[td_index]) > 1:
                         b_with = True
                     for i, td_index_index in enumerate(matched_index[td_index]):
                         content = ocr_contents[td_index_index][0]
@@ -163,7 +163,7 @@ class TableMatch:
                             if len(content) == 0:
                                 continue
                             if i != len(matched_index[
-                                    td_index]) - 1 and ' ' != content[-1]:
+                                            td_index]) - 1 and ' ' != content[-1]:
                                 content += ' '
                         txt += content
                 if b_with:

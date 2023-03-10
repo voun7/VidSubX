@@ -20,12 +20,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
-import os.path as osp
-import numpy as np
 import cv2
+import numpy as np
 import paddle
-import pyclipper
 
 
 class CTPostProcess(object):
@@ -97,7 +94,7 @@ class CTPostProcess(object):
             off_points[:, 1] = np.clip(off_points[:, 1], 0, label.shape[0] - 1)
 
             label[pixels[1], pixels[0]] = label_kernel[off_points[:, 1],
-                                                       off_points[:, 0]]
+            off_points[:, 0]]
             label[label_kernel > 0] = label_kernel[label_kernel > 0]
 
             score_pocket = [0.0]

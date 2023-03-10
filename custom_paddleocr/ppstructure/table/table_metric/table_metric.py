@@ -9,13 +9,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # Apache 2.0 License for more details.
 
-from rapidfuzz.distance import Levenshtein
+from collections import deque
+
 from apted import APTED, Config
 from apted.helpers import Tree
 from lxml import etree, html
-from collections import deque
-from .parallel import parallel_process
+from rapidfuzz.distance import Levenshtein
 from tqdm import tqdm
+
+from .parallel import parallel_process
 
 
 class TableTree(Tree):
@@ -41,15 +43,14 @@ class TableTree(Tree):
 class CustomConfig(Config):
     def rename(self, node1, node2):
         """Compares attributes of trees"""
-        #print(node1.tag)
+        # print(node1.tag)
         if (node1.tag != node2.tag) or (node1.colspan != node2.colspan) or (node1.rowspan != node2.rowspan):
             return 1.
         if node1.tag == 'td':
             if node1.content or node2.content:
-                #print(node1.content, )
+                # print(node1.content, )
                 return Levenshtein.normalized_distance(node1.content, node2.content)
         return 0.
-
 
 
 class CustomConfig_del_short(Config):
@@ -59,17 +60,18 @@ class CustomConfig_del_short(Config):
             return 1.
         if node1.tag == 'td':
             if node1.content or node2.content:
-                #print('before')
-                #print(node1.content, node2.content)
-                #print('after')
+                # print('before')
+                # print(node1.content, node2.content)
+                # print('after')
                 node1_content = node1.content
                 node2_content = node2.content
                 if len(node1_content) < 3:
                     node1_content = ['####']
                 if len(node2_content) < 3:
-                    node2_content = ['####']   
+                    node2_content = ['####']
                 return Levenshtein.normalized_distance(node1_content, node2_content)
         return 0.
+
 
 class CustomConfig_del_block(Config):
     def rename(self, node1, node2):
@@ -78,10 +80,10 @@ class CustomConfig_del_block(Config):
             return 1.
         if node1.tag == 'td':
             if node1.content or node2.content:
-                
+
                 node1_content = node1.content
                 node2_content = node2.content
-                while ' '  in node1_content:
+                while ' ' in node1_content:
                     print(node1_content.index(' '))
                     node1_content.pop(node1_content.index(' '))
                 while ' ' in node2_content:
@@ -90,13 +92,14 @@ class CustomConfig_del_block(Config):
                 return Levenshtein.normalized_distance(node1_content, node2_content)
         return 0.
 
+
 class TEDS(object):
     ''' Tree Edit Distance basead Similarity
     '''
 
     def __init__(self, structure_only=False, n_jobs=1, ignore_nodes=None):
         assert isinstance(n_jobs, int) and (
-            n_jobs >= 1), 'n_jobs must be an integer greather than 1'
+                n_jobs >= 1), 'n_jobs must be an integer greather than 1'
         self.structure_only = structure_only
         self.n_jobs = n_jobs
         self.ignore_nodes = ignore_nodes
@@ -193,7 +196,7 @@ class TEDS(object):
             scores = [self.evaluate(pred_html, true_html) for (
                 pred_html, true_html) in zip(pred_htmls, true_htmls)]
         else:
-            inputs = [{"pred": pred_html, "true": true_html} for(
+            inputs = [{"pred": pred_html, "true": true_html} for (
                 pred_html, true_html) in zip(pred_htmls, true_htmls)]
 
             scores = parallel_process(
@@ -204,6 +207,7 @@ class TEDS(object):
 if __name__ == '__main__':
     import json
     import pprint
+
     with open('sample_pred.json') as fp:
         pred_json = json.load(fp)
     with open('sample_gt.json') as fp:

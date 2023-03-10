@@ -15,8 +15,9 @@
 conver table label to html
 """
 
-import json
 import argparse
+import json
+
 from tqdm import tqdm
 
 

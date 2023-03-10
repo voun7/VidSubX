@@ -53,7 +53,8 @@ def write_rows(worksheet, elem, row, column=1):
                 # As we start filling in contents, the initial width of the cell (which can be retrieved by:
                 # worksheet.column_dimensions[get_column_letter(column)].width) is equal to the width of the previous
                 # cell in the same column (i.e. width of A2 = width of A1)
-                width = max(worksheet.column_dimensions[get_column_letter(column)].width or 0, len(table_cell.value) + 2)
+                width = max(worksheet.column_dimensions[get_column_letter(column)].width or 0,
+                            len(table_cell.value) + 2)
                 if max_width and width > max_width:
                     width = max_width
                 elif min_width and width < min_width:

@@ -16,11 +16,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import cv2
 import math
-
-import numpy as np
 from itertools import groupby
+
+import cv2
+import numpy as np
+
+
 # from skimage.morphology._skeletonize import thin
 
 
@@ -427,13 +429,13 @@ def generate_pivot_list_horizontal(p_score,
             if is_h_len:
                 xs = np.unique(xs)
                 for x in xs:
-                    ys = instance_label_map[:, x].copy().reshape((-1, ))
+                    ys = instance_label_map[:, x].copy().reshape((-1,))
                     y = int(np.where(ys == instance_id)[0].mean())
                     pos_list_final.append((y, x))
             else:
                 ys = np.unique(ys)
                 for y in ys:
-                    xs = instance_label_map[y, :].copy().reshape((-1, ))
+                    xs = instance_label_map[y, :].copy().reshape((-1,))
                     x = int(np.where(xs == instance_id)[0].mean())
                     pos_list_final.append((y, x))
 
@@ -499,7 +501,7 @@ def extract_main_direction(pos_list, f_direction):
     point_direction = point_direction[:, ::-1]  # x, y -> y, x
     average_direction = np.mean(point_direction, axis=0, keepdims=True)
     average_direction = average_direction / (
-        np.linalg.norm(average_direction) + 1e-6)
+            np.linalg.norm(average_direction) + 1e-6)
     return average_direction
 
 

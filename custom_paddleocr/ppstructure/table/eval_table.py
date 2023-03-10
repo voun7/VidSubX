@@ -13,20 +13,15 @@
 # limitations under the License.
 
 import os
-import sys
-
-__dir__ = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(__dir__)
-sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+import pickle
 
 import cv2
-import pickle
-import paddle
 from tqdm import tqdm
-from ppstructure.table.table_metric import TEDS
-from ppstructure.table.predict_table import TableSystem
-from ppstructure.utility import init_args
-from ppocr.utils.logging import get_logger
+
+from custom_paddleocr.ppocr.utils.logging import get_logger
+from custom_paddleocr.ppstructure.table.predict_table import TableSystem
+from custom_paddleocr.ppstructure.table.table_metric import TEDS
+from custom_paddleocr.ppstructure.utility import init_args
 
 logger = get_logger()
 

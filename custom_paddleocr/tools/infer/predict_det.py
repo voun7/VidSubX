@@ -31,6 +31,7 @@ from ppocr.utils.utility import get_image_file_list, check_and_read
 from ppocr.data import create_operators, transform
 from ppocr.postprocess import build_post_process
 import json
+
 logger = get_logger()
 
 
@@ -81,7 +82,7 @@ class TextDetector(object):
                 'NormalizeImage': {
                     'std': [1.0, 1.0, 1.0],
                     'mean':
-                    [0.48109378172549, 0.45752457890196, 0.40787054090196],
+                        [0.48109378172549, 0.45752457890196, 0.40787054090196],
                     'scale': '1./255.',
                     'order': 'hwc'
                 }
@@ -320,7 +321,7 @@ if __name__ == "__main__":
             if len(imgs) > 1:
                 save_pred = os.path.basename(image_file) + '_' + str(
                     index) + "\t" + str(
-                        json.dumps([x.tolist() for x in dt_boxes])) + "\n"
+                    json.dumps([x.tolist() for x in dt_boxes])) + "\n"
             else:
                 save_pred = os.path.basename(image_file) + "\t" + str(
                     json.dumps([x.tolist() for x in dt_boxes])) + "\n"

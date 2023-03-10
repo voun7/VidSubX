@@ -17,10 +17,11 @@ https://github.com/open-mmlab/mmocr/blob/v0.3.0/mmocr/models/textdet/postprocess
 """
 
 import cv2
-import paddle
 import numpy as np
+import paddle
 from numpy.fft import ifft
-from ppocr.utils.poly_nms import poly_nms, valid_boundary
+
+from custom_paddleocr.ppocr.utils.poly_nms import poly_nms, valid_boundary
 
 
 def fill_hole(input_mask):
@@ -196,7 +197,7 @@ class FCEPostProcess(object):
         x_pred = reg_pred[:, :, :2 * fourier_degree + 1]
         y_pred = reg_pred[:, :, 2 * fourier_degree + 1:]
 
-        score_pred = (tr_pred[1]**alpha) * (tcl_pred[1]**beta)
+        score_pred = (tr_pred[1] ** alpha) * (tcl_pred[1] ** beta)
         tr_pred_mask = (score_pred) > score_thr
         tr_mask = fill_hole(tr_pred_mask)
 

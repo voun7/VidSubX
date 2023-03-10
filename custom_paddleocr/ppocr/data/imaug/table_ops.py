@@ -19,8 +19,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import sys
-import six
 import cv2
 import numpy as np
 
@@ -49,11 +47,11 @@ class GenTableMask(object):
         box_list = []
         for i in range(len(project_val_array)):
             if in_text == False and project_val_array[
-                    i] > spilt_threshold:  # 进入字符区了
+                i] > spilt_threshold:  # 进入字符区了
                 in_text = True
                 start_idx = i
             elif project_val_array[
-                    i] <= spilt_threshold and in_text == True:  # 进入空白区了
+                i] <= spilt_threshold and in_text == True:  # 进入空白区了
                 end_idx = i
                 in_text = False
                 if end_idx - start_idx <= 2:
@@ -99,11 +97,11 @@ class GenTableMask(object):
         spilt_threshold = 0
         for i in range(len(project_val_array)):
             if in_text == False and project_val_array[
-                    i] > spilt_threshold:  # 进入字符区了
+                i] > spilt_threshold:  # 进入字符区了
                 in_text = True
                 start_idx = i
             elif project_val_array[
-                    i] <= spilt_threshold and in_text == True:  # 进入空白区了
+                i] <= spilt_threshold and in_text == True:  # 进入空白区了
                 end_idx = i
                 in_text = False
                 if end_idx - start_idx <= 2:

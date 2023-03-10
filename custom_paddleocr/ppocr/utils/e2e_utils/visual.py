@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
 import cv2
-import time
+import numpy as np
 
 
 def resize_image(im, max_side_len=512):
@@ -154,8 +153,8 @@ def expand_poly_along_width(poly, shrink_ratio_of_width=0.3):
 
 def norm2(x, axis=None):
     if axis:
-        return np.sqrt(np.sum(x**2, axis=axis))
-    return np.sqrt(np.sum(x**2))
+        return np.sqrt(np.sum(x ** 2, axis=axis))
+    return np.sqrt(np.sum(x ** 2))
 
 
 def cos(p1, p2):

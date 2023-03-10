@@ -247,7 +247,7 @@ class CVRandomPerspective(object):
         endpoints = [topleft, topright, botright, botleft]
         return np.array(
             startpoints, dtype=np.float32), np.array(
-                endpoints, dtype=np.float32)
+            endpoints, dtype=np.float32)
 
     def __call__(self, img):
         height, width = img.shape[:2]
@@ -312,7 +312,7 @@ class CVGaussianNoise(object):
             raise Exception('degree must be number or list with length 2')
 
     def __call__(self, img):
-        noise = np.random.normal(self.mean, self.var**0.5, img.shape)
+        noise = np.random.normal(self.mean, self.var ** 0.5, img.shape)
         img = np.clip(img + noise, 0, 255).astype(np.uint8)
         return img
 
@@ -403,8 +403,10 @@ class CVColorJitter(object):
             hue=hue)
 
     def __call__(self, img):
-        if random.random() < self.p: return self.transforms(img)
-        else: return img
+        if random.random() < self.p:
+            return self.transforms(img)
+        else:
+            return img
 
 
 class SVTRDeterioration(object):

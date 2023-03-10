@@ -11,16 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import copy
-import cv2
 import random
+
+import cv2
 import numpy as np
 from PIL import Image
 from shapely.geometry import Polygon
 
-from ppocr.data.imaug.iaa_augment import IaaAugment
-from ppocr.data.imaug.random_crop_data import is_poly_outside_rect
-from tools.infer.utility import get_rotate_crop_image
+from custom_paddleocr.ppocr.data.imaug.iaa_augment import IaaAugment
+from custom_paddleocr.ppocr.data.imaug.random_crop_data import is_poly_outside_rect
+from custom_paddleocr.tools.infer.utility import get_rotate_crop_image
 
 
 class CopyPaste(object):
@@ -60,7 +60,7 @@ class CopyPaste(object):
 
             src_img, box = self.paste_img(src_img, box_img, src_polys)
             if box is not None:
-                box = box.tolist() 
+                box = box.tolist()
                 for _ in range(len(box), point_num):
                     box.append(box[-1])
                 src_polys.append(box)

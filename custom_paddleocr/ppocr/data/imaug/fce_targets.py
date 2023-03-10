@@ -20,7 +20,6 @@ import cv2
 import numpy as np
 from numpy.fft import fft
 from numpy.linalg import norm
-import sys
 
 
 def vector_slope(vec):
@@ -111,7 +110,7 @@ class FCENetTargets:
 
             while current_edge_ind + 1 < len(
                     length_cumsum) and current_line_len >= length_cumsum[
-                        current_edge_ind + 1]:
+                current_edge_ind + 1]:
                 current_edge_ind += 1
 
             current_edge_end_shift = current_line_len - length_cumsum[
@@ -162,7 +161,7 @@ class FCENetTargets:
         sideline2 = pad_points[tail_inds[1]:(head_inds[1] + len(points))]
         sideline_mean_shift = np.mean(
             sideline1, axis=0) - np.mean(
-                sideline2, axis=0)
+            sideline2, axis=0)
 
         if sideline_mean_shift[1] > 0:
             top_sideline, bot_sideline = sideline2, sideline1
@@ -244,8 +243,8 @@ class FCENetTargets:
             tail_inds = [tail_start, tail_end]
         else:
             if vector_slope(points[1] - points[0]) + vector_slope(points[
-                    3] - points[2]) < vector_slope(points[2] - points[
-                        1]) + vector_slope(points[0] - points[3]):
+                                                                      3] - points[2]) < vector_slope(points[2] - points[
+                1]) + vector_slope(points[0] - points[3]):
                 horizontal_edge_inds = [[0, 1], [2, 3]]
                 vertical_edge_inds = [[3, 0], [1, 2]]
             else:
@@ -254,11 +253,12 @@ class FCENetTargets:
 
             vertical_len_sum = norm(points[vertical_edge_inds[0][0]] - points[
                 vertical_edge_inds[0][1]]) + norm(points[vertical_edge_inds[1][
-                    0]] - points[vertical_edge_inds[1][1]])
+                0]] - points[vertical_edge_inds[1][1]])
             horizontal_len_sum = norm(points[horizontal_edge_inds[0][
                 0]] - points[horizontal_edge_inds[0][1]]) + norm(points[
-                    horizontal_edge_inds[1][0]] - points[horizontal_edge_inds[1]
-                                                         [1]])
+                                                                     horizontal_edge_inds[1][0]] - points[
+                                                                     horizontal_edge_inds[1]
+                                                                     [1]])
 
             if vertical_len_sum > horizontal_len_sum * orientation_thr:
                 head_inds = horizontal_edge_inds[0]
@@ -346,7 +346,7 @@ class FCENetTargets:
             tail_shrink_num = int(line_tail_shrink_len // self.resample_step)
             if len(center_line) > head_shrink_num + tail_shrink_num + 2:
                 center_line = center_line[head_shrink_num:len(center_line) -
-                                          tail_shrink_num]
+                                                          tail_shrink_num]
                 resampled_top_line = resampled_top_line[head_shrink_num:len(
                     resampled_top_line) - tail_shrink_num]
                 resampled_bot_line = resampled_bot_line[head_shrink_num:len(
@@ -387,7 +387,7 @@ class FCENetTargets:
                 p2 = polygon[0]
             else:
                 p2 = polygon[i + 1]
-            length.append(((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5)
+            length.append(((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5)
 
         total_length = sum(length)
         n_on_each_line = (np.array(length) / (total_length + 1e-8)) * n
@@ -513,9 +513,9 @@ class FCENetTargets:
             for i in range(-k, k + 1):
                 if i != 0:
                     real_map[i + k, :, :] = mask * fourier_coeff[i + k, 0] + (
-                        1 - mask) * real_map[i + k, :, :]
+                            1 - mask) * real_map[i + k, :, :]
                     imag_map[i + k, :, :] = mask * fourier_coeff[i + k, 1] + (
-                        1 - mask) * imag_map[i + k, :, :]
+                            1 - mask) * imag_map[i + k, :, :]
                 else:
                     yx = np.argwhere(mask > 0.5)
                     k_ind = np.ones((len(yx)), dtype=np.int64) * k

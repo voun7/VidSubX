@@ -13,14 +13,15 @@
 # limitations under the License.
 
 import math
+import random
+
 import cv2
 import numpy as np
-import random
-import copy
 from PIL import Image
-from .text_image_aug import tia_perspective, tia_stretch, tia_distort
-from .abinet_aug import CVGeometry, CVDeterioration, CVColorJitter, SVTRGeometry, SVTRDeterioration
 from paddle.vision.transforms import Compose
+
+from .abinet_aug import CVGeometry, CVDeterioration, CVColorJitter, SVTRGeometry, SVTRDeterioration
+from .text_image_aug import tia_perspective, tia_stretch, tia_distort
 
 
 class RecAug(object):
@@ -159,7 +160,7 @@ class RecConAug(object):
             return data
         for idx, ext_data in enumerate(data["ext_data"]):
             if len(data["label"]) + len(ext_data[
-                    "label"]) > self.max_text_length:
+                                            "label"]) > self.max_text_length:
                 break
             concat_ratio = data['image'].shape[1] / data['image'].shape[
                 0] + ext_data['image'].shape[1] / ext_data['image'].shape[0]
@@ -632,7 +633,7 @@ def resize_norm_img_abinet(img, image_shape):
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
     resized_image = (
-        resized_image - mean[None, None, ...]) / std[None, None, ...]
+                            resized_image - mean[None, None, ...]) / std[None, None, ...]
     resized_image = resized_image.transpose((2, 0, 1))
     resized_image = resized_image.astype('float32')
 
@@ -641,7 +642,6 @@ def resize_norm_img_abinet(img, image_shape):
 
 
 def srn_other_inputs(image_shape, num_heads, max_text_length):
-
     imgC, imgH, imgW = image_shape
     feature_dim = int((imgH / 8) * (imgW / 8))
 
@@ -717,7 +717,7 @@ def add_gasuss_noise(image, mean=0, var=0.1):
     Gasuss noise
     """
 
-    noise = np.random.normal(mean, var**0.5, image.shape)
+    noise = np.random.normal(mean, var ** 0.5, image.shape)
     out = image + 0.5 * noise
     out = np.clip(out, 0, 255)
     out = np.uint8(out)
@@ -758,7 +758,7 @@ def get_warpR(config):
     if w > 69 and w < 112:
         anglex = anglex * 1.5
 
-    z = np.sqrt(w**2 + h**2) / 2 / np.tan(rad(fov / 2))
+    z = np.sqrt(w ** 2 + h ** 2) / 2 / np.tan(rad(fov / 2))
     # Homogeneous coordinate transformation matrix
     rx = np.array([[1, 0, 0, 0],
                    [0, np.cos(rad(anglex)), -np.sin(rad(anglex)), 0], [

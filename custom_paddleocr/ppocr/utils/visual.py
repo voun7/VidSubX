@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import cv2
 import os
+
+import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
@@ -56,7 +57,6 @@ def draw_ser_results(image,
 
 
 def draw_box_txt(bbox, text, draw, font, font_size, color):
-
     # draw ocr results outline
     bbox = ((bbox[0], bbox[1]), (bbox[2], bbox[3]))
     draw.rectangle(bbox, fill=color)

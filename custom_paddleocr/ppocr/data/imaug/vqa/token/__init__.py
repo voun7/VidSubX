@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .vqa_re_convert import TensorizeEntitiesRelations
 from .vqa_token_chunk import VQASerTokenChunk, VQAReTokenChunk
 from .vqa_token_pad import VQATokenPad
 from .vqa_token_relation import VQAReTokenRelation
-from .vqa_re_convert import TensorizeEntitiesRelations
