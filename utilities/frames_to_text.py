@@ -2,8 +2,9 @@ import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-import utilities.utils as utils
 from paddleocr import PaddleOCR
+
+import utilities.utils as utils
 
 logger = logging.getLogger(__name__)
 
