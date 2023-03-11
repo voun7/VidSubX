@@ -1,3 +1,4 @@
+import ctypes
 import logging
 import re
 import sys
@@ -17,6 +18,36 @@ from main import SubtitleDetector, SubtitleExtractor
 from utilities.logger_setup import get_logger
 
 logger = logging.getLogger(__name__)
+
+
+def set_dpi_scaling() -> None:
+    """
+    PROCESS DPI UNAWARE = 0
+    0 = DPI unaware. This app does not scale for DPI changes and is
+    always assumed to have a scale factor of 100% (96 DPI). It
+    will be automatically scaled by the system on any other DPI
+    setting.
+
+    1 = System DPI aware. This app does not scale for DPI changes.
+    It will query for the DPI once and use that value for the
+    lifetime of the app. If the DPI changes, the app will not
+    adjust to the new DPI value. It will be automatically scaled
+    up or down by the system when the DPI changes from the system
+    value.
+
+    2 = Per monitor DPI aware. This app checks for the DPI when it is
+    created and adjusts the scale factor whenever the DPI changes.
+    These applications are not automatically scaled by the system.
+    """
+    # Query DPI Awareness (Windows 10 and 8)
+    awareness = ctypes.c_int()
+    logger.debug(f"DPI awareness = {awareness}")
+
+    # Set DPI Awareness  (Windows 10 and 8)
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except Exception as dpi_error:
+        logger.exception(f"An error occurred while setting the dpi: {dpi_error}")
 
 
 class SubtitleExtractorGUI:
@@ -857,6 +888,7 @@ class PreferencesUI(Toplevel):
 if __name__ == '__main__':
     get_logger()
     logger.debug("\n\nGUI program Started.")
+    set_dpi_scaling()
     rt = Tk()
     SubtitleExtractorGUI(rt)
     rt.mainloop()
