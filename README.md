@@ -29,10 +29,6 @@ paddle.utils.run_check()
 3rd Install the following in the conda virtual environment:
 
 ```
-pip install --no-deps paddleocr
-```
-
-```
 pip install opencv-python
 ```
 
@@ -50,6 +46,10 @@ pip install pyclipper
 
 ```
 pip install lmdb
+```
+
+```
+pip install --no-deps paddleocr
 ```
 
 Not all of paddleocr dependencies are needed, comment out the imports for the following packages in paddleocr:
