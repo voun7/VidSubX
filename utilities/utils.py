@@ -35,6 +35,9 @@ class Config:
             "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "split_start", "split_stop",
             "no_of_frames", "sub_area_x_padding", "sub_area_y_padding"]
 
+    # Permanent values
+    subarea_height_scaler = 0.75
+
     # Default values
     default_frame_extraction_frequency = 2
     default_frame_extraction_chunk_size = 250

@@ -74,7 +74,7 @@ class SubtitleDetector:
         """
         Reposition the sub area that was change when using key area to detect texts bbox.
         """
-        y = int(self.frame_height * 0.75)
+        y = int(self.frame_height * utils.Config.subarea_height_scaler)
         top_left = top_left[0], top_left[1] + y
         bottom_right = bottom_right[0], bottom_right[1] + y
         return top_left, bottom_right
@@ -169,7 +169,7 @@ class SubtitleExtractor:
             return sub_area
         else:
             logger.debug("Subtitle area being set to default sub area")
-            x1, y1, x2, y2 = 0, int(frame_height * 0.75), frame_width, frame_height
+            x1, y1, x2, y2 = 0, int(frame_height * utils.Config.subarea_height_scaler), frame_width, frame_height
             return x1, y1, x2, y2
 
     def _empty_cache(self) -> None:
