@@ -93,7 +93,7 @@ class Config:
         cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
     @classmethod
-    def set_config(cls, **kwargs):
+    def set_config(cls, **kwargs: int | float | str) -> None:
         # Write into memory & file
         cls.frame_extraction_frequency = kwargs.get(cls.keys[0], cls.frame_extraction_frequency)
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
@@ -126,7 +126,8 @@ class Config:
         logger.debug("Configuration values changed!")
 
 
-def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_length=25):
+def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '', decimals: int = 3,
+                   bar_length: int = 25) -> None:
     """
     Call in a loop to create standard out progress bar
     :param iteration: current iteration
@@ -135,7 +136,6 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=3, bar_lengt
     :param suffix: suffix string
     :param decimals: positive number of decimals in percent complete
     :param bar_length: character length of bar
-    :return: None
     """
 
     format_str = "{0:." + str(decimals) + "f}"  # format the % done number string
