@@ -12,6 +12,7 @@ from tkinter import ttk
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
+from winotify import Notification, audio
 
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
@@ -446,6 +447,19 @@ class SubtitleExtractorGUI:
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
+    def send_notification(self, title: str, message: str = "") -> None:
+        operating_system = platform.system()
+        if operating_system == "Windows":
+            toast = Notification(
+                app_id=self.window_title,
+                title=title,
+                msg=message,
+                icon=str(Path("VSE.ico").absolute()),
+                duration="long"
+            )
+            toast.set_audio(audio.Default, loop=False)
+            toast.show()
+
     def detect_subtitles(self) -> None:
         """
         Detect sub area of videos in the queue and set as new sub area.
@@ -468,7 +482,9 @@ class SubtitleExtractorGUI:
         self._stop_sub_detection_process()
         self._set_video(self._video_indexer()[0])
         end = time.perf_counter()
-        logger.info(f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s\n")
+        completion_message = f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s"
+        self.send_notification("Subtitle Detection Completed!", completion_message)
+        logger.info(f"{completion_message}\n")
 
     def _stop_sub_detection_process(self) -> None:
         """
@@ -509,6 +525,7 @@ class SubtitleExtractorGUI:
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self.running = False
         self._stop_sub_extraction_process()
+        self.send_notification("Subtitle Extraction Completed!")
 
     def _stop_sub_extraction_process(self) -> None:
         """
