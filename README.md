@@ -49,6 +49,10 @@ pip install lmdb
 ```
 
 ```
+pip install winotify
+```
+
+```
 pip install --no-deps paddleocr
 ```
 
