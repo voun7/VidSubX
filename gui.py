@@ -65,8 +65,9 @@ class SubtitleExtractorGUI:
         """
         # Window title and icon
         self.window_title = "Video Subtitle Extractor"
+        self.icon_file = "VSE.ico"
         self.root.title(self.window_title)
-        self.root.iconbitmap("VSE.ico")
+        self.root.iconbitmap(self.icon_file)
         # Do not allow window to be resizable.
         self.root.resizable(FALSE, FALSE)
 
@@ -195,7 +196,7 @@ class SubtitleExtractorGUI:
         self.next_button.grid(column=4, row=0, padx=10)
 
     def _preferences(self):
-        self.preference_window = PreferencesUI()
+        self.preference_window = PreferencesUI(self.icon_file)
 
     @staticmethod
     def rescale(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
@@ -457,7 +458,7 @@ class SubtitleExtractorGUI:
                 app_id=self.window_title,
                 title=title,
                 msg=message,
-                icon=str(Path("VSE.ico").absolute()),
+                icon=str(Path(self.icon_file).absolute()),
                 duration="long"
             )
             toast.set_audio(audio.Default, loop=False)
@@ -584,8 +585,9 @@ class SubtitleExtractorGUI:
 
 
 class PreferencesUI(Toplevel):
-    def __init__(self) -> None:
+    def __init__(self, icon_file: str) -> None:
         super().__init__()
+        self.icon_file = icon_file
         self.focus()
         self.grab_set()
         self._create_layout()
@@ -595,7 +597,7 @@ class PreferencesUI(Toplevel):
         Create layout for preferences window.
         """
         self.title("Preferences")
-        self.iconbitmap("VSE.ico")
+        self.iconbitmap(self.icon_file)
         self.resizable(FALSE, FALSE)
 
         # Create main frame that will contain notebook.
