@@ -1,5 +1,6 @@
 import ctypes
 import logging
+import platform
 import re
 import sys
 import time
@@ -33,15 +34,17 @@ def set_dpi_scaling() -> None:
     2 = Per monitor DPI aware. This app checks for the DPI when it is created and adjusts the scale factor whenever the
     DPI changes. These applications are not automatically scaled by the system.
     """
-    # Query DPI Awareness (Windows 10 and 8)
-    awareness = ctypes.c_int()
-    logger.debug(f"DPI awareness = {awareness}")
+    operating_system = platform.system()
+    if operating_system == "Windows":
+        # Query DPI Awareness (Windows 10 and 8)
+        awareness = ctypes.c_int()
+        logger.debug(f"OS = {operating_system}, DPI awareness = {awareness}")
 
-    # Set DPI Awareness  (Windows 10 and 8)
-    try:
-        ctypes.windll.shcore.SetProcessDpiAwareness(2)
-    except Exception as dpi_error:
-        logger.exception(f"An error occurred while setting the dpi: {dpi_error}")
+        # Set DPI Awareness  (Windows 10 and 8)
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)
+        except Exception as dpi_error:
+            logger.exception(f"An error occurred while setting the dpi: {dpi_error}")
 
 
 class SubtitleExtractorGUI:
