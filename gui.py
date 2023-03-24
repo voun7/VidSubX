@@ -198,12 +198,33 @@ class SubtitleExtractorGUI:
     def _preferences(self):
         self.preference_window = PreferencesUI(self.icon_file)
 
-    @staticmethod
-    def rescale(frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
-                scale: float = 0.5) -> np.ndarray | tuple:
+    def get_scaler(self) -> float:
+        """
+        Use the frame height to determine which value will be used to scale the video.
+        :return: frame scale
+        """
+        if self.frame_height <= 480:
+            return 1.125
+        elif self.frame_height <= 720:
+            return 0.75
+        elif self.frame_height <= 1080:
+            return 0.5
+        elif self.frame_height <= 1440:
+            return 0.375
+        elif self.frame_height <= 2160:
+            return 0.25
+        else:
+            logger.debug("frame height above 2160")
+            return 0.1
+
+    def rescale(self, frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
+                scale: float = None) -> np.ndarray | tuple:
         """
         Method to rescale any frame, subtitle area and resolution.
         """
+        if not scale:
+            scale = self.get_scaler()
+
         if frame is not None:
             height = int(frame.shape[0] * scale)
             width = int(frame.shape[1] * scale)
