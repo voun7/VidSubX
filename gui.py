@@ -229,8 +229,7 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
-        _, _, frame_width, frame_height, = self.sub_ex.video_details(self.current_video)
-        frame_width, frame_height = self.rescale(resolution=(frame_width, frame_height))
+        frame_width, frame_height = self.rescale(resolution=(self.frame_width, self.frame_height))
         self.canvas.configure(width=frame_width, height=frame_height, bg="white")
 
     def _set_sub_area(self, subtitle_area: tuple) -> None:
@@ -271,7 +270,8 @@ class SubtitleExtractorGUI:
         if self.current_video:
             self.canvas.coords(self.current_sub_rect, *self.mouse_start, event.x, event.y)
             rect_coords = tuple(self.canvas.coords(self.current_sub_rect))
-            self._set_sub_area(self.rescale(subtitle_area=rect_coords, scale=2))
+            scale = self.frame_height / int(self.canvas['height'])
+            self._set_sub_area(self.rescale(subtitle_area=rect_coords, scale=scale))
 
     def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
         """
@@ -279,8 +279,7 @@ class SubtitleExtractorGUI:
         """
         if subtitle_area is None:
             logger.debug("Subtitle coordinates are None.")
-            _, _, frame_width, frame_height, = self.sub_ex.video_details(self.current_video)
-            def_sub = self.sub_ex.default_sub_area(frame_width, frame_height, subtitle_area)
+            def_sub = self.sub_ex.default_sub_area(self.frame_width, self.frame_height, subtitle_area)
             self._set_sub_area(def_sub)
             x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
             self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
@@ -378,6 +377,7 @@ class SubtitleExtractorGUI:
 
         self.current_video = list(self.video_queue.keys())[video_index]
         self.current_sub_area = list(self.video_queue.values())[video_index]
+        _, _, self.frame_width, self.frame_height = self.sub_ex.video_details(self.current_video)
         self.video_capture = cv.VideoCapture(self.current_video)
         self._set_canvas()
         self._set_frame_slider()
