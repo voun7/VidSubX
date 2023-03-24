@@ -482,7 +482,7 @@ class SubtitleExtractorGUI:
                 icon=str(Path(self.icon_file).absolute()),
                 duration="long"
             )
-            toast.set_audio(audio.Default, loop=False)
+            toast.set_audio(audio.Default, loop=True)
             toast.show()
 
     def detect_subtitles(self) -> None:
