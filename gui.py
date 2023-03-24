@@ -195,7 +195,7 @@ class SubtitleExtractorGUI:
         self.previous_button.grid(column=2, row=0, padx=10)
         self.next_button.grid(column=4, row=0, padx=10)
 
-    def _preferences(self):
+    def _preferences(self) -> None:
         self.preference_window = PreferencesUI(self.icon_file)
 
     def get_scaler(self) -> float:
@@ -262,7 +262,7 @@ class SubtitleExtractorGUI:
             self.current_sub_area = subtitle_area
             self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
-    def _on_click(self, event):
+    def _on_click(self, event: Event) -> None:
         """
         Fires when user clicks on the background ... binds to current rectangle
         """
@@ -271,7 +271,7 @@ class SubtitleExtractorGUI:
             self.canvas.bind('<Button-1>', self._on_click_rectangle)
             self.canvas.bind('<B1-Motion>', self._on_motion)
 
-    def _on_click_rectangle(self, event):
+    def _on_click_rectangle(self, event: Event) -> None:
         """
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle
         """
@@ -284,7 +284,7 @@ class SubtitleExtractorGUI:
                 y1, y2 = y2, y1
             self.mouse_start = x1, y1
 
-    def _on_motion(self, event):
+    def _on_motion(self, event: Event) -> None:
         """
         Fires when the user drags the mouse ... resizes currently active rectangle
         """
@@ -657,7 +657,7 @@ class PreferencesUI(Toplevel):
         # Set the reset button when layout is created.
         self._set_reset_button()
 
-    def _subtitle_detection_tab(self):
+    def _subtitle_detection_tab(self) -> None:
         """
         Creates widgets in the Subtitle detection preferences tab frame
         """
