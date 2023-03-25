@@ -801,7 +801,7 @@ class PreferencesUI(Toplevel):
         )
         self.ocr_rec_language = StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
-        languages = ["ch", "en"]
+        languages = ["ch", "en", "japan", "chinese_cht", "korean", "ru", "fr", "it"]
         ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
