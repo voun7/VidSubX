@@ -180,7 +180,7 @@ class SubtitleExtractor:
             shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
 
-    def timecode_sort(self, path: Path) -> float:
+    def timecode_duration_sort(self, path: Path) -> float:
         """
         Helps sort timecodes by turning the first value into a float.
         """
@@ -206,7 +206,7 @@ class SubtitleExtractor:
         no_of_files = len(list(self.text_output.iterdir()))
         counter = 1
         starting_file = None
-        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)):
+        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
             file1_text = file1.read_text(encoding="utf-8")
             file2_text = file2.read_text(encoding="utf-8")
             counter += 1
@@ -264,7 +264,7 @@ class SubtitleExtractor:
         no_of_files = len(list(self.text_output.iterdir()))
         counter = 1
         starting_file = file_text = file_duration = None
-        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)):
+        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
             file1_text, file1_duration = file1.read_text(encoding="utf-8"), self._name_to_duration(file1.stem, old_div)
             file2_text, file2_duration = file2.read_text(encoding="utf-8"), self._name_to_duration(file2.stem, old_div)
             similarity = self.similarity(file1_text, file2_text)
@@ -364,7 +364,7 @@ class SubtitleExtractor:
         self._remove_short_duration_subs(div2)
         subtitles = []
         line_code = 0
-        for file in sorted(self.text_output.iterdir(), key=self.timecode_sort):
+        for file in sorted(self.text_output.iterdir(), key=self.timecode_duration_sort):
             file_name = file.stem.split(div2)
             line_code += 1
             frame_start = self.timecode(float(file_name[0]))
