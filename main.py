@@ -184,8 +184,8 @@ class SubtitleExtractor:
         """
         Helps sort timecodes by turning the first value into a float.
         """
-        file_name = path.stem.split(self.div1)[0]
-        return float(file_name)
+        first_timecode = path.stem.split(self.div1)[0]
+        return float(first_timecode)
 
     def _remove_duplicate_texts(self, divider: str) -> None:
         """
