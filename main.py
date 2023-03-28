@@ -180,12 +180,11 @@ class SubtitleExtractor:
             shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
 
-    @staticmethod
-    def timecode_sort(path: Path) -> float:
+    def timecode_sort(self, path: Path) -> float:
         """
         Helps sort timecodes by turning the first value into a float.
         """
-        file_name = path.stem.split("--")[0]
+        file_name = path.stem.split(self.div1)[0]
         return float(file_name)
 
     def _remove_duplicate_texts(self, divider: str) -> None:
@@ -356,11 +355,11 @@ class SubtitleExtractor:
             return
 
         logger.info("Generating subtitle...")
-        div1 = "--"
+        self.div1 = "--"
         div2 = "---"
-        self._merge_adjacent_equal_texts(div1)
-        self._remove_duplicate_texts(div1)
-        self._merge_adjacent_similar_texts(div1, div2)
+        self._merge_adjacent_equal_texts(self.div1)
+        self._remove_duplicate_texts(self.div1)
+        self._merge_adjacent_similar_texts(self.div1, div2)
         self._remove_duplicate_texts(div2)
         self._remove_short_duration_subs(div2)
         subtitles = []
