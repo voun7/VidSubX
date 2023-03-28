@@ -356,7 +356,7 @@ class SubtitleExtractor:
 
         logger.info("Generating subtitle...")
         self.div1 = "--"
-        div2 = "---"
+        div2 = self.div1 + '-'
         self._merge_adjacent_equal_texts(self.div1)
         self._remove_duplicate_texts(self.div1)
         self._merge_adjacent_similar_texts(self.div1, div2)
