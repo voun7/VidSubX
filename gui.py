@@ -426,7 +426,7 @@ class SubtitleExtractorGUI:
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.progress_bar.configure(value=0)
             self.menubar.entryconfig(2, state="normal")
-            self.set_output()
+            self.clear_output()
             logger.info("Opening video(s)...")
             # Add all opened videos to a queue.
             for filename in filenames:
@@ -442,31 +442,30 @@ class SubtitleExtractorGUI:
         sys.stdout.write = self.write_to_output
         # sys.stderr.write = self.write_to_output
 
-    def set_output(self, text: str = None) -> None:
+    def clear_output(self, start="1.0", end="end"):
+        """
+        Delete text in text widget.
+        """
+        self.text_output_widget.configure(state="normal")
+        self.text_output_widget.delete(start, end)
+        self.text_output_widget.configure(state="disabled")
+
+    def write_progress_output(self, text: str) -> None:
         """
         Clear all text or clear progress repetition in text widget.
         """
-        if text is None:
-            logger.debug("Text output cleared")
-            self.text_output_widget.configure(state="normal")
-            self.text_output_widget.delete("1.0", "end")
-            self.text_output_widget.configure(state="disabled")
-            return
-
         progress_pattern = re.compile(r'.+\s\|[#-]+\|\s[\d.]+%\s')
         if progress_pattern.search(text):
             previous_line = self.text_output_widget.get("end-2l", "end-1l")
             if progress_pattern.search(previous_line):
-                self.text_output_widget.configure(state="normal")
-                self.text_output_widget.delete("end-2l", "end-1l")
-                self.text_output_widget.configure(state="disabled")
+                self.clear_output("end-2l", "end-1l")
 
     def write_to_output(self, text: str) -> None:
         """
         Write text to the output frame's text widget.
         :param text: Text to write.
         """
-        self.set_output(text)
+        self.write_progress_output(text)
         self.text_output_widget.configure(state="normal")
         self.text_output_widget.insert("end", f"{text}")
         self.text_output_widget.see("end")
