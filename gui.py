@@ -467,7 +467,7 @@ class SubtitleExtractorGUI:
         """
         self.write_progress_output(text)
         self.text_output_widget.configure(state="normal")
-        self.text_output_widget.insert("end", f"{text}")
+        self.text_output_widget.insert("end", text)
         self.text_output_widget.see("end")
         self.text_output_widget.configure(state="disabled")
 
