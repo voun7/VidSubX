@@ -256,7 +256,7 @@ class SubtitleExtractorGUI:
     def _set_sub_area(self, subtitle_area: tuple) -> None:
         """
         Set current video subtitle area to new area.
-        :param subtitle_area: new subtitle area to be used.
+        :param subtitle_area: New subtitle area to be used.
         """
         if not self.running:  # prevents new sub areas from being set while program has a process running.
             self.current_sub_area = subtitle_area
@@ -264,7 +264,7 @@ class SubtitleExtractorGUI:
 
     def _on_click(self, event: Event) -> None:
         """
-        Fires when user clicks on the background ... binds to current rectangle
+        Fires when user clicks on the background ... binds to current rectangle.
         """
         if self.current_video:
             self.mouse_start = event.x, event.y
@@ -273,7 +273,7 @@ class SubtitleExtractorGUI:
 
     def _on_click_rectangle(self, event: Event) -> None:
         """
-        Fires when the user clicks on a rectangle ... edits the clicked on rectangle
+        Fires when the user clicks on a rectangle ... edits the clicked on rectangle.
         """
         if self.current_video:
             x1, y1, x2, y2 = self.canvas.coords(self.current_sub_rect)
@@ -286,7 +286,7 @@ class SubtitleExtractorGUI:
 
     def _on_motion(self, event: Event) -> None:
         """
-        Fires when the user drags the mouse ... resizes currently active rectangle
+        Fires when the user drags the mouse ... resizes currently active rectangle.
         """
         if self.current_video:
             self.canvas.coords(self.current_sub_rect, *self.mouse_start, event.x, event.y)
@@ -312,7 +312,7 @@ class SubtitleExtractorGUI:
     def _display_video_frame(self, millisecond: float = 0.0) -> None:
         """
         Find captured video frame through corresponding second and display on video canvas.
-        :param millisecond: default corresponding millisecond
+        :param millisecond: Default corresponding millisecond.
         """
         self.video_capture.set(cv.CAP_PROP_POS_MSEC, millisecond)
         _, frame = self.video_capture.read()
@@ -464,7 +464,7 @@ class SubtitleExtractorGUI:
     def write_to_output(self, text: str) -> None:
         """
         Write text to the output frame's text widget.
-        :param text: text to write.
+        :param text: Text to write.
         """
         self.set_output(text)
         self.text_output_widget.configure(state="normal")
@@ -659,7 +659,7 @@ class PreferencesUI(Toplevel):
 
     def _subtitle_detection_tab(self) -> None:
         """
-        Creates widgets in the Subtitle detection preferences tab frame
+        Creates widgets in the Subtitle detection preferences tab frame.
         """
         subtitle_detection_frame = ttk.Frame(self.notebook_tab)
         subtitle_detection_frame.grid(column=0, row=0)
@@ -730,7 +730,7 @@ class PreferencesUI(Toplevel):
 
     def _frame_extraction_tab(self) -> None:
         """
-        Creates widgets in the Frame extraction preferences tab frame
+        Creates widgets in the Frame extraction preferences tab frame.
         """
         frame_extraction_frame = ttk.Frame(self.notebook_tab)
         frame_extraction_frame.grid(column=0, row=0)
@@ -764,7 +764,7 @@ class PreferencesUI(Toplevel):
 
     def _text_extraction_tab(self) -> None:
         """
-        Creates widgets in the Text extraction preferences tab frame
+        Creates widgets in the Text extraction preferences tab frame.
         """
         text_extraction_frame = ttk.Frame(self.notebook_tab)
         text_extraction_frame.grid(column=0, row=0)
@@ -812,7 +812,7 @@ class PreferencesUI(Toplevel):
 
     def _subtitle_generator_tab(self) -> None:
         """
-        Creates widgets in the Subtitle generator preferences tab frame
+        Creates widgets in the Subtitle generator preferences tab frame.
         """
         subtitle_generator_frame = ttk.Frame(self.notebook_tab)
         subtitle_generator_frame.grid(column=0, row=0)

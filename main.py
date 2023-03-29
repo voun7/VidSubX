@@ -200,7 +200,7 @@ class SubtitleExtractor:
         """
         Merge texts that are beside each other and are the exact same.
         Use divider for duration in text name.
-        :param divider: characters for separating time durations in file name
+        :param divider: Characters for separating time durations in file name.
         """
         logger.debug("Merging adjacent equal texts")
         no_of_files = len(list(self.text_output.iterdir()))
@@ -243,9 +243,9 @@ class SubtitleExtractor:
     def _name_to_duration(name: str, divider: str) -> float:
         """
         Takes a name with two numbers and subtracts to get the duration.
-        :param name: name numbers should seperated by identifier.
-        :param divider: value for splitting string.
-        :return: duration
+        :param name: Name numbers should seperated by identifier.
+        :param divider: Value for splitting string.
+        :return: Duration
         """
         name_timecode = name.split(divider)
         duration = float(name_timecode[1]) - float(name_timecode[0])
@@ -255,8 +255,8 @@ class SubtitleExtractor:
         """
         Merge texts that are not the same but beside each other and similar.
         The text that has the longest duration becomes the text for all similar texts.
-        :param old_div: old characters for separating time durations in file name
-        :param divider: characters for separating time durations in file name
+        :param old_div: Old characters for separating time durations in file name.
+        :param divider: Characters for separating time durations in file name.
         """
         logger.debug("Merging adjacent similar texts")
         # cut off point to determine similarity.
@@ -308,7 +308,7 @@ class SubtitleExtractor:
     def _remove_short_duration_subs(self, divider: str, minimum_duration: int = 150) -> None:
         """
         Deletes subtitles that have durations that are shorter than the minimum duration.
-        :param divider: string in file name that separates the time stamps.
+        :param divider: String in file name that separates the time stamps.
         :param minimum_duration: Minimum allowed time in milliseconds.
         """
         for file in self.text_output.iterdir():
@@ -347,7 +347,6 @@ class SubtitleExtractor:
     def _generate_subtitle(self) -> None:
         """
         Use text files in folder to create subtitle file.
-        :return:
         """
         # cancel if process has been cancelled by gui.
         if utils.Process.interrupt_process:
