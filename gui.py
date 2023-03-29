@@ -442,12 +442,12 @@ class SubtitleExtractorGUI:
         sys.stdout.write = self.write_to_output
         # sys.stderr.write = self.write_to_output
 
-    def clear_output(self, start="1.0", end="end"):
+    def clear_output(self, start="1.0", stop="end"):
         """
         Delete text in text widget.
         """
         self.text_output_widget.configure(state="normal")
-        self.text_output_widget.delete(start, end)
+        self.text_output_widget.delete(start, stop)
         self.text_output_widget.configure(state="disabled")
 
     def write_progress_output(self, text: str) -> None:
