@@ -456,7 +456,7 @@ class SubtitleExtractorGUI:
         """
         progress_pattern = re.compile(r'.+\s\|[#-]+\|\s[\d.]+%\s')
         if progress_pattern.search(text):
-            start, stop = "end-2l", "end-1l"
+            start, stop = 'end - 1 lines', 'end - 1 lines lineend'
             previous_line = self.text_output_widget.get(start, stop)
             if progress_pattern.search(previous_line):
                 self.clear_output(start, stop)
