@@ -452,9 +452,9 @@ class SubtitleExtractorGUI:
         self.text_output_widget.delete(start, stop)
         self.text_output_widget.configure(state="disabled")
 
-    def write_progress_output(self, text: str) -> None:
+    def set_progress_output(self, text: str) -> None:
         """
-        Overwrite progress bar in text widget.
+        Overwrite progress bar text in text widget, if detected in previous line.
         """
         progress_pattern = re.compile(r'.+\s\|[#-]+\|\s[\d.]+%\s')
         if progress_pattern.search(text):
@@ -468,7 +468,7 @@ class SubtitleExtractorGUI:
         Write text to the output frame's text widget.
         :param text: Text to write.
         """
-        self.write_progress_output(text)
+        self.set_progress_output(text)
         self.text_output_widget.configure(state="normal")
         self.text_output_widget.insert("end", text)
         self.text_output_widget.see("end")
