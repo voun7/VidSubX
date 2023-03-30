@@ -437,14 +437,16 @@ class SubtitleExtractorGUI:
 
     def _console_redirector(self) -> None:
         """
-        Redirect console statements to text widget
+        Redirect console statements to text widget.
         """
         sys.stdout.write = self.write_to_output
         # sys.stderr.write = self.write_to_output
 
-    def clear_output(self, start="1.0", stop="end"):
+    def clear_output(self, start: str = "1.0", stop: str = "end") -> None:
         """
         Delete text in text widget.
+        :param start: Text start position index.
+        :param stop: Text stop position index.
         """
         self.text_output_widget.configure(state="normal")
         self.text_output_widget.delete(start, stop)
@@ -452,7 +454,7 @@ class SubtitleExtractorGUI:
 
     def write_progress_output(self, text: str) -> None:
         """
-        Clear all text or clear progress repetition in text widget.
+        Overwrite progress bar in text widget.
         """
         progress_pattern = re.compile(r'.+\s\|[#-]+\|\s[\d.]+%\s')
         if progress_pattern.search(text):
