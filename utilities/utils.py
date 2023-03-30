@@ -142,8 +142,7 @@ def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '
     percents = format_str.format(100 * (iteration / float(total)))  # calculate the % done
     filled_length = int(round(bar_length * iteration / float(total)))  # calculate the filled bar length
     bar = '#' * filled_length + '-' * (bar_length - filled_length)  # generate the bar string
-    # print(f"\r{prefix} |{bar}| {percents}% {suffix}", end='', flush=True)  # prints progress on the same line
-    print(f"{prefix} |{bar}| {percents}% {suffix}")
+    print(f"\r{prefix} |{bar}| {percents}% {suffix}", end='', flush=True)  # prints progress on the same line
 
 
 if __name__ == '__main__':
