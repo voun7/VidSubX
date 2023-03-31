@@ -56,7 +56,7 @@ class SubtitleExtractorGUI:
         self.video_queue = {}
         self.current_video = None
         self.video_capture = None
-        self.running = False
+        self.thread_running = False
         self._console_redirector()
 
     def _create_layout(self) -> None:
@@ -258,7 +258,7 @@ class SubtitleExtractorGUI:
         Set current video subtitle area to new area.
         :param subtitle_area: New subtitle area to be used.
         """
-        if not self.running:  # prevents new sub areas from being set while program has a process running.
+        if not self.thread_running:  # prevents new sub areas from being set while program has a process running.
             self.current_sub_area = subtitle_area
             self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
@@ -493,11 +493,11 @@ class SubtitleExtractorGUI:
         """
         logger.info("Detecting subtitle area in video(s)...")
         start = time.perf_counter()
-        self.running = True
+        self.thread_running = True
         for video in self.video_queue.keys():
             if utils.Process.interrupt_process:
                 logger.warning("Process interrupted\n")
-                self.running = False
+                self.thread_running = False
                 self._stop_sub_detection_process()
                 return
             logger.info(f"File name: {Path(video).name}")
@@ -505,7 +505,7 @@ class SubtitleExtractorGUI:
             new_sub_area = sub_dt.get_sub_area()
             self.video_queue[video] = new_sub_area
             logger.info(f"New sub area = {new_sub_area}\n")
-        self.running = False
+        self.thread_running = False
         self._stop_sub_detection_process()
         self._set_video(self._video_indexer()[0])
         end = time.perf_counter()
@@ -519,7 +519,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Stop detection button clicked")
         utils.Process.stop_process()
-        if not self.running:
+        if not self.thread_running:
             self._set_run_state("normal", "detection")
             self.menubar.entryconfig(2, label="Detect Subtitles", command=self.run_sub_detection)
 
@@ -540,17 +540,17 @@ class SubtitleExtractorGUI:
         self.progress_bar.configure(maximum=queue_len)
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}\n")
-        self.running = True
+        self.thread_running = True
         for video, sub_area in self.video_queue.items():
             if utils.Process.interrupt_process:
                 logger.warning("Process interrupted\n")
-                self.running = False
+                self.thread_running = False
                 self._stop_sub_extraction_process()
                 return
             self.sub_ex.run_sub_extraction(video, sub_area)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
-        self.running = False
+        self.thread_running = False
         self._stop_sub_extraction_process()
         self.send_notification("Subtitle Extraction Completed!")
 
@@ -560,7 +560,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Stop button clicked")
         utils.Process.stop_process()
-        if not self.running:
+        if not self.thread_running:
             self.run_button.configure(text="Run", command=self._run_sub_extraction)
             self._set_run_state("normal")
 
