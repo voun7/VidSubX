@@ -27,6 +27,17 @@ class Sound:
     LoopingCall10 = "ms-winsoundevent:Notification.Looping.Call10"
     Silent = "silent"
 
+    @staticmethod
+    def all_sounds() -> list:
+        members = [attr for attr in dir(Sound) if not callable(getattr(Sound, attr)) and not attr.startswith("__")]
+        return members
+
+    @staticmethod
+    def get_sound_value(sound_name: str) -> str:
+        for attr in dir(Sound):
+            if sound_name == attr:
+                return getattr(Sound, attr)
+
 
 WIN_TOAST_TEMPLATE = r"""
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
