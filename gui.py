@@ -643,6 +643,7 @@ class PreferencesUI(Toplevel):
         self._frame_extraction_tab()
         self._text_extraction_tab()
         self._subtitle_generator_tab()
+        self._notifications_tab()
 
         # Add buttons to window.
         button_frame = ttk.Frame(main_frame)
@@ -836,6 +837,44 @@ class PreferencesUI(Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
+    def _notifications_tab(self) -> None:
+        """
+        Choose notification tab depending on platform os.
+        """
+        operating_system = platform.system()
+        if operating_system == "Windows":
+            self._win_notifications_tab()
+
+    def _win_notifications_tab(self) -> None:
+        """
+        Creates widgets in the Notifications preferences tab frame.
+        """
+        notification_frame = ttk.Frame(self.notebook_tab)
+        notification_frame.grid(column=0, row=0)
+        notification_frame.grid_columnconfigure(1, weight=1)
+        self.notebook_tab.add(notification_frame, text=utils.Config.sections[4])
+
+        ttk.Label(notification_frame, text="Notification Sound:").grid(
+            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
+        self.win_notify_sound = StringVar(value=utils.Config.win_notify_sound)
+        self.win_notify_sound.trace_add("write", self._set_reset_button)
+        ttk.Combobox(
+            notification_frame,
+            textvariable=self.win_notify_sound,
+            values=Sound.all_sounds(),
+            state="readonly",
+            width=14
+        ).grid(column=1, row=0)
+
+        self.win_notify_loop_sound = BooleanVar(value=utils.Config.win_notify_loop_sound)
+        self.win_notify_loop_sound.trace_add("write", self._set_reset_button)
+        ttk.Checkbutton(
+            notification_frame,
+            text='Loop Notification Sound',
+            variable=self.win_notify_loop_sound
+        ).grid(column=0, row=1)
+
     def _set_reset_button(self, *args) -> None:
         """
         Set the reset button based on the value of the text variables.
@@ -853,7 +892,9 @@ class PreferencesUI(Toplevel):
             utils.Config.default_split_stop,
             utils.Config.default_no_of_frames,
             utils.Config.default_sub_area_x_padding,
-            utils.Config.default_sub_area_y_padding
+            utils.Config.default_sub_area_y_padding,
+            utils.Config.default_win_notify_sound,
+            utils.Config.default_win_notify_loop_sound
         )
 
         try:
@@ -868,7 +909,9 @@ class PreferencesUI(Toplevel):
                 self.split_stop.get(),
                 self.no_of_frames.get(),
                 self.sub_area_x_padding.get(),
-                self.sub_area_y_padding.get()
+                self.sub_area_y_padding.get(),
+                self.win_notify_sound.get(),
+                self.win_notify_loop_sound.get()
             )
         except TclError:
             values = None
@@ -900,6 +943,8 @@ class PreferencesUI(Toplevel):
         self.no_of_frames.set(utils.Config.default_no_of_frames)
         self.sub_area_x_padding.set(utils.Config.default_sub_area_x_padding)
         self.sub_area_y_padding.set(utils.Config.default_sub_area_y_padding)
+        self.win_notify_sound.set(utils.Config.default_win_notify_sound)
+        self.win_notify_loop_sound.set(utils.Config.default_win_notify_loop_sound)
 
     def _save_settings(self) -> None:
         """
@@ -917,7 +962,9 @@ class PreferencesUI(Toplevel):
                 split_stop=self.split_stop.get(),
                 no_of_frames=self.no_of_frames.get(),
                 sub_area_x_padding=self.sub_area_x_padding.get(),
-                sub_area_y_padding=self.sub_area_y_padding.get()
+                sub_area_y_padding=self.sub_area_y_padding.get(),
+                win_notify_sound=self.win_notify_sound.get(),
+                win_notify_loop_sound=self.win_notify_loop_sound.get()
             )
         except TclError:
             logger.warning("An error occurred value(s) not saved!")
