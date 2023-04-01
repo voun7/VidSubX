@@ -101,10 +101,10 @@ class Config:
         cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
         cls.win_notify_sound = cls.config[cls.sections[4]][cls.keys[11]]
-        cls.win_notify_loop_sound = cls.config[cls.sections[4]][cls.keys[12]]
+        cls.win_notify_loop_sound = bool(cls.config[cls.sections[4]][cls.keys[12]])
 
     @classmethod
-    def set_config(cls, **kwargs: int | float | str) -> None:
+    def set_config(cls, **kwargs: int | float | str | bool) -> None:
         # Write into memory & file
         cls.frame_extraction_frequency = kwargs.get(cls.keys[0], cls.frame_extraction_frequency)
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
@@ -135,7 +135,7 @@ class Config:
         cls.win_notify_sound = kwargs.get(cls.keys[11], cls.win_notify_sound)
         cls.config[cls.sections[4]][cls.keys[11]] = cls.win_notify_sound
         cls.win_notify_loop_sound = kwargs.get(cls.keys[12], cls.win_notify_loop_sound)
-        cls.config[cls.sections[4]][cls.keys[12]] = cls.win_notify_loop_sound
+        cls.config[cls.sections[4]][cls.keys[12]] = str(cls.win_notify_loop_sound)
 
         with open(cls.config_file, 'w') as configfile:
             cls.config.write(configfile)
