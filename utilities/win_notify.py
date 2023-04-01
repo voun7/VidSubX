@@ -57,32 +57,8 @@ $Notifier.Show($Toast);
 """
 
 
-def _run_ps(*, file='', command=''):
-    si = subprocess.STARTUPINFO()
-    si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-    cmd = ["powershell.exe", "-ExecutionPolicy", "Bypass"]
-    if file and command:
-        raise ValueError
-    elif file:
-        cmd.extend(["-file", file])
-    elif command:
-        cmd.extend(['-Command', command])
-    else:
-        raise ValueError
-
-    subprocess.Popen(
-        cmd,
-        # stdin, stdout, and stderr have to be defined here, because windows tries to duplicate these if not null
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,  # set to null because we don't need the output :)
-        stderr=subprocess.DEVNULL,
-        startupinfo=si
-    )
-
-
 class Notification(object):
-    def __init__(self, app_id: str, title: str, msg: str = "", icon: str = "", duration: str = 'short'):
+    def __init__(self, app_id: str, title: str, msg: str = "", icon: str = "", duration: str = 'short') -> None:
         """
         Construct a new notification
         Args:
@@ -96,7 +72,6 @@ class Notification(object):
         Raises:
             ValueError: If the duration specified is not short or long
         """
-
         self.app_id = app_id
         self.title = title
         self.msg = msg
@@ -109,7 +84,7 @@ class Notification(object):
         if duration not in ("short", "long"):
             raise ValueError("Duration is not 'short' or 'long'")
 
-    def set_audio(self, sound, loop: bool):
+    def set_audio(self, sound: str, loop: bool) -> None:
         """
         Set the audio for the notification.
         Args:
@@ -119,7 +94,7 @@ class Notification(object):
         """
         self.audio = f'<audio src="{sound}" loop="{str(loop).lower()}" />'
 
-    def show(self):
+    def show(self) -> None:
         """
         Show the toast
         """
@@ -128,7 +103,7 @@ class Notification(object):
 
         self.script = WIN_TOAST_TEMPLATE.format(**self.__dict__)
 
-        _run_ps(command=self.script)
+        subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", '-Command', self.script])
 
 
 if __name__ == '__main__':
