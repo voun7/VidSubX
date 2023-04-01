@@ -1,5 +1,4 @@
 import subprocess
-from tempfile import gettempdir
 
 
 class Sound:
@@ -29,7 +28,7 @@ class Sound:
     Silent = "silent"
 
 
-TEMPLATE = r"""
+WIN_TOAST_TEMPLATE = r"""
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
 [Windows.UI.Notifications.ToastNotification, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime] | Out-Null
@@ -59,8 +58,6 @@ $Toast.Group = "{group}"
 $Notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("{app_id}")
 $Notifier.Show($Toast);
 """
-
-tempdir = gettempdir()
 
 
 def _run_ps(*, file='', command=''):
@@ -138,7 +135,7 @@ class Notification(object):
         if self.audio == Sound.Silent:
             self.audio = '<audio silent="true" />'
 
-        self.script = TEMPLATE.format(**self.__dict__)
+        self.script = WIN_TOAST_TEMPLATE.format(**self.__dict__)
 
         _run_ps(command=self.script)
 
