@@ -636,7 +636,7 @@ class PreferencesUI(Toplevel):
         self.entry_size = 15
         self.spinbox_size = 13
         self.combobox_size = 15
-        self.wgt_x_padding = 40
+        self.wgt_x_padding = 70
         self.wgt_y_padding = 20
 
         # Add tabs to notebook.
