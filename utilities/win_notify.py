@@ -1,6 +1,5 @@
 import subprocess
 from tempfile import gettempdir
-from typing import Callable, Union
 
 
 class Sound:
@@ -35,7 +34,7 @@ TEMPLATE = r"""
 [Windows.UI.Notifications.ToastNotification, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 [Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime] | Out-Null
 $Template = @"
-<toast {launch} duration="{duration}">
+<toast duration="{duration}">
     <visual>
         <binding template="ToastImageAndText02">
             <image id="1" src="{icon}" />
@@ -89,30 +88,17 @@ def _run_ps(*, file='', command=''):
 
 
 class Notification(object):
-    def __init__(self,
-                 app_id: str,
-                 title: str,
-                 msg: str = "",
-                 icon: str = "",
-                 duration: str = 'short',
-                 launch: str = ''):
+    def __init__(self, app_id: str, title: str, msg: str = "", icon: str = "", duration: str = 'short'):
         """
         Construct a new notification
-
         Args:
             app_id: your app name, make it readable to your user. It can contain spaces, however special characters
-                    (eg. é) are not supported.
+                    (e.g. é) are not supported.
             title: The heading of the toast.
             msg: The content/message of the toast.
             icon: An optional path to an image to display on the left of the title & message.
                   Make sure the path is absolute.
             duration: How long the toast should show up for (short/long), default is short.
-            launch: The url or callback to launch (invoked when the user clicks the notification)
-
-        Notes:
-            If you want to pass a callback to `launch` parameter,
-            please use `create_notification` from `Notifier` object
-
         Raises:
             ValueError: If the duration specified is not short or long
         """
@@ -122,7 +108,6 @@ class Notification(object):
         self.msg = msg
         self.icon = icon
         self.duration = duration
-        self.launch = launch
         self.audio = Sound.Silent
         self.tag = self.title
         self.group = self.app_id
@@ -131,60 +116,15 @@ class Notification(object):
         if duration not in ("short", "long"):
             raise ValueError("Duration is not 'short' or 'long'")
 
-    def set_audio(self, sound: Sound, loop: bool):
+    def set_audio(self, sound, loop: bool):
         """
-        Set the audio for the notification
-
+        Set the audio for the notification.
         Args:
-            sound: The audio to play when the notification is showing. Choose one from `winotify.audio` module,
-                   (eg. audio.Default). The default for all notification is silent.
-            loop: If True, the audio will play indefinitely until user click or dismis the notification.
-
+            sound: The audio to play when the notification is showing. Choose one from Sound class,
+                   (eg. Sound.Default). The default for all notification is silent.
+            loop: If True, the audio will play indefinitely until user click or dismiss the notification.
         """
-
-        self.audio = '<audio src="{}" loop="{}" />'.format(sound, str(loop).lower())
-
-    def add_actions(self, label: str, launch: Union[str, Callable] = ""):
-        """
-        Add buttons to the notification. Each notification can have 5 buttons max.
-
-        Args:
-            label: The label of the button
-            launch: The url to launch when clicking the button, 'file:///' protocol is allowed. Or a registered
-                    callback function
-
-        Returns: None
-
-        Notes:
-            Register a callback function using `Notifier.register_callback()` decorator before passing it here
-
-        Raises:
-              ValueError: If the callback function is not registered
-        """
-
-        if callable(launch):
-            if hasattr(launch, 'url'):
-                url = launch.url
-            else:
-                raise ValueError(f"{launch} is not registered")
-        else:
-            url = launch
-
-        xml = '<action activationType="protocol" content="{label}" arguments="{link}" />'
-        if len(self.actions) < 5:
-            self.actions.append(xml.format(label=label, link=url))
-
-    def build(self):
-        """
-        This method is deprecated, call `Notification.show()` directly instead.
-
-        Warnings:
-            DeprecationWarning
-
-        """
-        import warnings
-        warnings.warn("build method is deprecated, call show directly instead", DeprecationWarning)
-        return self
+        self.audio = f'<audio src="{sound}" loop="{str(loop).lower()}" />'
 
     def show(self):
         """
@@ -198,19 +138,16 @@ class Notification(object):
         if self.audio == Sound.Silent:
             self.audio = '<audio silent="true" />'
 
-        if self.launch:
-            self.launch = 'activationType="protocol" launch="{}"'.format(self.launch)
-
         self.script = TEMPLATE.format(**self.__dict__)
 
         _run_ps(command=self.script)
 
 
 if __name__ == '__main__':
-    toast = Notification(
+    test_toast = Notification(
         app_id="Test id",
         title="test title",
         msg="hey toast"
     )
-    # toast.set_audio(Default, loop=True)
-    toast.show()
+    test_toast.set_audio(Sound.Default, loop=False)
+    test_toast.show()
