@@ -13,11 +13,11 @@ from tkinter import ttk
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
-from winotify import Notification, audio
 
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
 from utilities.logger_setup import get_logger
+from utilities.win_notify import Notification, Sound
 
 logger = logging.getLogger(__name__)
 
@@ -484,7 +484,7 @@ class SubtitleExtractorGUI:
                 icon=str(Path(self.icon_file).absolute()),
                 duration="long"
             )
-            toast.set_audio(audio.Default, loop=True)
+            toast.set_audio(Sound.Default, loop=True)
             toast.show()
 
     def detect_subtitles(self) -> None:
