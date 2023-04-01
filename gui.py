@@ -845,6 +845,9 @@ class PreferencesUI(Toplevel):
         operating_system = platform.system()
         if operating_system == "Windows":
             self._win_notifications_tab()
+        else:
+            self.win_notify_sound = StringVar(value=utils.Config.win_notify_sound)
+            self.win_notify_loop_sound = BooleanVar(value=utils.Config.win_notify_loop_sound)
 
     def _win_notifications_tab(self) -> None:
         """
