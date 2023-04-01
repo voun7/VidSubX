@@ -41,9 +41,6 @@ $Template = @"
             <text id="2"><![CDATA[{msg}]]></text>
         </binding>
     </visual>
-    <actions>
-        {actions}
-    </actions>
     {audio}
 </toast>
 "@
@@ -108,7 +105,6 @@ class Notification(object):
         self.audio = Sound.Silent
         self.tag = self.title
         self.group = self.app_id
-        self.actions = []
         self.script = ""
         if duration not in ("short", "long"):
             raise ValueError("Duration is not 'short' or 'long'")
@@ -127,11 +123,6 @@ class Notification(object):
         """
         Show the toast
         """
-        if self.actions:
-            self.actions = '\n'.join(self.actions)
-        else:
-            self.actions = ''
-
         if self.audio == Sound.Silent:
             self.audio = '<audio silent="true" />'
 
