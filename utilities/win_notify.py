@@ -29,11 +29,16 @@ class Sound:
 
     @staticmethod
     def all_sounds() -> list:
-        members = [attr for attr in dir(Sound) if not callable(getattr(Sound, attr)) and not attr.startswith("__")]
-        return members
+        """
+        :return: All the sound variables in the class.
+        """
+        return [attr for attr in dir(Sound) if not callable(getattr(Sound, attr)) and not attr.startswith("__")]
 
     @staticmethod
     def get_sound_value(sound_name: str) -> str:
+        """
+        :return: Value of sound variable.
+        """
         for attr in dir(Sound):
             if sound_name == attr:
                 return getattr(Sound, attr)
