@@ -33,7 +33,7 @@ class Config:
     sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator", "Subtitle Detection", "Notification"]
     keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
             "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "split_start", "split_stop",
-            "no_of_frames", "sub_area_x_padding", "sub_area_y_padding", "win_notify_sound"]
+            "no_of_frames", "sub_area_x_padding", "sub_area_y_padding", "win_notify_sound", "win_notify_loop_sound"]
 
     # Permanent values
     subarea_height_scaler = 0.75
@@ -51,6 +51,7 @@ class Config:
     default_sub_area_x_padding = 200
     default_sub_area_y_padding = 10
     default_win_notify_sound = "Default"
+    default_win_notify_loop_sound = True
 
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
@@ -58,7 +59,7 @@ class Config:
     text_similarity_threshold = None
     split_start = split_stop = no_of_frames = None
     sub_area_x_padding = sub_area_y_padding = None
-    win_notify_sound = None
+    win_notify_sound = win_notify_loop_sound = None
 
     def __init__(self) -> None:
         if not self.config_file.exists():
@@ -77,7 +78,8 @@ class Config:
                                          self.keys[8]: self.default_no_of_frames,
                                          self.keys[9]: self.default_sub_area_x_padding,
                                          self.keys[10]: self.default_sub_area_y_padding}
-        self.config[self.sections[4]] = {self.keys[11]: self.default_win_notify_sound}
+        self.config[self.sections[4]] = {self.keys[11]: self.default_win_notify_sound,
+                                         self.keys[12]: self.default_win_notify_loop_sound}
         with open(self.config_file, 'w') as configfile:
             self.config.write(configfile)
 
@@ -99,6 +101,7 @@ class Config:
         cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
         cls.win_notify_sound = cls.config[cls.sections[4]][cls.keys[11]]
+        cls.win_notify_loop_sound = cls.config[cls.sections[4]][cls.keys[12]]
 
     @classmethod
     def set_config(cls, **kwargs: int | float | str) -> None:
@@ -131,6 +134,8 @@ class Config:
 
         cls.win_notify_sound = kwargs.get(cls.keys[11], cls.win_notify_sound)
         cls.config[cls.sections[4]][cls.keys[11]] = cls.win_notify_sound
+        cls.win_notify_loop_sound = kwargs.get(cls.keys[12], cls.win_notify_loop_sound)
+        cls.config[cls.sections[4]][cls.keys[12]] = cls.win_notify_loop_sound
 
         with open(cls.config_file, 'w') as configfile:
             cls.config.write(configfile)
