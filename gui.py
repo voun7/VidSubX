@@ -635,6 +635,7 @@ class PreferencesUI(Toplevel):
         # Shared widget values.
         self.entry_size = 15
         self.spinbox_size = 13
+        self.combobox_size = 15
         self.wgt_x_padding = 40
         self.wgt_y_padding = 20
 
@@ -811,7 +812,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.ocr_rec_language,
             values=languages,
             state="readonly",
-            width=13
+            width=self.combobox_size
         ).grid(column=1, row=2)
 
     def _subtitle_generator_tab(self) -> None:
@@ -864,7 +865,7 @@ class PreferencesUI(Toplevel):
             textvariable=self.win_notify_sound,
             values=Sound.all_sounds(),
             state="readonly",
-            width=14
+            width=self.combobox_size
         ).grid(column=1, row=0)
 
         self.win_notify_loop_sound = BooleanVar(value=utils.Config.win_notify_loop_sound)
@@ -873,7 +874,7 @@ class PreferencesUI(Toplevel):
             notification_frame,
             text='Loop Notification Sound',
             variable=self.win_notify_loop_sound
-        ).grid(column=0, row=1)
+        ).grid(column=1, row=1)
 
     def _set_reset_button(self, *args) -> None:
         """
