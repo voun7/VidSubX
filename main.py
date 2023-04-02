@@ -53,10 +53,10 @@ class SubtitleDetector:
             frame_chunks[-1][-1] = min(frame_chunks[-1][-1], stop - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
         # part of the video to look for texts.
-        key_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height, None)
+        default_subarea = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
 
         for frames in frame_chunks:
-            extract_frames(self.video_file, self.frame_output, key_area, frames[0], frames[1], int(self.fps))
+            extract_frames(self.video_file, self.frame_output, default_subarea, frames[0], frames[1], int(self.fps))
 
     def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
@@ -165,17 +165,14 @@ class SubtitleExtractor:
         return fps, frame_total, frame_width, frame_height
 
     @staticmethod
-    def default_sub_area(frame_width, frame_height, sub_area: None | tuple) -> tuple:
+    def default_sub_area(frame_width: int | float, frame_height: int | float) -> tuple:
         """
         Returns a default subtitle area that can be used if no subtitle is given.
         :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
         """
-        if sub_area:
-            return sub_area
-        else:
-            logger.debug("Subtitle area being set to default sub area")
-            x1, y1, x2, y2 = 0, int(frame_height * utils.Config.subarea_height_scaler), frame_width, frame_height
-            return x1, y1, x2, y2
+        logger.debug("Subtitle area being set to default sub area")
+        x1, y1, x2, y2 = 0, int(frame_height * utils.Config.subarea_height_scaler), frame_width, frame_height
+        return x1, y1, x2, y2
 
     def _empty_cache(self) -> None:
         """
@@ -397,7 +394,8 @@ class SubtitleExtractor:
             self.text_output.mkdir(parents=True)
 
         fps, frame_total, frame_width, frame_height = self.video_details(video_path)
-        sub_area = self.default_sub_area(frame_width, frame_height, sub_area)
+        if sub_area is None:
+            sub_area = self.default_sub_area(frame_width, frame_height)
 
         logger.info(f"File Path: {self.video_path}")
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
