@@ -113,8 +113,10 @@ class SubtitleDetector:
         """
         Returns the area containing the subtitle in the video.
         """
-        if not Path(self.video_file).exists():
-            logger.error(f"Video file: {Path(self.video_file).name} ...does not exist!")
+        video_path = Path(self.video_file)
+        new_sub_area = None
+        if not video_path.exists():
+            logger.error(f"Video file: {video_path.name} ...could not be found!\n")
             return
         # Empty cache at the beginning of program run before it recreates itself.
         self._empty_cache()
@@ -122,18 +124,17 @@ class SubtitleDetector:
             self.frame_output.mkdir(parents=True)
 
         logger.info(f"Video name: {video_path.name}")
-
         self._get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
         if bboxes:
             top_left, bottom_right = self._get_max_boundaries(bboxes)
             top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
             top_left, bottom_right = self._reposition_sub_area(top_left, bottom_right)
-            self._empty_cache()
-            return top_left[0], top_left[1], bottom_right[0], bottom_right[1]
-        else:
-            self._empty_cache()
-            return None
+            new_sub_area = top_left[0], top_left[1], bottom_right[0], bottom_right[1]
+
+        logger.info(f"New sub area = {new_sub_area}\n")
+        self._empty_cache()
+        return new_sub_area
 
 
 class SubtitleExtractor:
