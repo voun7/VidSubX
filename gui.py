@@ -203,15 +203,15 @@ class SubtitleExtractorGUI:
         Use the frame height to determine which value will be used to scale the video.
         :return: frame scale
         """
-        if self.frame_height <= 480:
+        if self.current_frame_height <= 480:
             return 1.125
-        elif self.frame_height <= 720:
+        elif self.current_frame_height <= 720:
             return 0.75
-        elif self.frame_height <= 1080:
+        elif self.current_frame_height <= 1080:
             return 0.5
-        elif self.frame_height <= 1440:
+        elif self.current_frame_height <= 1440:
             return 0.375
-        elif self.frame_height <= 2160:
+        elif self.current_frame_height <= 2160:
             return 0.25
         else:
             logger.debug("frame height above 2160")
@@ -250,10 +250,10 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
-        frame_width, frame_height = self.rescale(resolution=(self.frame_width, self.frame_height))
+        frame_width, frame_height = self.rescale(resolution=(self.current_frame_width, self.current_frame_height))
         self.canvas.configure(width=frame_width, height=frame_height, bg="white")
 
-    def _set_sub_area(self, subtitle_area: tuple) -> None:
+    def _set_current_sub_area(self, subtitle_area: tuple) -> None:
         """
         Set current video subtitle area to new area.
         :param subtitle_area: New subtitle area to be used.
@@ -412,7 +412,7 @@ class SubtitleExtractorGUI:
             self._remove_video_from_queue(self.current_video)
             return
         self.current_sub_area = list(self.video_queue.values())[video_index]
-        _, _, self.frame_width, self.frame_height = self.sub_ex.video_details(self.current_video)
+        _, _, self.current_frame_width, self.current_frame_height = self.sub_ex.video_details(self.current_video)
         self.video_capture = cv.VideoCapture(self.current_video)
         self._set_canvas()
         self._set_frame_slider()
