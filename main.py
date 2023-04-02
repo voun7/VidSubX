@@ -125,7 +125,6 @@ class SubtitleDetector:
 
         self._get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
-
         if bboxes:
             top_left, bottom_right = self._get_max_boundaries(bboxes)
             top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
@@ -385,7 +384,7 @@ class SubtitleExtractor:
         """
         self.video_path = Path(video_path)
         if not self.video_path.exists():
-            logger.error(f"Video file: {self.video_path.name} ...does not exist!\n")
+            logger.error(f"Video file: {self.video_path.name} ...could not be found!\n")
             return
         start = cv.getTickCount()
         # Empty cache at the beginning of program run before it recreates itself.
