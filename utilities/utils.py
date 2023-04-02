@@ -101,7 +101,7 @@ class Config:
         cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
         cls.win_notify_sound = cls.config[cls.sections[4]][cls.keys[11]]
-        cls.win_notify_loop_sound = bool(cls.config[cls.sections[4]][cls.keys[12]])
+        cls.win_notify_loop_sound = cls.config[cls.sections[4]][cls.keys[12]]
 
     @classmethod
     def set_config(cls, **kwargs: int | float | str | bool) -> None:
