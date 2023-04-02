@@ -113,6 +113,9 @@ class SubtitleDetector:
         """
         Returns the area containing the subtitle in the video.
         """
+        if not Path(self.video_file).exists():
+            logger.error(f"Video file: {Path(self.video_file).name} ...does not exist!")
+            return
         # Empty cache at the beginning of program run before it recreates itself.
         self._empty_cache()
         if not self.frame_output.exists():
@@ -378,6 +381,10 @@ class SubtitleExtractor:
         """
         Run through the steps of extracting texts from subtitle area in video to create subtitle.
         """
+        self.video_path = Path(video_path)
+        if not self.video_path.exists():
+            logger.error(f"Video file: {self.video_path.name} ...does not exist!\n")
+            return
         start = cv.getTickCount()
         # Empty cache at the beginning of program run before it recreates itself.
         self._empty_cache()
@@ -386,8 +393,6 @@ class SubtitleExtractor:
             self.frame_output.mkdir(parents=True)
         if not self.text_output.exists():
             self.text_output.mkdir(parents=True)
-
-        self.video_path = Path(video_path)
 
         fps, frame_total, frame_width, frame_height = self.video_details(video_path)
         sub_area = self.default_sub_area(frame_width, frame_height, sub_area)
