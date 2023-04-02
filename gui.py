@@ -113,7 +113,7 @@ class SubtitleExtractorGUI:
         video_frame.grid(column=0, row=0)
 
         # Create canvas widget in video frame.
-        self.canvas = Canvas(video_frame, bg="black", cursor="tcross")
+        self.canvas = Canvas(video_frame, cursor="tcross")
         self.canvas.grid(column=0, row=0)
         self.canvas.bind("<Button-1>", self._on_click)
         self.canvas.bind("<B1-Motion>", self._on_motion)
@@ -253,7 +253,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Setting canvas size")
         frame_width, frame_height = self.rescale(resolution=(self.current_frame_width, self.current_frame_height))
-        self.canvas.configure(width=frame_width, height=frame_height, bg="white")
+        self.canvas.configure(width=frame_width, height=frame_height)
 
     def _set_current_sub_area(self, subtitle_area: tuple) -> None:
         """
