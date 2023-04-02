@@ -125,6 +125,7 @@ class SubtitleExtractorGUI:
             video_work_frame, command=self._frame_slider, orient=HORIZONTAL, length=600, state="disabled"
         )
         self.video_scale.grid(column=0, row=1, padx=60)
+        # Show timecode of the video scale.
         self.scale_value = ttk.Label(video_work_frame)
         self.scale_value.grid(column=1, row=1)
 
