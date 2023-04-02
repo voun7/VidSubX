@@ -27,7 +27,7 @@ class SubtitleDetector:
 
     def _get_key_frames(self) -> None:
         """
-        Extract frames from specific parts of video that may contain subtitles.
+        Extract frames from default subtitle area of video that should contain subtitles.
         """
         # decimal used to multiply total frame to choose start point.
         split_start = utils.Config.split_start
@@ -72,7 +72,7 @@ class SubtitleDetector:
 
     def _reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
-        Reposition the sub area that was change when using key area to detect texts bbox.
+        Reposition the sub area that was changed when using the default subtitle area (key_area) to detect texts bbox.
         """
         y = int(self.frame_height * utils.Config.subarea_height_scaler)
         top_left = top_left[0], top_left[1] + y
@@ -111,7 +111,7 @@ class SubtitleDetector:
 
     def get_sub_area(self) -> tuple | None:
         """
-        Returns the area containing the subtitle in the video.
+        Using the default subtitle area, a more accurate area containing the subtitle in the video is returned.
         """
         video_path = Path(self.video_file)
         new_sub_area = None
