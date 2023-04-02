@@ -121,6 +121,8 @@ class SubtitleDetector:
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
 
+        logger.info(f"Video name: {video_path.name}")
+
         self._get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
 

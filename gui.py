@@ -515,11 +515,9 @@ class SubtitleExtractorGUI:
                 self.thread_running = False
                 self._stop_sub_detection_process()
                 return
-            logger.info(f"File name: {Path(video).name}")
             sub_dt = SubtitleDetector(video)
             new_sub_area = sub_dt.get_sub_area()
             self.video_queue[video] = new_sub_area
-            logger.info(f"New sub area = {new_sub_area}\n")
         self.thread_running = False
         self._stop_sub_detection_process()
         self._set_video(self._video_indexer()[0])
