@@ -56,6 +56,7 @@ class SubtitleExtractorGUI:
         self.video_queue = {}
         self.current_video = None
         self.video_capture = None
+        self.subtitle_rect = None
         self.thread_running = False
         self._console_redirector()
 
@@ -276,7 +277,7 @@ class SubtitleExtractorGUI:
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle.
         """
         if self.current_video:
-            x1, y1, x2, y2 = self.canvas.coords(self.current_sub_rect)
+            x1, y1, x2, y2 = self.canvas.coords(self.subtitle_rect)
             if abs(event.x - x1) < abs(event.x - x2):
                 # opposing side was grabbed; swap the anchor and mobile side
                 x1, x2 = x2, x1
@@ -289,25 +290,22 @@ class SubtitleExtractorGUI:
         Fires when the user drags the mouse ... resizes currently active rectangle.
         """
         if self.current_video:
-            self.canvas.coords(self.current_sub_rect, *self.mouse_start, event.x, event.y)
-            rect_coords = tuple(self.canvas.coords(self.current_sub_rect))
-            scale = self.frame_height / int(self.canvas['height'])
-            self._set_sub_area(self.rescale(subtitle_area=rect_coords, scale=scale))
+            self.canvas.coords(self.subtitle_rect, *self.mouse_start, event.x, event.y)
+            rect_coords = tuple(self.canvas.coords(self.subtitle_rect))
+            scale = self.current_frame_height / int(self.canvas['height'])
+            self._set_current_sub_area(self.rescale(subtitle_area=rect_coords, scale=scale))
 
     def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
-        if subtitle_area is None:
-            logger.debug("Subtitle coordinates are None.")
-            def_sub = self.sub_ex.default_sub_area(self.frame_width, self.frame_height, subtitle_area)
-            self._set_sub_area(def_sub)
-            x1, y1, x2, y2 = self.rescale(subtitle_area=def_sub)
-            self.current_sub_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
+        if self.subtitle_rect is None:
+            x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
+            self.subtitle_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
             self.canvas.event_generate("<Button-1>")
         else:
-            self.canvas.coords(self.current_sub_rect, self.rescale(subtitle_area=subtitle_area))
-            self.canvas.tag_raise(self.current_sub_rect)
+            self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=subtitle_area))
+            self.canvas.tag_raise(self.subtitle_rect)
 
     def _display_video_frame(self, millisecond: float = 0.0) -> None:
         """
