@@ -422,6 +422,18 @@ class SubtitleExtractorGUI:
         if len(self.video_queue) > 1:
             self._set_batch_layout()
 
+    def _set_opened_videos(self, filenames: tuple) -> None:
+        """
+        Add all opened videos to a queue along with default subtitles.
+        """
+        logger.info("Opening video(s)...")
+        for filename in filenames:
+            logger.info(f"Opened file: {Path(filename).name}")
+            _, _, frame_width, frame_height = self.sub_ex.video_details(filename)
+            default_subarea = self.sub_ex.default_sub_area(frame_width, frame_height)
+            self.video_queue[filename] = default_subarea
+        logger.info("All video(s) opened!\n")
+
     def _open_files(self) -> None:
         """
         Open file dialog to select a file or files then call required methods.
@@ -439,12 +451,7 @@ class SubtitleExtractorGUI:
             self.progress_bar.configure(value=0)
             self.menubar.entryconfig(2, state="normal")
             self.clear_output()
-            logger.info("Opening video(s)...")
-            # Add all opened videos to a queue.
-            for filename in filenames:
-                logger.info(f"Opened file: {Path(filename).name}")
-                self.video_queue[filename] = None
-            logger.info("All video(s) opened!\n")
+            self._set_opened_videos(filenames)
             self._set_video()  # Set one of the opened videos to current video.
 
     def _console_redirector(self) -> None:
