@@ -383,6 +383,16 @@ class SubtitleExtractorGUI:
         else:
             self._set_video()
 
+    def _remove_video_from_queue(self, video: str) -> None:
+        """
+        Remove given video from video queue and sets new video if no thread is running.
+        :param video: Video to be removed.
+        """
+        logger.info(f"Removing {Path(video).name} from queue.")
+        del self.video_queue[video]
+        if not self.thread_running:
+            self._set_video()
+
     def _set_video(self, video_index: int = 0) -> None:
         """
         Set the gui for the given current video queue index.
@@ -397,6 +407,10 @@ class SubtitleExtractorGUI:
                 self._reset_batch_layout()
 
         self.current_video = list(self.video_queue.keys())[video_index]
+        if not Path(self.current_video).exists():  # prevents errors that happen if the video goes missing.
+            logger.error("Video not found!")
+            self._remove_video_from_queue(self.current_video)
+            return
         self.current_sub_area = list(self.video_queue.values())[video_index]
         _, _, self.frame_width, self.frame_height = self.sub_ex.video_details(self.current_video)
         self.video_capture = cv.VideoCapture(self.current_video)
