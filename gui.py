@@ -388,7 +388,7 @@ class SubtitleExtractorGUI:
         Remove given video from video queue and sets new video if no thread is running.
         :param video: Video to be removed.
         """
-        logger.info(f"Removing {Path(video).name} from queue.")
+        logger.warning(f"Removing {Path(video).name} from queue.\n")
         del self.video_queue[video]
         if not self.thread_running:
             self._set_video()
