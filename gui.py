@@ -268,7 +268,7 @@ class SubtitleExtractorGUI:
         """
         Fires when user clicks on the background ... binds to current rectangle.
         """
-        if self.current_video:
+        if not self.thread_running:
             self.mouse_start = event.x, event.y
             self.canvas.bind('<Button-1>', self._on_click_rectangle)
             self.canvas.bind('<B1-Motion>', self._on_motion)
@@ -277,7 +277,7 @@ class SubtitleExtractorGUI:
         """
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle.
         """
-        if self.current_video:
+        if not self.thread_running:
             x1, y1, x2, y2 = self.canvas.coords(self.subtitle_rect)
             if abs(event.x - x1) < abs(event.x - x2):
                 # opposing side was grabbed; swap the anchor and mobile side
@@ -290,7 +290,7 @@ class SubtitleExtractorGUI:
         """
         Fires when the user drags the mouse ... resizes currently active rectangle.
         """
-        if self.current_video:
+        if not self.thread_running:
             self.canvas.coords(self.subtitle_rect, *self.mouse_start, event.x, event.y)
             rect_coords = tuple(self.canvas.coords(self.subtitle_rect))
             scale = self.current_frame_height / int(self.canvas['height'])
