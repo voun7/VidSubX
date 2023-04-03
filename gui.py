@@ -431,6 +431,9 @@ class SubtitleExtractorGUI:
         """
         logger.info("Opening video(s)...")
         for filename in filenames:
+            if utils.Process.interrupt_process:
+                logger.debug("Video opening process interrupted\n")
+                return
             logger.info(f"Opened file: {Path(filename).name}")
             _, _, frame_width, frame_height = self.sub_ex.video_details(filename)
             default_subarea = self.sub_ex.default_sub_area(frame_width, frame_height)
