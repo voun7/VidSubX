@@ -68,8 +68,8 @@ class SubtitleDetector:
                      f"with x_padding = {x_padding}, y_padding = {y_padding}")
         # Use frame width of video to determine width for padding sub area.
         # This makes sure that the width padding will be same for all video resolutions. Relative to width of video.
-        top_left = self.frame_width - (self.frame_width * x_padding), top_left[1] - y_padding
-        bottom_right = self.frame_width * x_padding, bottom_right[1] + y_padding
+        top_left = int(self.frame_width - (self.frame_width * x_padding)), top_left[1] - y_padding
+        bottom_right = int(self.frame_width * x_padding), bottom_right[1] + y_padding
         return top_left, bottom_right
 
     def _reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
