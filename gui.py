@@ -417,7 +417,7 @@ class SubtitleExtractorGUI:
         self._set_frame_slider()
         self._display_video_frame()
         self._draw_subtitle_area(self.current_sub_area)
-        self.root.geometry("")  # Make sure the window is properly resized after Thread is done opening videos.
+        self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
         self.scale_value.configure(text="")
 
