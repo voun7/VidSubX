@@ -48,7 +48,7 @@ class Config:
     default_split_start = 0.25
     default_split_stop = 0.5
     default_no_of_frames = 200
-    default_sub_area_x_padding = 0.75
+    default_sub_area_x_padding = 0.8
     default_sub_area_y_padding = 10
     default_win_notify_sound = "Default"
     default_win_notify_loop_sound = True
