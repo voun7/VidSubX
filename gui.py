@@ -623,7 +623,7 @@ class SubtitleExtractorGUI:
         """
         Method called when window is closed.
         """
-        self._stop_sub_extraction_process()
+        utils.Process.stop_process()
         self.root.quit()
         exit()
 
