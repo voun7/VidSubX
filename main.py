@@ -38,7 +38,7 @@ class SubtitleDetector:
 
         relative_start = int(self.frame_total * split_start)
         relative_stop = int(self.frame_total * split_stop)
-        logger.debug(f"Relative start = {relative_start}, Relative stop = {relative_stop}")
+        logger.debug(f"Relative start frame = {relative_start}, Relative stop frame = {relative_stop}")
         # Split the frames into chunk lists.
         frame_chunks = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
         frame_chunks_len = len(frame_chunks)
