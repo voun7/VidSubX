@@ -203,7 +203,8 @@ class SubtitleExtractorGUI:
     def get_scaler(self) -> float:
         """
         Use the frame height to determine which value will be used to scale the video.
-        :return: frame scale
+        Except when a videos resolution is 480p or below it will be up scaled, other video sizes will be downscaled.
+        :return: frame scaler
         """
         if self.current_frame_height <= 480:
             return 1.125
