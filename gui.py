@@ -744,7 +744,7 @@ class PreferencesUI(Toplevel):
         ).grid(column=1, row=2)
 
         ttk.Label(subtitle_detection_frame, text="X Axis Padding:").grid(column=0, row=3)
-        self.sub_area_x_padding = IntVar(value=utils.Config.sub_area_x_padding)
+        self.sub_area_x_padding = DoubleVar(value=utils.Config.sub_area_x_padding)
         self.sub_area_x_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(

@@ -48,7 +48,7 @@ class Config:
     default_split_start = 0.25
     default_split_stop = 0.5
     default_no_of_frames = 200
-    default_sub_area_x_padding = 300
+    default_sub_area_x_padding = 0.75
     default_sub_area_y_padding = 10
     default_win_notify_sound = "Default"
     default_win_notify_loop_sound = True
@@ -97,7 +97,7 @@ class Config:
         cls.split_start = float(cls.config[cls.sections[3]][cls.keys[6]])
         cls.split_stop = float(cls.config[cls.sections[3]][cls.keys[7]])
         cls.no_of_frames = int(cls.config[cls.sections[3]][cls.keys[8]])
-        cls.sub_area_x_padding = int(cls.config[cls.sections[3]][cls.keys[9]])
+        cls.sub_area_x_padding = float(cls.config[cls.sections[3]][cls.keys[9]])
         cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
 
         cls.win_notify_sound = cls.config[cls.sections[4]][cls.keys[11]]
