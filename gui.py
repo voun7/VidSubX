@@ -260,15 +260,15 @@ class SubtitleExtractorGUI:
         Set current video subtitle area to new area.
         :param subtitle_area: New subtitle area to be used.
         """
-        if not self.thread_running:  # prevents new sub areas from being set while program has a process running.
-            self.current_sub_area = subtitle_area
-            self.video_queue[f"{self.current_video}"] = self.current_sub_area
+        self.current_sub_area = subtitle_area
+        self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
     def _on_click(self, event: Event) -> None:
         """
         Fires when user clicks on the background ... binds to current rectangle.
         """
-        if not self.thread_running:
+        # Only allow clicks on canvas when there is currently a video frame being displayed and no thread is running.
+        if self.current_video and not self.thread_running:
             self.mouse_start = event.x, event.y
             self.canvas.bind('<Button-1>', self._on_click_rectangle)
             self.canvas.bind('<B1-Motion>', self._on_motion)
@@ -277,20 +277,20 @@ class SubtitleExtractorGUI:
         """
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle.
         """
-        if not self.thread_running:
-            x1, y1, x2, y2 = self.canvas.coords(self.subtitle_rect)
-            if abs(event.x - x1) < abs(event.x - x2):
-                # opposing side was grabbed; swap the anchor and mobile side
-                x1, x2 = x2, x1
-            if abs(event.y - y1) < abs(event.y - y2):
-                y1, y2 = y2, y1
-            self.mouse_start = x1, y1
+        x1, y1, x2, y2 = self.canvas.coords(self.subtitle_rect)
+        if abs(event.x - x1) < abs(event.x - x2):
+            # opposing side was grabbed; swap the anchor and mobile side
+            x1, x2 = x2, x1
+        if abs(event.y - y1) < abs(event.y - y2):
+            y1, y2 = y2, y1
+        self.mouse_start = x1, y1
 
     def _on_motion(self, event: Event) -> None:
         """
         Fires when the user drags the mouse ... resizes currently active rectangle.
         """
-        if not self.thread_running:
+        # Only allow clicks on canvas when there is currently a video frame being displayed and no thread is running.
+        if self.current_video and not self.thread_running:
             self.canvas.coords(self.subtitle_rect, *self.mouse_start, event.x, event.y)
             rect_coords = tuple(self.canvas.coords(self.subtitle_rect))
             scale = self.current_frame_height / int(self.canvas['height'])
