@@ -705,7 +705,7 @@ class PreferencesUI(Toplevel):
         subtitle_detection_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
 
-        ttk.Label(subtitle_detection_frame, text="Split Start Part:").grid(
+        ttk.Label(subtitle_detection_frame, text="Split Start (Relative position):").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
         self.split_start = DoubleVar(value=utils.Config.split_start)
@@ -719,7 +719,7 @@ class PreferencesUI(Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(subtitle_detection_frame, text="Split Stop Part:").grid(column=0, row=1)
+        ttk.Label(subtitle_detection_frame, text="Split Stop (Relative position):").grid(column=0, row=1)
         self.split_stop = DoubleVar(value=utils.Config.split_stop)
         self.split_stop.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
