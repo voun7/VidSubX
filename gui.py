@@ -417,6 +417,7 @@ class SubtitleExtractorGUI:
         self._set_frame_slider()
         self._display_video_frame()
         self._draw_subtitle_area(self.current_sub_area)
+        self.root.geometry("")  # Make sure the window is properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
         self.scale_value.configure(text="")
 
@@ -434,6 +435,7 @@ class SubtitleExtractorGUI:
             default_subarea = self.sub_ex.default_sub_area(frame_width, frame_height)
             self.video_queue[filename] = default_subarea
         logger.info("All video(s) opened!\n")
+        self._set_video()  # Set one of the opened videos to current video.
 
     def _open_files(self) -> None:
         """
@@ -452,8 +454,7 @@ class SubtitleExtractorGUI:
             self.progress_bar.configure(value=0)
             self.menubar.entryconfig(2, state="normal")
             self.clear_output()
-            self._set_opened_videos(filenames)
-            self._set_video()  # Set one of the opened videos to current video.
+            Thread(target=self._set_opened_videos, args=(filenames,), daemon=True).start()
 
     def _console_redirector(self) -> None:
         """
