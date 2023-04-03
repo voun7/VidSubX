@@ -743,19 +743,21 @@ class PreferencesUI(Toplevel):
             width=self.entry_size
         ).grid(column=1, row=2)
 
-        ttk.Label(subtitle_detection_frame, text="X Axis Padding:").grid(column=0, row=3)
+        ttk.Label(subtitle_detection_frame, text="X Axis Padding (Relative):").grid(column=0, row=3)
         self.sub_area_x_padding = DoubleVar(value=utils.Config.sub_area_x_padding)
         self.sub_area_x_padding.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             subtitle_detection_frame,
-            from_=0.0, to=1.0,
-            increment=0.05,
+            from_=0.5, to=1.0,
+            increment=0.01,
             textvariable=self.sub_area_x_padding,
             state="readonly",
             width=self.spinbox_size
         ).grid(column=1, row=3)
 
-        ttk.Label(subtitle_detection_frame, text="Y Axis Padding:").grid(column=0, row=4, pady=self.wgt_y_padding)
+        ttk.Label(subtitle_detection_frame, text="Y Axis Padding (Absolute):").grid(
+            column=0, row=4, pady=self.wgt_y_padding
+        )
         self.sub_area_y_padding = IntVar(value=utils.Config.sub_area_y_padding)
         self.sub_area_y_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
