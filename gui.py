@@ -900,7 +900,7 @@ class PreferencesUI(Toplevel):
 
     def _set_reset_button(self, *args) -> None:
         """
-        Set the reset button based on the value of the text variables.
+        Set the reset button based on whether the value of the text variables are the same as the default values.
         :param args: Info of the variable that called the method.
         """
         logger.debug(f"Reset button set by -> {args}")
