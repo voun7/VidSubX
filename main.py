@@ -29,16 +29,16 @@ class SubtitleDetector:
         """
         Extract frames from default subtitle area of video that should contain subtitles.
         """
-        # decimal used to multiply total frame to choose start point.
+        # Decimal used to multiply total frame to choose start point. Relative to length of video.
         split_start = utils.Config.split_start
-        # decimal used to multiply total frame to choose end point.
+        # Decimal used to multiply total frame to choose end point. Relative to length of video.
         split_stop = utils.Config.split_stop
-        # how many frame to look through after splits.
+        # How many frames to look through after splits.
         no_of_frames = utils.Config.no_of_frames
 
         start = int(self.frame_total * split_start)
         stop = int(self.frame_total * split_stop)
-        # split the frames into chunk lists.
+        # Split the frames into chunk lists.
         frame_chunks = [[i, i + no_of_frames] for i in range(start, stop)]
         frame_chunks_len = len(frame_chunks)
         logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
@@ -67,7 +67,7 @@ class SubtitleDetector:
         logger.debug(f"Padding sub area: top_left = {top_left} and bottom_right = {bottom_right} "
                      f"with x_padding = {x_padding}, y_padding = {y_padding}")
         # Use frame width of video to determine width for padding sub area.
-        # This makes sure that the width padding will be same for all video resolutions.
+        # This makes sure that the width padding will be same for all video resolutions. Relative to width of video.
         top_left = self.frame_width - (self.frame_width * x_padding), top_left[1] - y_padding
         bottom_right = self.frame_width * x_padding, bottom_right[1] + y_padding
         return top_left, bottom_right
