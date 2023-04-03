@@ -257,12 +257,12 @@ class SubtitleExtractorGUI:
         frame_width, frame_height = self.rescale(resolution=(self.current_frame_width, self.current_frame_height))
         self.canvas.configure(width=frame_width, height=frame_height)
 
-    def _set_current_sub_area(self, subtitle_area: tuple) -> None:
+    def _set_current_sub_area(self, new_subtitle_area: tuple) -> None:
         """
         Set current video subtitle area to new area.
-        :param subtitle_area: New subtitle area to be used.
+        :param new_subtitle_area: New subtitle area to be used.
         """
-        self.current_sub_area = subtitle_area
+        self.current_sub_area = new_subtitle_area
         self.video_queue[f"{self.current_video}"] = self.current_sub_area
 
     def _on_click(self, event: Event) -> None:
