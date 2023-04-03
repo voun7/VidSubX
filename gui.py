@@ -262,8 +262,10 @@ class SubtitleExtractorGUI:
         Set current video subtitle area to new area.
         :param new_subtitle_area: New subtitle area to be used.
         """
-        self.current_sub_area = new_subtitle_area
-        self.video_queue[f"{self.current_video}"] = self.current_sub_area
+        # Get the relative scale (up scale) for the subtitle area.
+        scale = self.current_frame_height / int(self.canvas['height'])
+        self.current_sub_area = self.rescale(subtitle_area=new_subtitle_area, scale=scale)
+        self.video_queue[f"{self.current_video}"] = self.current_sub_area  # Set new sub area.
 
     def _on_click(self, event: Event) -> None:
         """
@@ -296,9 +298,7 @@ class SubtitleExtractorGUI:
             # Redraw the rectangle at the given coordinates.
             self.canvas.coords(self.subtitle_rect, *self.mouse_start, event.x, event.y)
             rect_coords = tuple(self.canvas.coords(self.subtitle_rect))  # Get the coordinates of the rectangle.
-            # Get the relative scale (up scale) for the rectangle.
-            scale = self.current_frame_height / int(self.canvas['height'])
-            self._set_current_sub_area(self.rescale(subtitle_area=rect_coords, scale=scale))  # Set new sub area.
+            self._set_current_sub_area(rect_coords)  # Set new sub area with coordinates of the rectangle.
 
     def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
         """
