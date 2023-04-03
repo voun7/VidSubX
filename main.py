@@ -29,9 +29,9 @@ class SubtitleDetector:
         """
         Extract frames from default subtitle area of video that should contain subtitles.
         """
-        # Decimal used to multiply total frame to choose start point. Relative to length of video.
+        # Decimal used to signify the relative position to choose start point to search for frames.
         split_start = utils.Config.split_start
-        # Decimal used to multiply total frame to choose end point. Relative to length of video.
+        # Decimal used to signify the relative position to choose end point to search for frames.
         split_stop = utils.Config.split_stop
         # How many frames to look through after splits.
         no_of_frames = utils.Config.no_of_frames
@@ -52,7 +52,7 @@ class SubtitleDetector:
         if last_frame_chunk > self.frame_total:
             frame_chunks[-1][-1] = min(frame_chunks[-1][-1], stop - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
-        # part of the video to look for texts.
+        # Part of the video to look for subtitles.
         default_subarea = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
 
         for frames in frame_chunks:
