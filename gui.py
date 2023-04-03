@@ -462,6 +462,7 @@ class SubtitleExtractorGUI:
             self.video_queue = {}  # Empty the video queue before adding the new videos.
             self.clear_output()
             self.progress_bar.configure(value=0)
+            utils.Process.start_process()
             self._set_run_state("disabled", "opening")
             Thread(target=self._set_opened_videos, args=(filenames,), daemon=True).start()
 
