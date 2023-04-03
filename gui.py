@@ -98,7 +98,7 @@ class SubtitleExtractorGUI:
 
         self.menubar.add_cascade(menu=self.menu_file, label="File")
         self.menubar.add_command(label="Preferences", command=self._preferences)
-        self.menubar.add_command(label="Detect Subtitles", command=self.run_sub_detection, state="disabled")
+        self.menubar.add_command(label="Detect Subtitles", command=self._run_sub_detection, state="disabled")
 
         # Add menu items to file menu.
         self.menu_file.add_command(label="Open file(s)", command=self._open_files)
@@ -556,9 +556,9 @@ class SubtitleExtractorGUI:
         utils.Process.stop_process()
         if not self.thread_running:
             self._set_run_state("normal", "detection")
-            self.menubar.entryconfig(2, label="Detect Subtitles", command=self.run_sub_detection)
+            self.menubar.entryconfig(2, label="Detect Subtitles", command=self._run_sub_detection)
 
-    def run_sub_detection(self) -> None:
+    def _run_sub_detection(self) -> None:
         """
         Create a thread to run subtitle detection.
         """
