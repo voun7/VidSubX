@@ -636,8 +636,9 @@ class SubtitleExtractorGUI:
         Method called when window is closed.
         """
         utils.Process.stop_process()
-        self.root.quit()
-        exit()
+        if not self.thread_running:
+            self.root.quit()
+            exit()
 
 
 class PreferencesUI(Toplevel):
