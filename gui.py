@@ -706,7 +706,7 @@ class PreferencesUI(Toplevel):
         self.notebook_tab.add(subtitle_detection_frame, text=utils.Config.sections[3])
 
         ttk.Label(subtitle_detection_frame, text="Split Start Part:").grid(
-            column=0, row=0, padx=60, pady=self.wgt_y_padding
+            column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
         self.split_start = DoubleVar(value=utils.Config.split_start)
         self.split_start.trace_add("write", self._set_reset_button)
