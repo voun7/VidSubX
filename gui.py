@@ -252,6 +252,7 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
+        # The current frame size will be rescaled (down scale) to set the canvas size.
         frame_width, frame_height = self.rescale(resolution=(self.current_frame_width, self.current_frame_height))
         self.canvas.configure(width=frame_width, height=frame_height)
 
@@ -291,20 +292,23 @@ class SubtitleExtractorGUI:
         """
         # Only allow clicks on canvas when there is currently a video frame being displayed and no thread is running.
         if self.current_video and not self.thread_running:
+            # Redraw the rectangle at the given coordinates.
             self.canvas.coords(self.subtitle_rect, *self.mouse_start, event.x, event.y)
-            rect_coords = tuple(self.canvas.coords(self.subtitle_rect))
+            rect_coords = tuple(self.canvas.coords(self.subtitle_rect))  # Get the coordinates of the rectangle.
+            # Get the relative scale (up scale) for the rectangle.
             scale = self.current_frame_height / int(self.canvas['height'])
-            self._set_current_sub_area(self.rescale(subtitle_area=rect_coords, scale=scale))
+            self._set_current_sub_area(self.rescale(subtitle_area=rect_coords, scale=scale))  # Set new sub area.
 
     def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
         if self.subtitle_rect is None:
-            x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)
+            x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)  # Values for creating rectangle.
             self.subtitle_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
-            self.canvas.event_generate("<Button-1>")
+            self.canvas.event_generate("<Button-1>")  # Prevents mouse sudden jumps on first canvas mouse click.
         else:
+            # Rescale (down scale) and redraw the rectangle at the coordinates of subtitle_area.
             self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.subtitle_rect)
 
@@ -317,7 +321,7 @@ class SubtitleExtractorGUI:
         _, frame = self.video_capture.read()
 
         cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
-        frame_resized = self.rescale(cv2image)
+        frame_resized = self.rescale(cv2image)  # Make image fit canvas (usually a down scale).
 
         img = Image.fromarray(frame_resized)
         photo = ImageTk.PhotoImage(image=img)
@@ -387,7 +391,7 @@ class SubtitleExtractorGUI:
         Remove given video from video queue and sets new video if no thread is running.
         :param video: Video to be removed.
         """
-        if not self.thread_running:  # To prevent dictionary changed size during iteration
+        if not self.thread_running:  # To prevent dictionary from changing size during iteration
             logger.warning(f"Removing {Path(video).name} from queue.\n")
             del self.video_queue[video]
             self._set_video()
