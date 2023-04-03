@@ -36,21 +36,22 @@ class SubtitleDetector:
         # How many frames to look through after splits.
         no_of_frames = utils.Config.no_of_frames
 
-        start = int(self.frame_total * split_start)
-        stop = int(self.frame_total * split_stop)
+        relative_start = int(self.frame_total * split_start)
+        relative_stop = int(self.frame_total * split_stop)
+        logger.debug(f"Relative start = {relative_start}, Relative stop = {relative_stop}")
         # Split the frames into chunk lists.
-        frame_chunks = [[i, i + no_of_frames] for i in range(start, stop)]
+        frame_chunks = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
         frame_chunks_len = len(frame_chunks)
         logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
-        start_duration = self.sub_ex.timecode((start / self.fps) * 1000).replace(",", ":")
-        stop_duration = self.sub_ex.timecode((stop / self.fps) * 1000).replace(",", ":")
+        start_duration = self.sub_ex.timecode((relative_start / self.fps) * 1000).replace(",", ":")
+        stop_duration = self.sub_ex.timecode((relative_stop / self.fps) * 1000).replace(",", ":")
         logger.info(f"Split Start = {start_duration}, Split Stop = {stop_duration}")
         if frame_chunks_len > 3:
             middle_chunk = int(frame_chunks_len / 2)
             frame_chunks = [frame_chunks[0], frame_chunks[middle_chunk], frame_chunks[-1]]
         last_frame_chunk = frame_chunks[-1][-1]
         if last_frame_chunk > self.frame_total:
-            frame_chunks[-1][-1] = min(frame_chunks[-1][-1], stop - 1)
+            frame_chunks[-1][-1] = min(frame_chunks[-1][-1], relative_stop - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
         # Part of the video to look for subtitles.
         default_subarea = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
