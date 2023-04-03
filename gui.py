@@ -406,7 +406,7 @@ class SubtitleExtractorGUI:
                 self._reset_batch_layout()
 
         self.current_video = list(self.video_queue.keys())[video_index]
-        if not Path(self.current_video).exists():  # prevents errors that happen if the video goes missing.
+        if not Path(self.current_video).exists():  # Prevents errors that happen if the video goes missing.
             logger.error("Video not found!")
             self.video_scale.configure(state="disabled")
             self._remove_video_from_queue(self.current_video)
