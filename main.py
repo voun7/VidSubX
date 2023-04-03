@@ -72,7 +72,7 @@ class SubtitleDetector:
 
     def _reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
-        Reposition the sub area that was changed when using the default subtitle area (key_area) to detect texts bbox.
+        Reposition the sub area that was changed when using the default subtitle area to detect texts bbox.
         """
         y = int(self.frame_height * utils.Config.subarea_height_scaler)
         top_left = top_left[0], top_left[1] + y
