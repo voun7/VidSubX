@@ -443,6 +443,7 @@ class SubtitleExtractorGUI:
             self.video_queue[filename] = default_subarea
         self.thread_running = False
         logger.info("All video(s) opened!\n")
+        self._set_run_state("normal", "opening")
         self._set_video()  # Set one of the opened videos to current video.
 
     def _open_files(self) -> None:
@@ -459,9 +460,9 @@ class SubtitleExtractorGUI:
         if filenames:
             logger.debug("New files have been selected, video queue, and text widget output cleared")
             self.video_queue = {}  # Empty the video queue before adding the new videos.
-            self.progress_bar.configure(value=0)
-            self.menubar.entryconfig(2, state="normal")
             self.clear_output()
+            self.progress_bar.configure(value=0)
+            self._set_run_state("disabled", "opening")
             Thread(target=self._set_opened_videos, args=(filenames,), daemon=True).start()
 
     def _console_redirector(self) -> None:
@@ -616,14 +617,18 @@ class SubtitleExtractorGUI:
         Set state for widgets while process is running.
         """
         logger.debug("Setting run state")
-        self.menu_file.entryconfig(0, state=state)
-        self.menubar.entryconfig(1, state=state)
+        self.menu_file.entryconfig(0, state=state)  # Open file button.
+        self.menubar.entryconfig(1, state=state)  # Preferences button.
 
-        if process_name == "detection":
+        if process_name == "opening":
+            self.previous_button.configure(state=state)
+            self.next_button.configure(state=state)
+
+        if process_name in ("detection", "opening"):
             self.run_button.configure(state=state)
 
-        if process_name == "extraction":
-            self.menubar.entryconfig(2, state=state)
+        if process_name in ("extraction", "opening"):
+            self.menubar.entryconfig(2, state=state)  # Detect button.
             self.video_scale.configure(state=state)
 
     def _on_closing(self) -> None:
