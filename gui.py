@@ -200,7 +200,7 @@ class SubtitleExtractorGUI:
     def _preferences(self) -> None:
         self.preference_window = PreferencesUI(self.icon_file)
 
-    def get_current_scaler(self) -> float:
+    def _get_scale_value(self) -> float:
         """
         Use the frame height to determine which value will be used to scale the current video.
         Except when a videos resolution is 480p or below it will be up scaled, other video sizes will be downscaled.
@@ -226,7 +226,7 @@ class SubtitleExtractorGUI:
         Method to rescale any frame, subtitle area and resolution.
         """
         if not scale:
-            scale = self.get_current_scaler()
+            scale = self._get_scale_value()
 
         if frame is not None:
             height = int(frame.shape[0] * scale)
