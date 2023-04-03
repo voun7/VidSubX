@@ -955,17 +955,22 @@ class PreferencesUI(Toplevel):
         """
         Change the values of the text variables to the default values.
         """
+        # Frame extraction settings.
         self.frame_extraction_frequency.set(utils.Config.default_frame_extraction_frequency)
         self.frame_extraction_chunk_size.set(utils.Config.default_frame_extraction_chunk_size)
+        # Text extraction settings.
         self.text_extraction_chunk_size.set(utils.Config.default_text_extraction_chunk_size)
         self.ocr_max_processes.set(utils.Config.default_ocr_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
+        # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
+        # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)
         self.split_stop.set(utils.Config.default_split_stop)
         self.no_of_frames.set(utils.Config.default_no_of_frames)
         self.sub_area_x_padding.set(utils.Config.default_sub_area_x_padding)
         self.sub_area_y_padding.set(utils.Config.default_sub_area_y_padding)
+        # Notification settings.
         self.win_notify_sound.set(utils.Config.default_win_notify_sound)
         self.win_notify_loop_sound.set(utils.Config.default_win_notify_loop_sound)
 
@@ -975,17 +980,22 @@ class PreferencesUI(Toplevel):
         """
         try:
             utils.Config.set_config(
+                # Frame extraction settings.
                 frame_extraction_frequency=self.frame_extraction_frequency.get(),
                 frame_extraction_chunk_size=self.frame_extraction_chunk_size.get(),
+                # Text extraction settings.
                 text_extraction_chunk_size=self.text_extraction_chunk_size.get(),
                 ocr_max_processes=self.ocr_max_processes.get(),
                 ocr_rec_language=self.ocr_rec_language.get(),
+                # Subtitle generator settings.
                 text_similarity_threshold=self.text_similarity_threshold.get(),
+                # Subtitle detection settings.
                 split_start=self.split_start.get(),
                 split_stop=self.split_stop.get(),
                 no_of_frames=self.no_of_frames.get(),
                 sub_area_x_padding=self.sub_area_x_padding.get(),
                 sub_area_y_padding=self.sub_area_y_padding.get(),
+                # Notification settings.
                 win_notify_sound=self.win_notify_sound.get(),
                 win_notify_loop_sound=self.win_notify_loop_sound.get()
             )
