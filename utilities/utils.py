@@ -67,6 +67,9 @@ class Config:
         self.load_config()
 
     def create_default_config_file(self) -> None:
+        """
+        Creates a new config file with the default values.
+        """
         self.config[self.sections[0]] = {self.keys[0]: str(self.default_frame_extraction_frequency),
                                          self.keys[1]: self.default_frame_extraction_chunk_size}
         self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_chunk_size,
@@ -85,6 +88,9 @@ class Config:
 
     @classmethod
     def load_config(cls) -> None:
+        """
+        Parse the values of the config file into memory.
+        """
         cls.frame_extraction_frequency = int(cls.config[cls.sections[0]][cls.keys[0]])
         cls.frame_extraction_chunk_size = int(cls.config[cls.sections[0]][cls.keys[1]])
 
@@ -105,8 +111,13 @@ class Config:
 
     @classmethod
     def set_config(cls, **kwargs: int | float | str | bool) -> None:
-        # Write into memory & file
+        """
+        Write new configuration values into memory & file.
+        Config values must be strings.
+        """
+        # Write the new config value into the class variable (memory).
         cls.frame_extraction_frequency = kwargs.get(cls.keys[0], cls.frame_extraction_frequency)
+        # Write the value of the class variable into to the config parser (file).
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
         cls.frame_extraction_chunk_size = kwargs.get(cls.keys[1], cls.frame_extraction_chunk_size)
         cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
@@ -145,7 +156,7 @@ class Config:
 def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '', decimals: int = 3,
                    bar_length: int = 25) -> None:
     """
-    Call in a loop to create standard out progress bar
+    Call in a loop to create standard out progress bar.
     :param iteration: current iteration
     :param total: total iterations
     :param prefix: prefix string
