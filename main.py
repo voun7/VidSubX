@@ -174,8 +174,7 @@ class SubtitleExtractor:
         :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
         """
         logger.debug("Subtitle area being set to default sub area")
-        # The value 5 is used instead of 0 to prevent the left side of the drawn rect from being unseen.
-        x1, y1, x2, y2 = 5, int(frame_height * utils.Config.subarea_height_scaler), frame_width, frame_height
+        x1, y1, x2, y2 = 0, int(frame_height * utils.Config.subarea_height_scaler), frame_width, frame_height
         return x1, y1, x2, y2
 
     def _empty_cache(self) -> None:
