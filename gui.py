@@ -539,10 +539,7 @@ class SubtitleExtractorGUI:
                 return
             sub_dt = SubtitleDetector(video)
             new_sub_area = sub_dt.get_sub_area()
-            if new_sub_area:  # Subtitle area will not change if detection returns none.
-                self.video_queue[video] = new_sub_area
-            else:
-                logger.warning("Subtitle area not changed!\n")
+            self.video_queue[video] = new_sub_area
         self.thread_running = False
         self._stop_sub_detection_process()
         self._set_video(self._video_indexer()[0])
