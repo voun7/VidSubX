@@ -113,7 +113,8 @@ class SubtitleExtractorGUI:
         video_frame.grid(column=0, row=0)
 
         # Create canvas widget in video frame.
-        self.canvas = Canvas(video_frame, cursor="tcross")
+        # Border width and highlight thickness set to 0 to prevent hidden rectangle parts.
+        self.canvas = Canvas(video_frame, cursor="tcross", borderwidth=0, highlightthickness=0)
         self.canvas.grid(column=0, row=0)
         self.canvas.bind("<Button-1>", self._on_click)
         self.canvas.bind("<B1-Motion>", self._on_motion)
