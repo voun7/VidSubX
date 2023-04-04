@@ -18,17 +18,21 @@ paddle_ocr = PaddleOCR(
 )
 
 
-def extract_bboxes(files: Path) -> list:
+def extract_bboxes(files: Path, drop_score: float = 0.9) -> list:
     """
     Returns the bounding boxes of detected texted in images.
-    :param files: directory with images for detection
+    :param files: Directory with images for detection.
+    :param drop_score: Filter the results by score and those results below this score will not be returned.
     """
     boxes = []
     for file in files.iterdir():
-        result = paddle_ocr.ocr(str(file), rec=False)
+        result = paddle_ocr.ocr(str(file))
         result = result[0]
         if result:
-            boxes.append(result)
+            score = result[0][1][1]
+            if score > drop_score:
+                box = result[0][0]
+                boxes.append(box)
     return boxes
 
 

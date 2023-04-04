@@ -97,10 +97,10 @@ class SubtitleDetector:
         """
         new_top_left_x = new_top_left_y = new_bottom_right_x = new_bottom_right_y = None
         for bbox in bboxes:
-            top_left_x = int(bbox[0][0][0])
-            top_left_y = int(bbox[0][0][1])
-            bottom_right_x = int(bbox[0][2][0])
-            bottom_right_y = int(bbox[0][2][1])
+            top_left_x = int(bbox[0][0])
+            top_left_y = int(bbox[0][1])
+            bottom_right_x = int(bbox[2][0])
+            bottom_right_y = int(bbox[2][1])
 
             if not new_top_left_x or top_left_x < new_top_left_x:
                 new_top_left_x = top_left_x
