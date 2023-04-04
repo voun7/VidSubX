@@ -20,9 +20,9 @@ class SubtitleDetector:
         self.video_file = video_file
         self.sub_ex = SubtitleExtractor()
         self.fps, self.frame_total, self.frame_width, self.frame_height = self.sub_ex.video_details(self.video_file)
-        # Create cache directory
+        # Create cache directory.
         self.vd_output_dir = Path(f"{Path.cwd()}/output")
-        # Extracted video frame storage directory
+        # Extracted video frame storage directory.
         self.frame_output = self.vd_output_dir / "sub detect frames"
 
     def _get_key_frames(self) -> None:
@@ -146,11 +146,11 @@ class SubtitleExtractor:
         Extracts hardcoded subtitles from video.
         """
         self.video_path = None
-        # Create cache directory
+        # Create cache directory.
         self.vd_output_dir = Path(f"{Path.cwd()}/output")
-        # Extracted video frame storage directory
+        # Extracted video frame storage directory.
         self.frame_output = self.vd_output_dir / "frames"
-        # Extracted text file storage directory
+        # Extracted text file storage directory.
         self.text_output = self.vd_output_dir / "extracted texts"
 
     @staticmethod
@@ -353,7 +353,7 @@ class SubtitleExtractor:
         """
         Use text files in folder to create subtitle file.
         """
-        # cancel if process has been cancelled by gui.
+        # Cancel if process has been cancelled by gui.
         if utils.Process.interrupt_process:
             logger.warning("Subtitle generation process interrupted!")
             return
