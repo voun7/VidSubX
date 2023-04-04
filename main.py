@@ -168,7 +168,7 @@ class SubtitleExtractor:
         return fps, frame_total, frame_width, frame_height
 
     @staticmethod
-    def default_sub_area(frame_width: int | float, frame_height: int | float) -> tuple:
+    def default_sub_area(frame_width: int, frame_height: int) -> tuple:
         """
         Returns a default subtitle area that can be used if no subtitle is given.
         :return: Position of subtitle relative to the resolution of the video. x2 = width and y2 = height
