@@ -314,7 +314,7 @@ class SubtitleExtractorGUI:
             self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.subtitle_rect)
 
-    def _display_video_frame(self, frame_no: float | int = 0) -> None:
+    def _display_video_frame(self, frame_no: float = 0) -> None:
         """
         Find captured video frame through corresponding frame number and display on video canvas.
         :param frame_no: default corresponding frame_no.
