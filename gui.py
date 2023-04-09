@@ -314,12 +314,12 @@ class SubtitleExtractorGUI:
             self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=subtitle_area))
             self.canvas.tag_raise(self.subtitle_rect)
 
-    def _display_video_frame(self, millisecond: float = 0.0) -> None:
+    def _display_video_frame(self, frame_no: float | int = 0) -> None:
         """
-        Find captured video frame through corresponding second and display on video canvas.
-        :param millisecond: Default corresponding millisecond.
+        Find captured video frame through corresponding frame number and display on video canvas.
+        :param frame_no: default corresponding frame_no.
         """
-        self.video_capture.set(cv.CAP_PROP_POS_MSEC, millisecond)
+        self.video_capture.set(cv.CAP_PROP_POS_FRAMES, frame_no)  # CAP_PROP_POS_MSEC would be used for milliseconds.
         _, frame = self.video_capture.read()
 
         cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
@@ -336,26 +336,23 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
-        current_time = self.sub_ex.timecode(scale_value).replace(",", ":")
-        total_time = self.sub_ex.timecode(self._video_duration()).replace(",", ":")
+        # Durations of the current_video in milliseconds.
+        current_duration = (scale_value / self.current_fps) * 1000
+        video_duration = ((self.current_frame_total / self.current_fps) * 1000)
+        # Update timecode label as slider is moved.
+        current_time = self.sub_ex.timecode(current_duration).replace(",", ":")
+        total_time = self.sub_ex.timecode(video_duration).replace(",", ":")
         self.scale_value.configure(text=f"{current_time}/{total_time}")
+
         self._display_video_frame(scale_value)
         self._draw_subtitle_area(self.current_sub_area)
-
-    def _video_duration(self) -> float:
-        """
-        Returns the total duration of the current_video in milliseconds.
-        """
-        fps, frame_total, _, _ = self.sub_ex.video_details(self.current_video)
-        milliseconds_duration = ((frame_total / fps) * 1000) - 1000
-        return milliseconds_duration
 
     def _set_frame_slider(self) -> None:
         """
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        self.video_scale.configure(state="normal", from_=0.0, to=self._video_duration(), value=0)
+        self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total - 1, value=0)
 
     def _video_indexer(self) -> tuple:
         """
@@ -418,7 +415,8 @@ class SubtitleExtractorGUI:
             self._remove_video_from_queue(self.current_video)
             return
         self.current_sub_area = list(self.video_queue.values())[video_index]
-        _, _, self.current_frame_width, self.current_frame_height = self.sub_ex.video_details(self.current_video)
+        self.current_fps, self.current_frame_total, self.current_frame_width, self.current_frame_height \
+            = self.sub_ex.video_details(self.current_video)
         self.video_capture = cv.VideoCapture(self.current_video)
         self._set_canvas()
         self._set_frame_slider()
