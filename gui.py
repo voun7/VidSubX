@@ -127,8 +127,10 @@ class SubtitleExtractorGUI:
         )
         self.video_scale.grid(column=0, row=1, padx=60)
         # Show timecode of the video scale.
-        self.scale_value = ttk.Label(video_work_frame)
-        self.scale_value.grid(column=1, row=1)
+        self.current_scale_value = ttk.Label(video_work_frame)
+        self.current_scale_value.grid(column=1, row=1)
+        self.total_scale_value = ttk.Label(video_work_frame)
+        self.total_scale_value.grid(column=2, row=1)
 
     def _work_frame(self) -> None:
         """
@@ -336,14 +338,10 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
-        # Durations of the current_video in milliseconds.
-        current_duration = (scale_value / self.current_fps) * 1000
-        video_duration = ((self.current_frame_total / self.current_fps) * 1000)
+        current_duration = (scale_value / self.current_fps) * 1000  # Duration of scale value in milliseconds.
         # Update timecode label as slider is moved.
         current_time = self.sub_ex.timecode(current_duration).replace(",", ":")
-        total_time = self.sub_ex.timecode(video_duration).replace(",", ":")
-        self.scale_value.configure(text=f"{current_time}/{total_time}")
-
+        self.current_scale_value.configure(text=current_time)
         self._display_video_frame(scale_value)
         self._draw_subtitle_area(self.current_sub_area)
 
@@ -352,7 +350,13 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
+        # Set the max size of the frame slider.
         self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total - 1, value=0)
+        # Set the durations labels.
+        video_duration = ((self.current_frame_total / self.current_fps) * 1000)
+        total_time = self.sub_ex.timecode(video_duration).replace(",", ":")
+        self.current_scale_value.configure(text="00:00:00:000")
+        self.total_scale_value.configure(text=f"/ {total_time}")
 
     def _video_indexer(self) -> tuple:
         """
@@ -424,7 +428,6 @@ class SubtitleExtractorGUI:
         self._draw_subtitle_area(self.current_sub_area)
         self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
-        self.scale_value.configure(text="")
 
         if len(self.video_queue) > 1:
             self._set_batch_layout()
