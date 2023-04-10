@@ -350,7 +350,7 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        # Set the max size of the frame slider.
+        # Set the max size of the frame slider. Size reduced by 1 to prevent cv2.error when slider reaches end.
         self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total - 1, value=0)
         # Set the durations labels.
         video_duration = ((self.current_frame_total / self.current_fps) * 1000)
