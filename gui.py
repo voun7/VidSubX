@@ -36,11 +36,11 @@ def set_dpi_scaling() -> None:
     """
     operating_system = platform.system()
     if operating_system == "Windows":
-        # Query DPI Awareness (Windows 10 and 8)
+        # Query DPI Awareness (Windows 10 and 8).
         awareness = ctypes.c_int()
         logger.debug(f"OS = {operating_system}, DPI awareness = {awareness}")
 
-        # Set DPI Awareness  (Windows 10 and 8)
+        # Set DPI Awareness  (Windows 10 and 8).
         try:
             ctypes.windll.shcore.SetProcessDpiAwareness(2)
         except Exception as dpi_error:
@@ -64,7 +64,7 @@ class SubtitleExtractorGUI:
         """
         Use ttk to create frames for gui.
         """
-        # Window title and icon
+        # Window title and icon.
         self.window_title = "Video Subtitle Extractor"
         self.icon_file = "VSE.ico"
         self.root.title(self.window_title)
@@ -162,7 +162,7 @@ class SubtitleExtractorGUI:
         """
         Frame that contains the widgets for the extraction text output.
         """
-        # Create output frame in main frame
+        # Create output frame in main frame.
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(column=0, row=2, sticky="N, S, E, W")
 
@@ -394,7 +394,7 @@ class SubtitleExtractorGUI:
         Remove given video from video queue and sets new video if no thread is running.
         :param video: Video to be removed.
         """
-        if not self.thread_running:  # To prevent dictionary from changing size during iteration
+        if not self.thread_running:  # To prevent dictionary from changing size during iteration.
             logger.warning(f"Removing {Path(video).name} from queue.\n")
             del self.video_queue[video]
             self._set_video()

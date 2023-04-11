@@ -63,11 +63,11 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
     :param frame_output: directory of the frames
     :param text_output: directory for extracted texts
     """
-    # size of files given to each processor.
+    # Size of files given to each processor.
     chunk_size = utils.Config.text_extraction_chunk_size
-    # number of processors to be used.
+    # Number of processors to be used.
     ocr_max_processes = utils.Config.ocr_max_processes
-    # cancel if process has been cancelled by gui.
+    # Cancel if process has been cancelled by gui.
     if utils.Process.interrupt_process:
         logger.warning("Text extraction process interrupted!")
         return

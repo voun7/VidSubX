@@ -7,7 +7,7 @@ from pathlib import Path
 def get_console_handler() -> logging.handlers:
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
-    # The console sends only messages by default no need for formatter
+    # The console sends only messages by default no need for formatter.
     return console_handler
 
 
@@ -22,22 +22,22 @@ def get_file_handler() -> logging.handlers:
 
 
 def get_logger():
-    # Create folder for file logs
+    # Create folder for file logs.
     log_dir = Path("./logs")
     if not log_dir.exists():
         log_dir.mkdir()
 
-    # Create a custom logger
+    # Create a custom logger.
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)  # better to have too much log than not enough
+    logger.setLevel(logging.DEBUG)  # Better to have too much log than not enough.
 
-    # Add handlers to the logger
+    # Add handlers to the logger.
     logger.addHandler(get_console_handler())
     logger.addHandler(get_file_handler())
 
 
 def my_namer(default_name):
-    # This will be called when doing the log rotation
+    # This will be called when doing the log rotation.
     # default_name is the default filename that would be assigned, e.g. Rotate_Test.txt.YYYY-MM-DD
     # Do any manipulations to that name here, for example this changes the name to Rotate_Test.YYYY-MM-DD.txt
     base_filename, ext, date = default_name.split(".")

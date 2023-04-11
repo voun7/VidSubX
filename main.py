@@ -264,8 +264,7 @@ class SubtitleExtractor:
         :param divider: Characters for separating time durations in file name.
         """
         logger.debug("Merging adjacent similar texts")
-        # cut off point to determine similarity.
-        similarity_threshold = utils.Config.text_similarity_threshold
+        similarity_threshold = utils.Config.text_similarity_threshold  # Cut off point to determine similarity.
         no_of_files = len(list(self.text_output.iterdir()))
         counter = 1
         starting_file = file_text = file_duration = None
