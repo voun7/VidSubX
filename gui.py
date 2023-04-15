@@ -334,6 +334,7 @@ class SubtitleExtractorGUI:
         Resize the non subtitle area to match the current video.
         """
         if self.non_subarea_rect:
+            logger.debug("non_subarea_rect resized")
             # Rescale (down scale) and redraw the rectangle at the coordinates of current non subtitle area.
             self.canvas.coords(self.non_subarea_rect, self.rescale(subtitle_area=self.current_non_subarea()))
 
