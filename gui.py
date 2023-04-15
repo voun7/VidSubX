@@ -97,6 +97,7 @@ class SubtitleExtractorGUI:
         self.menubar.add_cascade(menu=self.menu_file, label="File")
         self.menubar.add_command(label="Preferences", command=self._preferences)
         self.menubar.add_command(label="Detect Subtitles", command=self._run_sub_detection, state="disabled")
+        self.menubar.add_command(label="Hide Non-SubArea", command=self._hide_non_subarea)
 
         # Add menu items to file menu.
         self.menu_file.add_command(label="Open file(s)", command=self._open_files)
@@ -301,17 +302,17 @@ class SubtitleExtractorGUI:
             rect_coords = tuple(self.canvas.coords(self.subtitle_rect))  # Get the coordinates of the rectangle.
             self._set_current_sub_area(rect_coords)  # Set new sub area with coordinates of the rectangle.
 
-    def _draw_subtitle_area(self, subtitle_area: tuple, border_width: int = 4, color: str = "green") -> None:
+    def _draw_current_subtitle_area(self, border_width: int = 4, color: str = "green") -> None:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
         if self.subtitle_rect is None:
-            x1, y1, x2, y2 = self.rescale(subtitle_area=subtitle_area)  # Values for creating rectangle.
+            x1, y1, x2, y2 = self.rescale(subtitle_area=self.current_sub_area)  # Values for creating rectangle.
             self.subtitle_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
             self.canvas.event_generate("<Button-1>")  # Prevents mouse sudden jumps on first canvas mouse click.
         else:
             # Rescale (down scale) and redraw the rectangle at the coordinates of subtitle_area.
-            self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=subtitle_area))
+            self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=self.current_sub_area))
             self.canvas.tag_raise(self.subtitle_rect)
 
     def _display_video_frame(self, frame_no: float = 0) -> None:
@@ -341,7 +342,7 @@ class SubtitleExtractorGUI:
         current_time = self.sub_ex.timecode(current_duration).replace(",", ":")
         self.current_scale_value.configure(text=current_time)
         self._display_video_frame(scale_value)
-        self._draw_subtitle_area(self.current_sub_area)
+        self._draw_current_subtitle_area()
 
     def _set_frame_slider(self) -> None:
         """
@@ -423,7 +424,7 @@ class SubtitleExtractorGUI:
         self._set_canvas()
         self._set_frame_slider()
         self._display_video_frame()
-        self._draw_subtitle_area(self.current_sub_area)
+        self._draw_current_subtitle_area()
         self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
 
