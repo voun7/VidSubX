@@ -311,7 +311,7 @@ class SubtitleExtractorGUI:
             self.subtitle_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
             self.canvas.event_generate("<Button-1>")  # Prevents mouse sudden jumps on first canvas mouse click.
         else:
-            # Rescale (down scale) and redraw the rectangle at the coordinates of subtitle_area.
+            # Rescale (down scale) and redraw the rectangle at the coordinates of current subtitle_area.
             self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=self.current_sub_area))
             self.canvas.tag_raise(self.subtitle_rect)
 
