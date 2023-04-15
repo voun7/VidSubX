@@ -345,13 +345,13 @@ class SubtitleExtractorGUI:
         if self.non_subarea_rect:
             self.canvas.tag_raise(self.non_subarea_rect)
 
-    def _draw_current_subtitle_area(self, border_width: int = 4, color: str = "green") -> None:
+    def _draw_current_subtitle_area(self) -> None:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
         """
         if self.subtitle_rect is None:
             x1, y1, x2, y2 = self.rescale(subtitle_area=self.current_sub_area)  # Values for creating rectangle.
-            self.subtitle_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=border_width, outline=color)
+            self.subtitle_rect = self.canvas.create_rectangle(x1, y1, x2, y2, width=4, outline="green")
             self.canvas.event_generate("<Button-1>")  # Prevents mouse sudden jumps on first canvas mouse click.
         else:
             # Rescale (down scale) and redraw the rectangle at the coordinates of current subtitle_area.
