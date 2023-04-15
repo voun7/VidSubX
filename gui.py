@@ -54,9 +54,7 @@ class SubtitleExtractorGUI:
         self._create_layout()
         self.sub_ex = SubtitleExtractor()
         self.video_queue = {}
-        self.current_video = None
-        self.video_capture = None
-        self.subtitle_rect = None
+        self.current_video = self.video_capture = self.subtitle_rect = None
         self.thread_running = False
         self._console_redirector()
 
