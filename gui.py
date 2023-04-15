@@ -54,7 +54,7 @@ class SubtitleExtractorGUI:
         self._create_layout()
         self.sub_ex = SubtitleExtractor()
         self.video_queue = {}
-        self.current_video = self.video_capture = self.subtitle_rect = None
+        self.current_video = self.video_capture = self.subtitle_rect = self.non_subarea_rect = None
         self.thread_running = False
         self._console_redirector()
 
@@ -97,7 +97,7 @@ class SubtitleExtractorGUI:
         self.menubar.add_cascade(menu=self.menu_file, label="File")
         self.menubar.add_command(label="Preferences", command=self._preferences)
         self.menubar.add_command(label="Detect Subtitles", command=self._run_sub_detection, state="disabled")
-        self.menubar.add_command(label="Hide Non-SubArea", command=self._hide_non_subarea)
+        self.menubar.add_command(label="Hide Non-SubArea", command=self._hide_non_subarea, state="disabled")
 
         # Add menu items to file menu.
         self.menu_file.add_command(label="Open file(s)", command=self._open_files)
@@ -302,6 +302,48 @@ class SubtitleExtractorGUI:
             rect_coords = tuple(self.canvas.coords(self.subtitle_rect))  # Get the coordinates of the rectangle.
             self._set_current_sub_area(rect_coords)  # Set new sub area with coordinates of the rectangle.
 
+    def current_non_subarea(self) -> tuple:
+        """
+        The area of the current video that usually doesn't have subtitles.
+        """
+        bottom_right_height = int(self.current_frame_height * utils.Config.subarea_height_scaler)
+        x1, y1, x2, y2 = 0, 0, self.current_frame_width, bottom_right_height
+        return x1, y1, x2, y2
+
+    def _hide_non_subarea(self) -> None:
+        """
+        Create a rectangle that hides the non subtitle area.
+        """
+        if self.non_subarea_rect is None:
+            logger.debug("Rectangle for non subtitle area created.")
+            x1, y1, x2, y2 = self.rescale(subtitle_area=self.current_non_subarea())
+            self.non_subarea_rect = self.canvas.create_rectangle(x1, y1, x2, y2, fill="black")
+        self.menubar.entryconfig(3, label="Show Non-SubArea", command=self._show_non_subarea)  # Change button config.
+
+    def _show_non_subarea(self) -> None:
+        """
+        Delete the rectangle covering the non subtitle area.
+        """
+        logger.debug("Rectangle for non subtitle area deleted.")
+        self.canvas.delete(self.non_subarea_rect)
+        self.non_subarea_rect = None
+        self.menubar.entryconfig(3, label="Hide Non-SubArea", command=self._hide_non_subarea)
+
+    def _set_current_non_subarea(self) -> None:
+        """
+        Resize the non subtitle area to match the current video.
+        """
+        if self.non_subarea_rect:
+            # Rescale (down scale) and redraw the rectangle at the coordinates of current non subtitle area.
+            self.canvas.coords(self.non_subarea_rect, self.rescale(subtitle_area=self.current_non_subarea()))
+
+    def _elevate_non_subarea(self) -> None:
+        """
+        Raise the non subtitle rectangle to the top of the canvas. Prevents rectangle from being hidden.
+        """
+        if self.non_subarea_rect:
+            self.canvas.tag_raise(self.non_subarea_rect)
+
     def _draw_current_subtitle_area(self, border_width: int = 4, color: str = "green") -> None:
         """
         Draw subtitle on video frame. x1, y1 = top left corner and x2, y2 = bottom right corner.
@@ -342,6 +384,7 @@ class SubtitleExtractorGUI:
         current_time = self.sub_ex.timecode(current_duration).replace(",", ":")
         self.current_scale_value.configure(text=current_time)
         self._display_video_frame(scale_value)
+        self._elevate_non_subarea()
         self._draw_current_subtitle_area()
 
     def _set_frame_slider(self) -> None:
@@ -424,6 +467,7 @@ class SubtitleExtractorGUI:
         self._set_canvas()
         self._set_frame_slider()
         self._display_video_frame()
+        self._set_current_non_subarea()
         self._draw_current_subtitle_area()
         self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
@@ -636,6 +680,7 @@ class SubtitleExtractorGUI:
 
         if process_name in ("extraction", "opening"):
             self.menubar.entryconfig(2, state=state)  # Detect button.
+            self.menubar.entryconfig(3, state=state)  # Hide Non-SubArea button.
             self.video_scale.configure(state=state)
 
     def _on_closing(self) -> None:
