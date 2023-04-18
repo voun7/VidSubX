@@ -378,7 +378,7 @@ class SubtitleExtractor:
         self._save_subtitle(subtitles)
         logger.info("Subtitle generated!")
 
-    def run_sub_extraction(self, video_path: str, sub_area: tuple = None) -> None:
+    def run_extraction(self, video_path: str, sub_area: tuple = None) -> None:
         """
         Run through the steps of extracting texts from subtitle area in video to create subtitle.
         """
@@ -420,5 +420,5 @@ if __name__ == '__main__':
     logger.debug("\n\nMain program Started.")
     test_video = Path(r"")
     se = SubtitleExtractor()
-    se.run_sub_extraction(str(test_video))
+    se.run_extraction(str(test_video))
     logger.debug("Main program Ended.\n\n")
