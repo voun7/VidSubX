@@ -418,7 +418,8 @@ class SubtitleExtractor:
 if __name__ == '__main__':
     get_logger()
     logger.debug("\n\nMain program Started.")
-    test_video = Path(r"")
+    test_video = r""
+    test_sub_area = SubtitleDetector(test_video).get_sub_area()
     se = SubtitleExtractor()
-    se.run_extraction(str(test_video))
+    se.run_extraction(test_video, test_sub_area)
     logger.debug("Main program Ended.\n\n")
