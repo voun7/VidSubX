@@ -227,8 +227,7 @@ class SubtitleExtractorGUI:
         """
         Method to rescale any frame, subtitle area and resolution.
         """
-        if not scale:
-            scale = self._get_scale_value()
+        scale = scale or self._get_scale_value()
 
         if frame is not None:
             height = int(frame.shape[0] * scale)
