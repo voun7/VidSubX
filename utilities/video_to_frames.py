@@ -21,7 +21,7 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
     :return: count of images saved
     """
 
-    capture = cv.VideoCapture(str(video_path))  # open the video using OpenCV
+    capture = cv.VideoCapture(video_path)  # open the video using OpenCV
 
     if start < 0:  # if start isn't specified lets assume 0
         start = 0
@@ -64,8 +64,8 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
 
 def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None) -> None:
     """
-    Extracts the frames from a video using multiprocessing
-    :param video_path: path to the video
+    Extracts the frames from a video using multiprocessing.
+    :param video_path: path like string to the video
     :param frames_dir: directory to save the frames
     :param key_area: coordinates of the frame containing subtitle
     :return: path to the directory where the frames were saved, or None if fails
@@ -81,7 +81,7 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None) -
 
     logger.info("Starting to extracting video keyframes...")
 
-    capture = cv.VideoCapture(str(video_path))  # load the video
+    capture = cv.VideoCapture(video_path)  # load the video
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
 
