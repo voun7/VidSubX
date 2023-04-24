@@ -677,6 +677,7 @@ class SubtitleExtractorGUI:
 
         if process_name in ("detection", "opening"):
             self.run_button.configure(state=state)
+            self.video_scale.configure(state=state)
 
         if process_name in ("extraction", "opening"):
             self.menubar.entryconfig(2, state=state)  # Detect button.
