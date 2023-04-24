@@ -62,10 +62,11 @@ class SubtitleDetector:
         # Part of the video to look for subtitles.
         if self.search_area is None:
             logger.info("Default sub area is being used as search area")
-            self.search_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
-
+            search_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
+        else:
+            search_area = self.search_area
         for frames in frame_chunks:
-            extract_frames(self.video_file, self.frame_output, self.search_area, frames[0], frames[1], int(self.fps))
+            extract_frames(self.video_file, self.frame_output, search_area, frames[0], frames[1], int(self.fps))
 
     def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
@@ -122,7 +123,7 @@ class SubtitleDetector:
 
     def get_sub_area(self) -> tuple | None:
         """
-        Using the default subtitle area, a more accurate area containing the subtitle in the video is returned.
+        A more accurate area containing the subtitle in the video is returned.
         """
         video_path = Path(self.video_file)
         new_sub_area = None
@@ -144,7 +145,7 @@ class SubtitleDetector:
             new_sub_area = top_left[0], top_left[1], bottom_right[0], bottom_right[1]
 
         logger.info(f"New sub area = {new_sub_area}\n")
-        self._empty_cache()
+        # self._empty_cache()
         return new_sub_area
 
 
