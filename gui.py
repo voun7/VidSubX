@@ -822,6 +822,14 @@ class PreferencesUI(tk.Toplevel):
             width=self.entry_size
         ).grid(column=1, row=4)
 
+        self.use_search_area = tk.BooleanVar(value=utils.Config.use_search_area)
+        self.use_search_area.trace_add("write", self._set_reset_button)
+        ttk.Checkbutton(
+            subtitle_detection_frame,
+            text='Use Default Search Area',
+            variable=self.use_search_area
+        ).grid(column=0, row=5)
+
     def _frame_extraction_tab(self) -> None:
         """
         Creates widgets in the Frame extraction preferences tab frame.
@@ -986,6 +994,7 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_no_of_frames,
             utils.Config.default_sub_area_x_padding,
             utils.Config.default_sub_area_y_padding,
+            utils.Config.default_use_search_area,
             utils.Config.default_win_notify_sound,
             utils.Config.default_win_notify_loop_sound
         )
@@ -1003,6 +1012,7 @@ class PreferencesUI(tk.Toplevel):
                 self.no_of_frames.get(),
                 self.sub_area_x_padding.get(),
                 self.sub_area_y_padding.get(),
+                self.use_search_area.get(),
                 self.win_notify_sound.get(),
                 self.win_notify_loop_sound.get()
             )
@@ -1040,6 +1050,7 @@ class PreferencesUI(tk.Toplevel):
         self.no_of_frames.set(utils.Config.default_no_of_frames)
         self.sub_area_x_padding.set(utils.Config.default_sub_area_x_padding)
         self.sub_area_y_padding.set(utils.Config.default_sub_area_y_padding)
+        self.use_search_area.set(utils.Config.default_use_search_area)
         # Notification settings.
         self.win_notify_sound.set(utils.Config.default_win_notify_sound)
         self.win_notify_loop_sound.set(utils.Config.default_win_notify_loop_sound)
@@ -1065,6 +1076,7 @@ class PreferencesUI(tk.Toplevel):
                 no_of_frames=self.no_of_frames.get(),
                 sub_area_x_padding=self.sub_area_x_padding.get(),
                 sub_area_y_padding=self.sub_area_y_padding.get(),
+                use_search_area=self.use_search_area.get(),
                 # Notification settings.
                 win_notify_sound=self.win_notify_sound.get(),
                 win_notify_loop_sound=self.win_notify_loop_sound.get()
