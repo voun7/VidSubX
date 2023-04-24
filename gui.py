@@ -569,7 +569,7 @@ class SubtitleExtractorGUI:
             toast.set_audio(sound, loop=utils.Config.win_notify_loop_sound)
             toast.show()
 
-    def detect_subtitles(self) -> None:
+    def _detect_subtitles(self) -> None:
         """
         Detect sub area of videos in the queue and set as new sub area.
         """
@@ -588,7 +588,8 @@ class SubtitleExtractorGUI:
             self.video_queue[video] = new_sub_area
         self.thread_running = False
         self._stop_sub_detection_process()
-        self._set_video(self._video_indexer()[0])
+        self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]]
+        self._draw_current_subtitle_area()
         end = time.perf_counter()
         completion_message = f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s"
         self.send_notification("Subtitle Detection Completed!", completion_message)
@@ -611,7 +612,7 @@ class SubtitleExtractorGUI:
         utils.Process.start_process()
         self._set_run_state("disabled", "detection")
         self.menubar.entryconfig(2, label="Stop Sub Detection", command=self._stop_sub_detection_process)
-        Thread(target=self.detect_subtitles, daemon=True).start()
+        Thread(target=self._detect_subtitles, daemon=True).start()
 
     def extract_subtitles(self) -> None:
         """
@@ -678,7 +679,6 @@ class SubtitleExtractorGUI:
 
         if process_name in ("detection", "opening"):
             self.run_button.configure(state=state)
-            self.video_scale.configure(state=state)
 
         if process_name in ("extraction", "opening"):
             self.menubar.entryconfig(2, state=state)  # Detect button.
