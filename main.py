@@ -16,8 +16,14 @@ logger = logging.getLogger(__name__)
 
 
 class SubtitleDetector:
-    def __init__(self, video_file: str) -> None:
+    def __init__(self, video_file: str, search_area: tuple = None) -> None:
+        """
+        Detect the subtitle position in a given video.
+        :param video_file: The path like string of the video file.
+        :param search_area: The area in the video to search for the subtitles.
+        """
         self.video_file = video_file
+        self.search_area = search_area
         self.sub_ex = SubtitleExtractor()
         self.fps, self.frame_total, self.frame_width, self.frame_height = self.sub_ex.video_details(self.video_file)
         # Create cache directory.
@@ -54,10 +60,12 @@ class SubtitleDetector:
             frame_chunks[-1][-1] = min(frame_chunks[-1][-1], relative_stop - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
         # Part of the video to look for subtitles.
-        default_subarea = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
+        if self.search_area is None:
+            logger.info("Default sub area is being used as search area")
+            self.search_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
 
         for frames in frame_chunks:
-            extract_frames(self.video_file, self.frame_output, default_subarea, frames[0], frames[1], int(self.fps))
+            extract_frames(self.video_file, self.frame_output, self.search_area, frames[0], frames[1], int(self.fps))
 
     def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
