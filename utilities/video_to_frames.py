@@ -9,7 +9,7 @@ import utilities.utils as utils
 logger = logging.getLogger(__name__)
 
 
-def extract_frames(video_path: Path | str, frames_dir: Path, key_area: tuple, start: int, end: int, every: int) -> int:
+def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, start: int, end: int, every: int) -> int:
     """
     Extract frames from a video using OpenCVs VideoCapture
     :param video_path: path of the video
@@ -62,7 +62,7 @@ def extract_frames(video_path: Path | str, frames_dir: Path, key_area: tuple, st
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: Path, frames_dir: Path, key_area: tuple) -> None:
+def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None) -> None:
     """
     Extracts the frames from a video using multiprocessing
     :param video_path: path to the video
