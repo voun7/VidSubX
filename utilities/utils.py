@@ -97,24 +97,24 @@ class Config:
         """
         Parse the values of the config file into memory.
         """
-        cls.frame_extraction_frequency = int(cls.config[cls.sections[0]][cls.keys[0]])
-        cls.frame_extraction_chunk_size = int(cls.config[cls.sections[0]][cls.keys[1]])
+        cls.frame_extraction_frequency = cls.config[cls.sections[0]].getint(cls.keys[0])
+        cls.frame_extraction_chunk_size = cls.config[cls.sections[0]].getint(cls.keys[1])
 
-        cls.text_extraction_chunk_size = int(cls.config[cls.sections[1]][cls.keys[2]])
-        cls.ocr_max_processes = int(cls.config[cls.sections[1]][cls.keys[3]])
+        cls.text_extraction_chunk_size = cls.config[cls.sections[1]].getint(cls.keys[2])
+        cls.ocr_max_processes = cls.config[cls.sections[1]].getint(cls.keys[3])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
 
-        cls.text_similarity_threshold = float(cls.config[cls.sections[2]][cls.keys[5]])
+        cls.text_similarity_threshold = cls.config[cls.sections[2]].getfloat(cls.keys[5])
 
-        cls.split_start = float(cls.config[cls.sections[3]][cls.keys[6]])
-        cls.split_stop = float(cls.config[cls.sections[3]][cls.keys[7]])
-        cls.no_of_frames = int(cls.config[cls.sections[3]][cls.keys[8]])
-        cls.sub_area_x_padding = float(cls.config[cls.sections[3]][cls.keys[9]])
-        cls.sub_area_y_padding = int(cls.config[cls.sections[3]][cls.keys[10]])
-        cls.use_search_area = cls.config[cls.sections[3]][cls.keys[11]]
+        cls.split_start = cls.config[cls.sections[3]].getfloat(cls.keys[6])
+        cls.split_stop = cls.config[cls.sections[3]].getfloat(cls.keys[7])
+        cls.no_of_frames = cls.config[cls.sections[3]].getint(cls.keys[8])
+        cls.sub_area_x_padding = cls.config[cls.sections[3]].getfloat(cls.keys[9])
+        cls.sub_area_y_padding = cls.config[cls.sections[3]].getint(cls.keys[10])
+        cls.use_search_area = cls.config[cls.sections[3]].getboolean(cls.keys[11])
 
         cls.win_notify_sound = cls.config[cls.sections[4]][cls.keys[12]]
-        cls.win_notify_loop_sound = cls.config[cls.sections[4]][cls.keys[13]]
+        cls.win_notify_loop_sound = cls.config[cls.sections[4]].getboolean(cls.keys[13])
 
     @classmethod
     def set_config(cls, **kwargs: int | float | str | bool) -> None:
