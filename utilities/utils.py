@@ -150,7 +150,7 @@ class Config:
         cls.sub_area_y_padding = kwargs.get(cls.keys[10], cls.sub_area_y_padding)
         cls.config[cls.sections[3]][cls.keys[10]] = str(cls.sub_area_y_padding)
         cls.use_search_area = kwargs.get(cls.keys[11], cls.use_search_area)
-        cls.config[cls.sections[3]][cls.keys[11]] = cls.use_search_area
+        cls.config[cls.sections[3]][cls.keys[11]] = str(cls.use_search_area)
 
         cls.win_notify_sound = kwargs.get(cls.keys[12], cls.win_notify_sound)
         cls.config[cls.sections[4]][cls.keys[12]] = cls.win_notify_sound
