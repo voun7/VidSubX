@@ -4,9 +4,9 @@ import platform
 import re
 import sys
 import time
+import tkinter as tk
 from pathlib import Path
 from threading import Thread
-from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 
@@ -68,7 +68,7 @@ class SubtitleExtractorGUI:
         self.root.title(self.window_title)
         self.root.iconbitmap(self.icon_file)
         # Do not allow window to be resizable.
-        self.root.resizable(FALSE, FALSE)
+        self.root.resizable(tk.FALSE, tk.FALSE)
 
         # Create window menu bar.
         self._menu_bar()
@@ -85,14 +85,14 @@ class SubtitleExtractorGUI:
 
     def _menu_bar(self) -> None:
         # Remove dashed lines that come default with tkinter menu bar.
-        self.root.option_add('*tearOff', FALSE)
+        self.root.option_add('*tearOff', tk.FALSE)
 
         # Create menu bar in root window.
-        self.menubar = Menu(self.root)
+        self.menubar = tk.Menu(self.root)
         self.root.config(menu=self.menubar)
 
         # Create menus for menu bar.
-        self.menu_file = Menu(self.menubar)
+        self.menu_file = tk.Menu(self.menubar)
 
         self.menubar.add_cascade(menu=self.menu_file, label="File")
         self.menubar.add_command(label="Preferences", command=self._preferences)
@@ -113,7 +113,7 @@ class SubtitleExtractorGUI:
 
         # Create canvas widget in video frame.
         # Border width and highlight thickness set to 0 to prevent hidden rectangle parts.
-        self.canvas = Canvas(video_frame, cursor="tcross", borderwidth=0, highlightthickness=0)
+        self.canvas = tk.Canvas(video_frame, cursor="tcross", borderwidth=0, highlightthickness=0)
         self.canvas.grid(column=0, row=0)
         self.canvas.bind("<Button-1>", self._on_click)
         self.canvas.bind("<B1-Motion>", self._on_motion)
@@ -122,7 +122,7 @@ class SubtitleExtractorGUI:
         video_work_frame = ttk.Frame(video_frame)
         video_work_frame.grid(column=0, row=1, sticky="W")
         self.video_scale = ttk.Scale(
-            video_work_frame, command=self._frame_slider, orient=HORIZONTAL, length=600, state="disabled"
+            video_work_frame, command=self._frame_slider, orient=tk.HORIZONTAL, length=600, state="disabled"
         )
         self.video_scale.grid(column=0, row=1, padx=60)
         # Show timecode of the video scale.
@@ -144,7 +144,7 @@ class SubtitleExtractorGUI:
         self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
         # Create progress bar widget for showing the text extraction progress.
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=HORIZONTAL, length=600, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=tk.HORIZONTAL, length=600, mode='determinate')
         self.progress_bar.grid(column=1, row=0, padx=10)
 
         # Create button widget for previous video in queue for subtitle area selection.
@@ -166,11 +166,11 @@ class SubtitleExtractorGUI:
         output_frame.grid(column=0, row=2, sticky="N, S, E, W")
 
         # Create text widget for showing the text extraction details in the output. Does not allow input from gui.
-        self.text_output_widget = Text(output_frame, height=12, state="disabled")
+        self.text_output_widget = tk.Text(output_frame, height=12, state="disabled")
         self.text_output_widget.grid(column=0, row=0, sticky="N, S, E, W")
 
         # Create scrollbar widget for text widget.
-        output_scroll = ttk.Scrollbar(output_frame, orient=VERTICAL, command=self.text_output_widget.yview)
+        output_scroll = ttk.Scrollbar(output_frame, orient=tk.VERTICAL, command=self.text_output_widget.yview)
         output_scroll.grid(column=1, row=0, sticky="N,S")
 
         # Connect text and scrollbar widgets.
@@ -268,7 +268,7 @@ class SubtitleExtractorGUI:
         self.current_sub_area = self.rescale(subtitle_area=new_subtitle_area, scale=scale)
         self.video_queue[f"{self.current_video}"] = self.current_sub_area  # Set new sub area.
 
-    def _on_click(self, event: Event) -> None:
+    def _on_click(self, event: tk.Event) -> None:
         """
         Fires when user clicks on the background ... binds to current rectangle.
         """
@@ -278,7 +278,7 @@ class SubtitleExtractorGUI:
             self.canvas.bind('<Button-1>', self._on_click_rectangle)
             self.canvas.bind('<B1-Motion>', self._on_motion)
 
-    def _on_click_rectangle(self, event: Event) -> None:
+    def _on_click_rectangle(self, event: tk.Event) -> None:
         """
         Fires when the user clicks on a rectangle ... edits the clicked on rectangle.
         """
@@ -290,7 +290,7 @@ class SubtitleExtractorGUI:
             y1, y2 = y2, y1
         self.mouse_start = x1, y1
 
-    def _on_motion(self, event: Event) -> None:
+    def _on_motion(self, event: tk.Event) -> None:
         """
         Fires when the user drags the mouse ... resizes currently active rectangle.
         """
@@ -370,7 +370,7 @@ class SubtitleExtractorGUI:
 
         img = Image.fromarray(frame_resized)
         photo = ImageTk.PhotoImage(image=img)
-        self.canvas.create_image(0, 0, image=photo, anchor=NW)
+        self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
         self.canvas.image = photo
 
     def _frame_slider(self, scale_value: str) -> None:
@@ -693,7 +693,7 @@ class SubtitleExtractorGUI:
             exit()
 
 
-class PreferencesUI(Toplevel):
+class PreferencesUI(tk.Toplevel):
     def __init__(self, icon_file: str) -> None:
         super().__init__()
         self.icon_file = icon_file
@@ -707,7 +707,7 @@ class PreferencesUI(Toplevel):
         """
         self.title("Preferences")
         self.iconbitmap(self.icon_file)
-        self.resizable(FALSE, FALSE)
+        self.resizable(tk.FALSE, tk.FALSE)
 
         # Create main frame that will contain notebook.
         main_frame = ttk.Frame(self, padding=(5, 5, 5, 5))
@@ -759,7 +759,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(subtitle_detection_frame, text="Split Start (Relative position):").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
-        self.split_start = DoubleVar(value=utils.Config.split_start)
+        self.split_start = tk.DoubleVar(value=utils.Config.split_start)
         self.split_start.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             subtitle_detection_frame,
@@ -771,7 +771,7 @@ class PreferencesUI(Toplevel):
         ).grid(column=1, row=0)
 
         ttk.Label(subtitle_detection_frame, text="Split Stop (Relative position):").grid(column=0, row=1)
-        self.split_stop = DoubleVar(value=utils.Config.split_stop)
+        self.split_stop = tk.DoubleVar(value=utils.Config.split_stop)
         self.split_stop.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             subtitle_detection_frame,
@@ -783,7 +783,7 @@ class PreferencesUI(Toplevel):
         ).grid(column=1, row=1)
 
         ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, pady=self.wgt_y_padding)
-        self.no_of_frames = IntVar(value=utils.Config.no_of_frames)
+        self.no_of_frames = tk.IntVar(value=utils.Config.no_of_frames)
         self.no_of_frames.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
@@ -795,7 +795,7 @@ class PreferencesUI(Toplevel):
         ).grid(column=1, row=2)
 
         ttk.Label(subtitle_detection_frame, text="X Axis Padding (Relative):").grid(column=0, row=3)
-        self.sub_area_x_padding = DoubleVar(value=utils.Config.sub_area_x_padding)
+        self.sub_area_x_padding = tk.DoubleVar(value=utils.Config.sub_area_x_padding)
         self.sub_area_x_padding.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             subtitle_detection_frame,
@@ -809,7 +809,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(subtitle_detection_frame, text="Y Axis Padding (Absolute):").grid(
             column=0, row=4, pady=self.wgt_y_padding
         )
-        self.sub_area_y_padding = IntVar(value=utils.Config.sub_area_y_padding)
+        self.sub_area_y_padding = tk.IntVar(value=utils.Config.sub_area_y_padding)
         self.sub_area_y_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
@@ -832,7 +832,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(frame_extraction_frame, text="Frame Extraction Frequency:").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
-        self.frame_extraction_frequency = IntVar(value=utils.Config.frame_extraction_frequency)
+        self.frame_extraction_frequency = tk.IntVar(value=utils.Config.frame_extraction_frequency)
         self.frame_extraction_frequency.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             frame_extraction_frame,
@@ -843,7 +843,7 @@ class PreferencesUI(Toplevel):
         ).grid(column=1, row=0)
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
-        self.frame_extraction_chunk_size = IntVar(value=utils.Config.frame_extraction_chunk_size)
+        self.frame_extraction_chunk_size = tk.IntVar(value=utils.Config.frame_extraction_chunk_size)
         self.frame_extraction_chunk_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
@@ -866,7 +866,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
-        self.text_extraction_chunk_size = IntVar(value=utils.Config.text_extraction_chunk_size)
+        self.text_extraction_chunk_size = tk.IntVar(value=utils.Config.text_extraction_chunk_size)
         self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
@@ -878,7 +878,7 @@ class PreferencesUI(Toplevel):
         ).grid(column=1, row=0)
 
         ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1)
-        self.ocr_max_processes = IntVar(value=utils.Config.ocr_max_processes)
+        self.ocr_max_processes = tk.IntVar(value=utils.Config.ocr_max_processes)
         self.ocr_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
@@ -891,7 +891,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(
             column=0, row=2, pady=self.wgt_y_padding
         )
-        self.ocr_rec_language = StringVar(value=utils.Config.ocr_rec_language)
+        self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
         languages = ["ch", "en", "ru", "fr", "it", "japan", "korean", "chinese_cht"]
         ttk.Combobox(
@@ -914,7 +914,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
-        self.text_similarity_threshold = DoubleVar(value=utils.Config.text_similarity_threshold)
+        self.text_similarity_threshold = tk.DoubleVar(value=utils.Config.text_similarity_threshold)
         self.text_similarity_threshold.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             subtitle_generator_frame,
@@ -933,8 +933,8 @@ class PreferencesUI(Toplevel):
         if operating_system == "Windows":
             self._win_notifications_tab()
         else:
-            self.win_notify_sound = StringVar(value=utils.Config.win_notify_sound)
-            self.win_notify_loop_sound = BooleanVar(value=utils.Config.win_notify_loop_sound)
+            self.win_notify_sound = tk.StringVar(value=utils.Config.win_notify_sound)
+            self.win_notify_loop_sound = tk.BooleanVar(value=utils.Config.win_notify_loop_sound)
 
     def _win_notifications_tab(self) -> None:
         """
@@ -948,7 +948,7 @@ class PreferencesUI(Toplevel):
         ttk.Label(notification_frame, text="Notification Sound:").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
-        self.win_notify_sound = StringVar(value=utils.Config.win_notify_sound)
+        self.win_notify_sound = tk.StringVar(value=utils.Config.win_notify_sound)
         self.win_notify_sound.trace_add("write", self._set_reset_button)
         ttk.Combobox(
             notification_frame,
@@ -958,7 +958,7 @@ class PreferencesUI(Toplevel):
             width=self.combobox_size
         ).grid(column=1, row=0)
 
-        self.win_notify_loop_sound = BooleanVar(value=utils.Config.win_notify_loop_sound)
+        self.win_notify_loop_sound = tk.BooleanVar(value=utils.Config.win_notify_loop_sound)
         self.win_notify_loop_sound.trace_add("write", self._set_reset_button)
         ttk.Checkbutton(
             notification_frame,
@@ -1004,7 +1004,7 @@ class PreferencesUI(Toplevel):
                 self.win_notify_sound.get(),
                 self.win_notify_loop_sound.get()
             )
-        except TclError:
+        except tk.TclError:
             values = None
 
         if default_values == values:
@@ -1067,7 +1067,7 @@ class PreferencesUI(Toplevel):
                 win_notify_sound=self.win_notify_sound.get(),
                 win_notify_loop_sound=self.win_notify_loop_sound.get()
             )
-        except TclError:
+        except tk.TclError:
             logger.warning("An error occurred value(s) not saved!")
         self.destroy()
 
@@ -1076,7 +1076,7 @@ if __name__ == '__main__':
     get_logger()
     logger.debug("\n\nGUI program Started.")
     set_dpi_scaling()
-    rt = Tk()
+    rt = tk.Tk()
     SubtitleExtractorGUI(rt)
     rt.mainloop()
     logger.debug("GUI program Ended.\n\n")
