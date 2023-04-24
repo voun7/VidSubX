@@ -575,14 +575,15 @@ class SubtitleExtractorGUI:
         """
         logger.info("Detecting subtitle area in video(s)...")
         start = time.perf_counter()
+        use_default = True
         self.thread_running = True
-        for video, sub_area in self.video_queue.items():
+        for video in self.video_queue.keys():
             if utils.Process.interrupt_process:
                 logger.warning("Process interrupted\n")
                 self.thread_running = False
                 self._stop_sub_detection_process()
                 return
-            sub_dt = SubtitleDetector(video, sub_area)
+            sub_dt = SubtitleDetector(video, use_default)
             new_sub_area = sub_dt.get_sub_area()
             self.video_queue[video] = new_sub_area
         self.thread_running = False

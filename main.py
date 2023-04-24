@@ -16,14 +16,15 @@ logger = logging.getLogger(__name__)
 
 
 class SubtitleDetector:
-    def __init__(self, video_file: str, search_area: tuple = None) -> None:
+    def __init__(self, video_file: str, default_search_area: bool) -> None:
         """
-        Detect the subtitle position in a given video.
+        Detect the subtitle position in a given video using a default sub area as search area.
         :param video_file: The path like string of the video file.
-        :param search_area: The area in the video to search for the subtitles.
+        :param default_search_area: Whether to use the default search area or
+        the full video images to search for sub position.
         """
         self.video_file = video_file
-        self.search_area = search_area
+        self.default_search_area = default_search_area
         self.sub_ex = SubtitleExtractor()
         self.fps, self.frame_total, self.frame_width, self.frame_height = self.sub_ex.video_details(self.video_file)
         # Create cache directory.
@@ -60,11 +61,11 @@ class SubtitleDetector:
             frame_chunks[-1][-1] = min(frame_chunks[-1][-1], relative_stop - 1)
         logger.debug(f"Frame chunks = {frame_chunks}")
         # Part of the video to look for subtitles.
-        if self.search_area is None:
-            logger.info("Default sub area is being used as search area")
+        if self.default_search_area:
+            logger.info("Default sub area is being used as search area.")
             search_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
         else:
-            search_area = self.search_area
+            search_area = None
         for frames in frame_chunks:
             extract_frames(self.video_file, self.frame_output, search_area, frames[0], frames[1], int(self.fps))
 
@@ -86,10 +87,13 @@ class SubtitleDetector:
         """
         Reposition the sub area that was changed when using the default subtitle area to detect texts bbox.
         """
-        y = int(self.frame_height * utils.Config.subarea_height_scaler)
-        top_left = top_left[0], top_left[1] + y
-        bottom_right = bottom_right[0], bottom_right[1] + y
-        return top_left, bottom_right
+        if self.default_search_area:
+            y = int(self.frame_height * utils.Config.subarea_height_scaler)
+            top_left = top_left[0], top_left[1] + y
+            bottom_right = bottom_right[0], bottom_right[1] + y
+            return top_left, bottom_right
+        else:
+            return top_left, bottom_right
 
     def _empty_cache(self) -> None:
         """
@@ -145,7 +149,7 @@ class SubtitleDetector:
             new_sub_area = top_left[0], top_left[1], bottom_right[0], bottom_right[1]
 
         logger.info(f"New sub area = {new_sub_area}\n")
-        # self._empty_cache()
+        self._empty_cache()
         return new_sub_area
 
 
@@ -428,7 +432,7 @@ if __name__ == '__main__':
     get_logger()
     logger.debug("\n\nMain program Started.")
     test_video = r""
-    test_sub_area = SubtitleDetector(test_video).get_sub_area()
+    test_sub_area = SubtitleDetector(test_video, True).get_sub_area()
     se = SubtitleExtractor()
     se.run_extraction(test_video, test_sub_area)
     logger.debug("Main program Ended.\n\n")
