@@ -1025,11 +1025,30 @@ class PreferencesUI(tk.Toplevel):
             self.reset_button.configure(state="normal")
 
     @staticmethod
-    def _check_integer(new_val: str) -> bool:
+    def _check_integer(entry_value: str) -> bool:
         """
         Check if the value entered into the entry widget is valid.
         """
-        return new_val.isnumeric() or new_val == ""
+        if entry_value == "":
+            return True
+        try:
+            int(entry_value)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def _check_float(entry_value: str) -> bool:
+        """
+        Check if the value entered into the entry widget is valid.
+        """
+        if entry_value == "":
+            return True
+        try:
+            float(entry_value)
+            return True
+        except ValueError:
+            return False
 
     def _reset_settings(self) -> None:
         """
