@@ -321,17 +321,41 @@ class SubtitleExtractor:
 
                 starting_file = file_text = file_duration = None
 
-    def _remove_short_duration_subs(self, divider: str, minimum_duration: int = 150) -> None:
+    @staticmethod
+    def delete_files(file_paths: set) -> None:
+        for file_path in file_paths:
+            try:
+                Path(file_path).unlink()
+                # print(f"Deleted file: {file_path}")
+            except OSError as error:
+                logger.error(f"Error deleting file: {file_path} - {error}")
+
+    def _remove_short_duration_subs(self, divider: str) -> None:
         """
         Deletes file that contain subtitles that have durations that are shorter than the minimum duration.
         :param divider: String in file name that separates the time stamps.
-        :param minimum_duration: Minimum allowed time in milliseconds.
         """
-        for file in self.text_output.iterdir():
-            duration = self._name_to_duration(file.stem, divider)
-            if duration <= minimum_duration:
-                # print(f"Deleting short duration found. \nFile name: {file.name}, \nDuration: {duration}\n")
-                file.unlink()
+        min_sub_duration = 1000  # Minimum allowed time in milliseconds.
+        max_consecutive_short_durs = 4  # Maximum allowed number of short durations in a row.
+        counter, short_dur_files, no_of_files = 1, set(), len(list(self.text_output.iterdir()))
+        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
+            file1_duration = self._name_to_duration(file1.stem, divider)
+            file2_duration = self._name_to_duration(file2.stem, divider)
+            counter += 1
+            # print(f"File 1 Name: {file1.name}, Duration: {file1_duration}\n"
+            #       f"File 2 Name: {file2.name}, Duration: {file2_duration}")
+            if file1_duration < min_sub_duration and file2_duration < min_sub_duration and counter != no_of_files:
+                short_dur_files.add(file1)
+                short_dur_files.add(file2)
+            else:
+                if file2_duration < min_sub_duration:
+                    short_dur_files.add(file2)
+                if len(short_dur_files) >= max_consecutive_short_durs:
+                    self.delete_files(short_dur_files)
+                    # print(f"Deleting short durations found! Files ({len(short_dur_files)}) = {short_dur_files}\n")
+                    short_dur_files = set()
+                else:
+                    short_dur_files = set()
 
     @staticmethod
     def timecode(frame_no_in_milliseconds: float) -> str:
