@@ -935,6 +935,34 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
+        ttk.Label(subtitle_generator_frame, text="Minimum Sub duration (ms):").grid(
+            column=0, row=1, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
+        self.min_sub_duration = tk.DoubleVar(value=utils.Config.min_sub_duration)
+        self.min_sub_duration.trace_add("write", self._set_reset_button)
+        check_float = (self.register(self._check_float), '%P')
+        ttk.Entry(
+            subtitle_generator_frame,
+            textvariable=self.min_sub_duration,
+            validate='key',
+            validatecommand=check_float,
+            width=self.entry_size
+        ).grid(column=1, row=1)
+
+        ttk.Label(subtitle_generator_frame, text="Max Consecutive Short Durations:").grid(
+            column=0, row=2, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+        )
+        self.max_consecutive_short_durs = tk.IntVar(value=utils.Config.max_consecutive_short_durs)
+        self.max_consecutive_short_durs.trace_add("write", self._set_reset_button)
+        check_int = (self.register(self._check_integer), '%P')
+        ttk.Entry(
+            subtitle_generator_frame,
+            textvariable=self.max_consecutive_short_durs,
+            validate='key',
+            validatecommand=check_int,
+            width=self.entry_size
+        ).grid(column=1, row=2)
+
     def _notifications_tab(self) -> None:
         """
         Choose notification tab depending on platform os.
@@ -989,6 +1017,8 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_ocr_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_similarity_threshold,
+            utils.Config.default_min_sub_duration,
+            utils.Config.default_max_consecutive_short_durs,
             utils.Config.default_split_start,
             utils.Config.default_split_stop,
             utils.Config.default_no_of_frames,
@@ -1007,6 +1037,8 @@ class PreferencesUI(tk.Toplevel):
                 self.ocr_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_similarity_threshold.get(),
+                self.min_sub_duration.get(),
+                self.max_consecutive_short_durs.get(),
                 self.split_start.get(),
                 self.split_stop.get(),
                 self.no_of_frames.get(),
@@ -1063,6 +1095,8 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
+        self.min_sub_duration.set(utils.Config.min_sub_duration)
+        self.max_consecutive_short_durs.set(utils.Config.max_consecutive_short_durs)
         # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)
         self.split_stop.set(utils.Config.default_split_stop)
@@ -1089,6 +1123,8 @@ class PreferencesUI(tk.Toplevel):
                 ocr_rec_language=self.ocr_rec_language.get(),
                 # Subtitle generator settings.
                 text_similarity_threshold=self.text_similarity_threshold.get(),
+                min_sub_duration=self.min_sub_duration.get(),
+                max_consecutive_short_durs=self.max_consecutive_short_durs.get(),
                 # Subtitle detection settings.
                 split_start=self.split_start.get(),
                 split_stop=self.split_stop.get(),
