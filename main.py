@@ -259,7 +259,7 @@ class SubtitleExtractor:
     @staticmethod
     def _name_to_duration(name: str, divider: str) -> float:
         """
-        Takes a name with two numbers and subtracts to get the duration.
+        Takes a name with two numbers and subtracts to get the duration in milliseconds.
         :param name: Name numbers should seperated by identifier.
         :param divider: Value for splitting string.
         :return: Duration
