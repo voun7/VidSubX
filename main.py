@@ -332,7 +332,8 @@ class SubtitleExtractor:
 
     def _remove_short_duration_subs(self, divider: str) -> None:
         """
-        Deletes file that contain subtitles that have durations that are shorter than the minimum duration.
+        Deletes files that contain subtitles that have durations that are shorter than the minimum duration
+        in consecutive rows.
         :param divider: String in file name that separates the time stamps.
         """
         # Minimum allowed time in milliseconds.
