@@ -335,8 +335,11 @@ class SubtitleExtractor:
         Deletes file that contain subtitles that have durations that are shorter than the minimum duration.
         :param divider: String in file name that separates the time stamps.
         """
-        min_sub_duration = 1000  # Minimum allowed time in milliseconds.
-        max_consecutive_short_durs = 4  # Maximum allowed number of short durations in a row.
+        # Minimum allowed time in milliseconds.
+        min_sub_duration = utils.Config.min_sub_duration
+        # Maximum allowed number of short durations in a row.
+        max_consecutive_short_durs = utils.Config.max_consecutive_short_durs
+
         counter, short_dur_files, no_of_files = 1, set(), len(list(self.text_output.iterdir()))
         for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
             file1_duration = self._name_to_duration(file1.stem, divider)
