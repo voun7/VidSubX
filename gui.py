@@ -935,9 +935,7 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(subtitle_generator_frame, text="Minimum Sub duration (ms):").grid(
-            column=0, row=1, padx=self.wgt_x_padding, pady=self.wgt_y_padding
-        )
+        ttk.Label(subtitle_generator_frame, text="Minimum Sub duration (ms):").grid(column=0, row=1)
         self.min_sub_duration = tk.DoubleVar(value=utils.Config.min_sub_duration)
         self.min_sub_duration.trace_add("write", self._set_reset_button)
         check_float = (self.register(self._check_float), '%P')
@@ -950,7 +948,7 @@ class PreferencesUI(tk.Toplevel):
         ).grid(column=1, row=1)
 
         ttk.Label(subtitle_generator_frame, text="Max Consecutive Short Durations:").grid(
-            column=0, row=2, padx=self.wgt_x_padding, pady=self.wgt_y_padding
+            column=0, row=2, pady=self.wgt_y_padding
         )
         self.max_consecutive_short_durs = tk.IntVar(value=utils.Config.max_consecutive_short_durs)
         self.max_consecutive_short_durs.trace_add("write", self._set_reset_button)
