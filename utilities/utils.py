@@ -48,7 +48,7 @@ class Config:
     default_ocr_rec_language = "ch"
 
     default_text_similarity_threshold = 0.65
-    default_min_sub_duration = 1000.0
+    default_min_sub_duration = 700.0
     default_max_consecutive_short_durs = 4
 
     default_split_start = 0.25
