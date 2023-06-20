@@ -1093,8 +1093,8 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
-        self.min_sub_duration.set(utils.Config.min_sub_duration)
-        self.max_consecutive_short_durs.set(utils.Config.max_consecutive_short_durs)
+        self.min_sub_duration.set(utils.Config.default_min_sub_duration)
+        self.max_consecutive_short_durs.set(utils.Config.default_max_consecutive_short_durs)
         # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)
         self.split_stop.set(utils.Config.default_split_stop)
