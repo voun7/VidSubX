@@ -58,7 +58,7 @@ class SubtitleDetector:
             frame_chunks = [frame_chunks[0], frame_chunks[middle_chunk], frame_chunks[-1]]
         last_frame_chunk = frame_chunks[-1][-1]
         if last_frame_chunk > self.frame_total:
-            frame_chunks[-1][-1] = min(frame_chunks[-1][-1], relative_stop - 1)
+            frame_chunks[-1][-1] = relative_stop
         logger.debug(f"Frame chunks = {frame_chunks}")
         # Part of the video to look for subtitles.
         if self.use_search_area:
