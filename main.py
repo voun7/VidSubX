@@ -418,7 +418,8 @@ class SubtitleExtractor:
         self._save_subtitle(subtitles)
         logger.info("Subtitle generated!")
 
-    def run_extraction(self, video_path: str, sub_area: tuple = None) -> None:
+    def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
+                       stop_frame: int = None) -> None:
         """
         Run through the steps of extracting texts from subtitle area in video to create subtitle.
         """
@@ -443,8 +444,9 @@ class SubtitleExtractor:
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
         logger.info(f"Subtitle Area: {sub_area}")
+        logger.info(f"Start Frame: {start_frame}, Stop Frame: {stop_frame}")
 
-        video_to_frames(video_path, self.frame_output, sub_area)
+        video_to_frames(video_path, self.frame_output, sub_area, start_frame, stop_frame)
         frames_to_text(self.frame_output, self.text_output)
         self._generate_subtitle()
 

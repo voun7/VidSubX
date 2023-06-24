@@ -98,6 +98,9 @@ class SubtitleExtractorGUI:
         self.menubar.add_command(label="Preferences", command=self._preferences)
         self.menubar.add_command(label="Detect Subtitles", command=self._run_sub_detection, state="disabled")
         self.menubar.add_command(label="Hide Non-SubArea", command=self._hide_non_subarea, state="disabled")
+        self.menubar.add_command(label="||", state="disabled")
+        self.menubar.add_command(label="Set Start Frame", command=self._set_current_start_frame, state="disabled")
+        self.menubar.add_command(label="Set Stop Frame", command=self._set_current_stop_frame, state="disabled")
 
         # Add menu items to file menu.
         self.menu_file.add_command(label="Open file(s)", command=self._open_files)
@@ -266,7 +269,7 @@ class SubtitleExtractorGUI:
         # Get the relative scale (up scale) for the subtitle area.
         scale = self.current_frame_height / int(self.canvas['height'])
         self.current_sub_area = self.rescale(subtitle_area=new_subtitle_area, scale=scale)
-        self.video_queue[f"{self.current_video}"] = self.current_sub_area  # Set new sub area.
+        self.video_queue[f"{self.current_video}"][0] = self.current_sub_area  # Set new sub area.
 
     def _on_click(self, event: tk.Event) -> None:
         """
@@ -400,6 +403,30 @@ class SubtitleExtractorGUI:
         self.current_scale_value.configure(text="00:00:00:000")
         self.total_scale_value.configure(text=f"/ {total_time}")
 
+    def _set_current_start_frame(self) -> None:
+        """
+        Sets the point where frame extraction will start for subtitles.
+        """
+        logger.debug("Setting start frame.")
+        current_frame = self.video_scale.get()
+        stop_frame = self.video_queue[f"{self.current_video}"][2]
+        if stop_frame and current_frame >= stop_frame:
+            logger.error("Start frame must be before stop frame!")
+            return
+        self.video_queue[f"{self.current_video}"][1] = current_frame
+
+    def _set_current_stop_frame(self) -> None:
+        """
+        Sets the point where frame extraction will stop for subtitles.
+        """
+        logger.debug("Setting stop frame.")
+        current_frame = self.video_scale.get()
+        start_frame = self.video_queue[f"{self.current_video}"][1]
+        if start_frame and current_frame <= start_frame:
+            logger.error("Stop frame must be after start frame!")
+            return
+        self.video_queue[f"{self.current_video}"][2] = current_frame
+
     def _video_indexer(self) -> tuple:
         """
         Checks the index of the given video in the video queue dictionary using its key.
@@ -460,7 +487,7 @@ class SubtitleExtractorGUI:
             self.video_scale.configure(state="disabled")
             self._remove_video_from_queue(self.current_video)
             return
-        self.current_sub_area = list(self.video_queue.values())[video_index]
+        self.current_sub_area = list(self.video_queue.values())[video_index][0]
         self.current_fps, self.current_frame_total, self.current_frame_width, self.current_frame_height \
             = self.sub_ex.video_details(self.current_video)
         self.video_capture = cv.VideoCapture(self.current_video)
@@ -490,7 +517,7 @@ class SubtitleExtractorGUI:
             logger.info(f"Opened file: {Path(filename).name}")
             _, _, frame_width, frame_height = self.sub_ex.video_details(filename)
             default_subarea = self.sub_ex.default_sub_area(frame_width, frame_height)
-            self.video_queue[filename] = default_subarea
+            self.video_queue[filename] = [default_subarea, None, None]
         self.thread_running = False
         logger.info("All video(s) opened!\n")
         self._set_run_state("normal", "opening")
@@ -585,10 +612,10 @@ class SubtitleExtractorGUI:
                 return
             sub_dt = SubtitleDetector(video, use_search_area)
             new_sub_area = sub_dt.get_sub_area()
-            self.video_queue[video] = new_sub_area
+            self.video_queue[video][0] = new_sub_area
         self.thread_running = False
         self._stop_sub_detection_process()
-        self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]]
+        self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]][0]
         self._draw_current_subtitle_area()
         end = time.perf_counter()
         completion_message = f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s"
@@ -623,13 +650,16 @@ class SubtitleExtractorGUI:
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}\n")
         self.thread_running = True
-        for video, sub_area in self.video_queue.items():
+        for video, sub_info in self.video_queue.items():
+            sub_area, start_frame, stop_frame = sub_info[0], sub_info[1], sub_info[2]
+            start_frame = int(start_frame) if start_frame else start_frame
+            stop_frame = int(stop_frame) if stop_frame else stop_frame
             if utils.Process.interrupt_process:
                 logger.warning("Process interrupted\n")
                 self.thread_running = False
                 self._stop_sub_extraction_process()
                 return
-            self.sub_ex.run_extraction(video, sub_area)
+            self.sub_ex.run_extraction(video, sub_area, start_frame, stop_frame)
             self.progress_bar['value'] += 1
             self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         self.thread_running = False
@@ -683,6 +713,8 @@ class SubtitleExtractorGUI:
         if process_name in ("extraction", "opening"):
             self.menubar.entryconfig(2, state=state)  # Detect button.
             self.menubar.entryconfig(3, state=state)  # Hide Non-SubArea button.
+            self.menubar.entryconfig(5, state=state)  # Set Start Frame button.
+            self.menubar.entryconfig(6, state=state)  # Set Stop Frame button.
             self.video_scale.configure(state=state)
 
     def _on_closing(self) -> None:

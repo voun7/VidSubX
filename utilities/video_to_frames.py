@@ -62,12 +62,15 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
     return saved_count  # and return the count of the images we saved
 
 
-def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None) -> None:
+def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, start_frame: int = None,
+                    stop_frame: int = None) -> None:
     """
     Extracts the frames from a video using multiprocessing.
     :param video_path: path like string to the video
     :param frames_dir: directory to save the frames
     :param key_area: coordinates of the frame containing subtitle
+    :param start_frame: The frame where image extractions from video starts.
+    :param stop_frame: The frame where image extractions from video stops.
     :return: path to the directory where the frames were saved, or None if fails
     """
     # extract every this many frames.
@@ -92,10 +95,12 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None) -
         logger.error("Video has no frames. Check your OpenCV installation")
         return  # end function call
 
+    start_frame = start_frame if start_frame else 0
+    stop_frame = stop_frame if stop_frame else frame_count
+
     # split the frames into chunk lists
-    frame_chunks = [[i, i + chunk_size] for i in range(0, frame_count, chunk_size)]
-    # make sure last chunk has correct end frame, also handles case chunk_size < total
-    frame_chunks[-1][-1] = min(frame_chunks[-1][-1], frame_count - 1)
+    frame_chunks = [[i, i + chunk_size] for i in range(start_frame, stop_frame, chunk_size)]
+    frame_chunks[-1][-1] = stop_frame  # make sure last chunk has correct end frame
     logger.debug(f"Frame chunks = {frame_chunks}")
 
     prefix = "Extracting frames from video chunks"  # a prefix string to be printed in progress bar
