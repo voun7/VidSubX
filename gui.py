@@ -968,7 +968,7 @@ class PreferencesUI(tk.Toplevel):
         ).grid(column=1, row=0)
 
         ttk.Label(subtitle_generator_frame, text="Minimum Sub duration (ms):").grid(column=0, row=1)
-        self.min_sub_duration = tk.DoubleVar(value=utils.Config.min_sub_duration)
+        self.min_sub_duration = tk.DoubleVar(value=utils.Config.min_sub_duration_ms)
         self.min_sub_duration.trace_add("write", self._set_reset_button)
         check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
@@ -1047,7 +1047,7 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_ocr_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_similarity_threshold,
-            utils.Config.default_min_sub_duration,
+            utils.Config.default_min_sub_duration_ms,
             utils.Config.default_max_consecutive_short_durs,
             utils.Config.default_split_start,
             utils.Config.default_split_stop,
@@ -1125,7 +1125,7 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
-        self.min_sub_duration.set(utils.Config.default_min_sub_duration)
+        self.min_sub_duration.set(utils.Config.default_min_sub_duration_ms)
         self.max_consecutive_short_durs.set(utils.Config.default_max_consecutive_short_durs)
         # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)

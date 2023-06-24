@@ -32,7 +32,7 @@ class Config:
 
     sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator", "Subtitle Detection", "Notification"]
     keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
-            "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "min_sub_duration",
+            "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "min_sub_duration_ms",
             "max_consecutive_short_durs", "split_start", "split_stop", "no_of_frames", "sub_area_x_padding",
             "sub_area_y_padding", "use_search_area", "win_notify_sound", "win_notify_loop_sound"]
 
@@ -48,7 +48,7 @@ class Config:
     default_ocr_rec_language = "ch"
 
     default_text_similarity_threshold = 0.65
-    default_min_sub_duration = 700.0
+    default_min_sub_duration_ms = 700.0
     default_max_consecutive_short_durs = 4
 
     default_split_start = 0.25
@@ -64,7 +64,7 @@ class Config:
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
     text_extraction_chunk_size = ocr_max_processes = ocr_rec_language = None
-    text_similarity_threshold = min_sub_duration = max_consecutive_short_durs = None
+    text_similarity_threshold = min_sub_duration_ms = max_consecutive_short_durs = None
     split_start = split_stop = no_of_frames = sub_area_x_padding = sub_area_y_padding = use_search_area = None
     win_notify_sound = win_notify_loop_sound = None
 
@@ -83,7 +83,7 @@ class Config:
                                          self.keys[3]: self.default_ocr_max_processes,
                                          self.keys[4]: self.default_ocr_rec_language}
         self.config[self.sections[2]] = {self.keys[5]: str(self.default_text_similarity_threshold),
-                                         self.keys[6]: self.default_min_sub_duration,
+                                         self.keys[6]: self.default_min_sub_duration_ms,
                                          self.keys[7]: self.default_max_consecutive_short_durs}
         self.config[self.sections[3]] = {self.keys[8]: str(self.default_split_start),
                                          self.keys[9]: self.default_split_stop,
@@ -109,7 +109,7 @@ class Config:
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
 
         cls.text_similarity_threshold = cls.config[cls.sections[2]].getfloat(cls.keys[5])
-        cls.min_sub_duration = cls.config[cls.sections[2]].getfloat(cls.keys[6])
+        cls.min_sub_duration_ms = cls.config[cls.sections[2]].getfloat(cls.keys[6])
         cls.max_consecutive_short_durs = cls.config[cls.sections[2]].getint(cls.keys[7])
 
         cls.split_start = cls.config[cls.sections[3]].getfloat(cls.keys[8])
@@ -144,8 +144,8 @@ class Config:
 
         cls.text_similarity_threshold = kwargs.get(cls.keys[5], cls.text_similarity_threshold)
         cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
-        cls.min_sub_duration = kwargs.get(cls.keys[6], cls.min_sub_duration)
-        cls.config[cls.sections[2]][cls.keys[6]] = str(cls.min_sub_duration)
+        cls.min_sub_duration_ms = kwargs.get(cls.keys[6], cls.min_sub_duration_ms)
+        cls.config[cls.sections[2]][cls.keys[6]] = str(cls.min_sub_duration_ms)
         cls.max_consecutive_short_durs = kwargs.get(cls.keys[7], cls.max_consecutive_short_durs)
         cls.config[cls.sections[2]][cls.keys[7]] = str(cls.max_consecutive_short_durs)
 

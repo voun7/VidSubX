@@ -337,7 +337,7 @@ class SubtitleExtractor:
         :param divider: String in file name that separates the time stamps.
         """
         # Minimum allowed time in milliseconds.
-        min_sub_duration = utils.Config.min_sub_duration
+        min_sub_duration = utils.Config.min_sub_duration_ms
         # Maximum allowed number of short durations in a row.
         max_consecutive_short_durs = utils.Config.max_consecutive_short_durs
 
