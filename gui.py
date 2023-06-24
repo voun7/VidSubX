@@ -382,7 +382,7 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
-        current_duration = (scale_value / self.current_fps) * 1000  # Duration of scale value in milliseconds.
+        current_duration = self.sub_ex.frame_no_to_ms(scale_value, self.current_fps)
         # Update timecode label as slider is moved.
         current_time = self.sub_ex.timecode(current_duration).replace(",", ":")
         self.current_scale_value.configure(text=current_time)
@@ -398,7 +398,7 @@ class SubtitleExtractorGUI:
         # Set the max size of the frame slider. Size reduced by 1 to prevent cv2.error when slider reaches end.
         self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total - 1, value=0)
         # Set the durations labels.
-        video_duration = ((self.current_frame_total / self.current_fps) * 1000)
+        video_duration = self.sub_ex.frame_no_to_ms(self.current_frame_total, self.current_fps)
         total_time = self.sub_ex.timecode(video_duration).replace(",", ":")
         self.current_scale_value.configure(text="00:00:00:000")
         self.total_scale_value.configure(text=f"/ {total_time}")
