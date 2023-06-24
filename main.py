@@ -352,6 +352,9 @@ class SubtitleExtractor:
                 short_dur_files.add(file1)
                 short_dur_files.add(file2)
             else:
+                # Incase only one of the files has a short sub and is the first or last file in the loop.
+                if file1_duration < min_sub_duration:
+                    short_dur_files.add(file1)
                 if file2_duration < min_sub_duration:
                     short_dur_files.add(file2)
                 if len(short_dur_files) >= max_consecutive_short_durs:
