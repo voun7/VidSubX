@@ -324,11 +324,7 @@ class SubtitleExtractor:
     @staticmethod
     def delete_files(file_paths: set) -> None:
         for file_path in file_paths:
-            try:
-                Path(file_path).unlink()
-                # print(f"Deleted file: {file_path}")
-            except OSError as error:
-                logger.error(f"Error deleting file: {file_path} - {error}")
+            Path(file_path).unlink(missing_ok=True)
 
     def _remove_short_duration_subs(self, divider: str) -> None:
         """
@@ -352,17 +348,12 @@ class SubtitleExtractor:
                 short_dur_files.add(file1)
                 short_dur_files.add(file2)
             else:
-                # Incase only one of the files has a short sub and is the first or last file in the loop.
-                if file1_duration < min_sub_duration:
-                    short_dur_files.add(file1)
                 if file2_duration < min_sub_duration:
                     short_dur_files.add(file2)
                 if len(short_dur_files) >= max_consecutive_short_durs:
                     self.delete_files(short_dur_files)
                     # print(f"Deleting short durations found! Files ({len(short_dur_files)}) = {short_dur_files}\n")
-                    short_dur_files = set()
-                else:
-                    short_dur_files = set()
+                short_dur_files = set()
 
     @staticmethod
     def timecode(frame_no_in_milliseconds: float) -> str:
