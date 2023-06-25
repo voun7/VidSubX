@@ -74,7 +74,7 @@ class SubtitleExtractorGUI:
         self._menu_bar()
 
         # Create main frame that will contain other frames.
-        self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 15))
+        self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 0))
         # Main frame's position in root window.
         self.main_frame.grid(column=0, row=0, sticky="N, S, E, W")
 
@@ -82,6 +82,9 @@ class SubtitleExtractorGUI:
         self._video_frame()
         self._work_frame()
         self._output_frame()
+
+        self.status_label = tk.Label(self.main_frame)
+        self.status_label.grid(column=0, row=3, sticky="E")
 
     def _menu_bar(self) -> None:
         # Remove dashed lines that come default with tkinter menu bar.
@@ -411,9 +414,12 @@ class SubtitleExtractorGUI:
         current_frame = self.video_scale.get()
         stop_frame = self.video_queue[f"{self.current_video}"][2]
         if stop_frame and current_frame >= stop_frame:
-            logger.error("Start frame must be before stop frame!")
+            self.status_label.configure(text="Start frame must be before stop frame!")
             return
         self.video_queue[f"{self.current_video}"][1] = current_frame
+        current_frame_ms = self.sub_ex.frame_no_to_ms(current_frame, self.current_fps)
+        current_frame_timecode = self.sub_ex.timecode(current_frame_ms).replace(",", ":")
+        self.status_label.configure(text=f"Start Frame set to {current_frame_timecode}")
 
     def _set_current_stop_frame(self) -> None:
         """
@@ -423,9 +429,12 @@ class SubtitleExtractorGUI:
         current_frame = self.video_scale.get()
         start_frame = self.video_queue[f"{self.current_video}"][1]
         if start_frame and current_frame <= start_frame:
-            logger.error("Stop frame must be after start frame!")
+            self.status_label.configure(text="Stop frame must be after start frame!")
             return
         self.video_queue[f"{self.current_video}"][2] = current_frame
+        current_frame_ms = self.sub_ex.frame_no_to_ms(current_frame, self.current_fps)
+        current_frame_timecode = self.sub_ex.timecode(current_frame_ms).replace(",", ":")
+        self.status_label.configure(text=f"Stop Frame set to {current_frame_timecode}")
 
     def _video_indexer(self) -> tuple:
         """
@@ -498,6 +507,7 @@ class SubtitleExtractorGUI:
         self._draw_current_subtitle_area()
         self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
+        self.status_label.configure(text='')
 
         if len(self.video_queue) > 1:
             self._set_batch_layout()
