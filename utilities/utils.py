@@ -33,8 +33,8 @@ class Config:
     sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator", "Subtitle Detection", "Notification"]
     keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
             "ocr_max_processes", "ocr_rec_language", "text_similarity_threshold", "min_sub_duration_ms",
-            "max_consecutive_short_durs", "split_start", "split_stop", "no_of_frames", "sub_area_x_padding",
-            "sub_area_y_padding", "use_search_area", "win_notify_sound", "win_notify_loop_sound"]
+            "max_consecutive_short_durs", "split_start", "split_stop", "no_of_frames", "sub_area_x_rel_padding",
+            "sub_area_y_abs_padding", "use_search_area", "win_notify_sound", "win_notify_loop_sound"]
 
     # Permanent values
     subarea_height_scaler = 0.75
@@ -54,8 +54,8 @@ class Config:
     default_split_start = 0.25
     default_split_stop = 0.5
     default_no_of_frames = 200
-    default_sub_area_x_padding = 0.85
-    default_sub_area_y_padding = 10
+    default_sub_area_x_rel_padding = 0.85
+    default_sub_area_y_abs_padding = 10
     default_use_search_area = True
 
     default_win_notify_sound = "Default"
@@ -65,7 +65,7 @@ class Config:
     frame_extraction_frequency = frame_extraction_chunk_size = None
     text_extraction_chunk_size = ocr_max_processes = ocr_rec_language = None
     text_similarity_threshold = min_sub_duration_ms = max_consecutive_short_durs = None
-    split_start = split_stop = no_of_frames = sub_area_x_padding = sub_area_y_padding = use_search_area = None
+    split_start = split_stop = no_of_frames = sub_area_x_rel_padding = sub_area_y_abs_padding = use_search_area = None
     win_notify_sound = win_notify_loop_sound = None
 
     def __init__(self) -> None:
@@ -88,8 +88,8 @@ class Config:
         self.config[self.sections[3]] = {self.keys[8]: str(self.default_split_start),
                                          self.keys[9]: self.default_split_stop,
                                          self.keys[10]: self.default_no_of_frames,
-                                         self.keys[11]: self.default_sub_area_x_padding,
-                                         self.keys[12]: self.default_sub_area_y_padding,
+                                         self.keys[11]: self.default_sub_area_x_rel_padding,
+                                         self.keys[12]: self.default_sub_area_y_abs_padding,
                                          self.keys[13]: self.default_use_search_area}
         self.config[self.sections[4]] = {self.keys[14]: self.default_win_notify_sound,
                                          self.keys[15]: self.default_win_notify_loop_sound}
@@ -115,8 +115,8 @@ class Config:
         cls.split_start = cls.config[cls.sections[3]].getfloat(cls.keys[8])
         cls.split_stop = cls.config[cls.sections[3]].getfloat(cls.keys[9])
         cls.no_of_frames = cls.config[cls.sections[3]].getint(cls.keys[10])
-        cls.sub_area_x_padding = cls.config[cls.sections[3]].getfloat(cls.keys[11])
-        cls.sub_area_y_padding = cls.config[cls.sections[3]].getint(cls.keys[12])
+        cls.sub_area_x_rel_padding = cls.config[cls.sections[3]].getfloat(cls.keys[11])
+        cls.sub_area_y_abs_padding = cls.config[cls.sections[3]].getint(cls.keys[12])
         cls.use_search_area = cls.config[cls.sections[3]].getboolean(cls.keys[13])
 
         cls.win_notify_sound = cls.config[cls.sections[4]][cls.keys[14]]
@@ -155,10 +155,10 @@ class Config:
         cls.config[cls.sections[3]][cls.keys[9]] = str(cls.split_stop)
         cls.no_of_frames = kwargs.get(cls.keys[10], cls.no_of_frames)
         cls.config[cls.sections[3]][cls.keys[10]] = str(cls.no_of_frames)
-        cls.sub_area_x_padding = kwargs.get(cls.keys[11], cls.sub_area_x_padding)
-        cls.config[cls.sections[3]][cls.keys[11]] = str(cls.sub_area_x_padding)
-        cls.sub_area_y_padding = kwargs.get(cls.keys[12], cls.sub_area_y_padding)
-        cls.config[cls.sections[3]][cls.keys[12]] = str(cls.sub_area_y_padding)
+        cls.sub_area_x_rel_padding = kwargs.get(cls.keys[11], cls.sub_area_x_rel_padding)
+        cls.config[cls.sections[3]][cls.keys[11]] = str(cls.sub_area_x_rel_padding)
+        cls.sub_area_y_abs_padding = kwargs.get(cls.keys[12], cls.sub_area_y_abs_padding)
+        cls.config[cls.sections[3]][cls.keys[12]] = str(cls.sub_area_y_abs_padding)
         cls.use_search_area = kwargs.get(cls.keys[13], cls.use_search_area)
         cls.config[cls.sections[3]][cls.keys[13]] = str(cls.use_search_area)
 

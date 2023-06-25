@@ -845,13 +845,13 @@ class PreferencesUI(tk.Toplevel):
         ).grid(column=1, row=2)
 
         ttk.Label(subtitle_detection_frame, text="X Axis Padding (Relative):").grid(column=0, row=3)
-        self.sub_area_x_padding = tk.DoubleVar(value=utils.Config.sub_area_x_padding)
-        self.sub_area_x_padding.trace_add("write", self._set_reset_button)
+        self.sub_area_x_rel_padding = tk.DoubleVar(value=utils.Config.sub_area_x_rel_padding)
+        self.sub_area_x_rel_padding.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             subtitle_detection_frame,
             from_=0.5, to=1.0,
             increment=0.01,
-            textvariable=self.sub_area_x_padding,
+            textvariable=self.sub_area_x_rel_padding,
             state="readonly",
             width=self.spinbox_size
         ).grid(column=1, row=3)
@@ -859,12 +859,12 @@ class PreferencesUI(tk.Toplevel):
         ttk.Label(subtitle_detection_frame, text="Y Axis Padding (Absolute):").grid(
             column=0, row=4, pady=self.wgt_y_padding
         )
-        self.sub_area_y_padding = tk.IntVar(value=utils.Config.sub_area_y_padding)
-        self.sub_area_y_padding.trace_add("write", self._set_reset_button)
+        self.sub_area_y_abs_padding = tk.IntVar(value=utils.Config.sub_area_y_abs_padding)
+        self.sub_area_y_abs_padding.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             subtitle_detection_frame,
-            textvariable=self.sub_area_y_padding,
+            textvariable=self.sub_area_y_abs_padding,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
@@ -984,12 +984,12 @@ class PreferencesUI(tk.Toplevel):
         ).grid(column=1, row=0)
 
         ttk.Label(subtitle_generator_frame, text="Minimum Sub duration (ms):").grid(column=0, row=1)
-        self.min_sub_duration = tk.DoubleVar(value=utils.Config.min_sub_duration_ms)
-        self.min_sub_duration.trace_add("write", self._set_reset_button)
+        self.min_sub_duration_ms = tk.DoubleVar(value=utils.Config.min_sub_duration_ms)
+        self.min_sub_duration_ms.trace_add("write", self._set_reset_button)
         check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
             subtitle_generator_frame,
-            textvariable=self.min_sub_duration,
+            textvariable=self.min_sub_duration_ms,
             validate='key',
             validatecommand=check_float,
             width=self.entry_size
@@ -1068,8 +1068,8 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_split_start,
             utils.Config.default_split_stop,
             utils.Config.default_no_of_frames,
-            utils.Config.default_sub_area_x_padding,
-            utils.Config.default_sub_area_y_padding,
+            utils.Config.default_sub_area_x_rel_padding,
+            utils.Config.default_sub_area_y_abs_padding,
             utils.Config.default_use_search_area,
             utils.Config.default_win_notify_sound,
             utils.Config.default_win_notify_loop_sound
@@ -1083,13 +1083,13 @@ class PreferencesUI(tk.Toplevel):
                 self.ocr_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_similarity_threshold.get(),
-                self.min_sub_duration.get(),
+                self.min_sub_duration_ms.get(),
                 self.max_consecutive_short_durs.get(),
                 self.split_start.get(),
                 self.split_stop.get(),
                 self.no_of_frames.get(),
-                self.sub_area_x_padding.get(),
-                self.sub_area_y_padding.get(),
+                self.sub_area_x_rel_padding.get(),
+                self.sub_area_y_abs_padding.get(),
                 self.use_search_area.get(),
                 self.win_notify_sound.get(),
                 self.win_notify_loop_sound.get()
@@ -1141,14 +1141,14 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
-        self.min_sub_duration.set(utils.Config.default_min_sub_duration_ms)
+        self.min_sub_duration_ms.set(utils.Config.default_min_sub_duration_ms)
         self.max_consecutive_short_durs.set(utils.Config.default_max_consecutive_short_durs)
         # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)
         self.split_stop.set(utils.Config.default_split_stop)
         self.no_of_frames.set(utils.Config.default_no_of_frames)
-        self.sub_area_x_padding.set(utils.Config.default_sub_area_x_padding)
-        self.sub_area_y_padding.set(utils.Config.default_sub_area_y_padding)
+        self.sub_area_x_rel_padding.set(utils.Config.default_sub_area_x_rel_padding)
+        self.sub_area_y_abs_padding.set(utils.Config.default_sub_area_y_abs_padding)
         self.use_search_area.set(utils.Config.default_use_search_area)
         # Notification settings.
         self.win_notify_sound.set(utils.Config.default_win_notify_sound)
@@ -1160,27 +1160,29 @@ class PreferencesUI(tk.Toplevel):
         """
         try:
             utils.Config.set_config(
-                # Frame extraction settings.
-                frame_extraction_frequency=self.frame_extraction_frequency.get(),
-                frame_extraction_chunk_size=self.frame_extraction_chunk_size.get(),
-                # Text extraction settings.
-                text_extraction_chunk_size=self.text_extraction_chunk_size.get(),
-                ocr_max_processes=self.ocr_max_processes.get(),
-                ocr_rec_language=self.ocr_rec_language.get(),
-                # Subtitle generator settings.
-                text_similarity_threshold=self.text_similarity_threshold.get(),
-                min_sub_duration=self.min_sub_duration.get(),
-                max_consecutive_short_durs=self.max_consecutive_short_durs.get(),
-                # Subtitle detection settings.
-                split_start=self.split_start.get(),
-                split_stop=self.split_stop.get(),
-                no_of_frames=self.no_of_frames.get(),
-                sub_area_x_padding=self.sub_area_x_padding.get(),
-                sub_area_y_padding=self.sub_area_y_padding.get(),
-                use_search_area=self.use_search_area.get(),
-                # Notification settings.
-                win_notify_sound=self.win_notify_sound.get(),
-                win_notify_loop_sound=self.win_notify_loop_sound.get()
+                **{
+                    # Frame extraction settings.
+                    utils.Config.keys[0]: self.frame_extraction_frequency.get(),
+                    utils.Config.keys[1]: self.frame_extraction_chunk_size.get(),
+                    # Text extraction settings.
+                    utils.Config.keys[2]: self.text_extraction_chunk_size.get(),
+                    utils.Config.keys[3]: self.ocr_max_processes.get(),
+                    utils.Config.keys[4]: self.ocr_rec_language.get(),
+                    # Subtitle generator settings.
+                    utils.Config.keys[5]: self.text_similarity_threshold.get(),
+                    utils.Config.keys[6]: self.min_sub_duration_ms.get(),
+                    utils.Config.keys[7]: self.max_consecutive_short_durs.get(),
+                    # Subtitle detection settings.
+                    utils.Config.keys[8]: self.split_start.get(),
+                    utils.Config.keys[9]: self.split_stop.get(),
+                    utils.Config.keys[10]: self.no_of_frames.get(),
+                    utils.Config.keys[11]: self.sub_area_x_rel_padding.get(),
+                    utils.Config.keys[12]: self.sub_area_y_abs_padding.get(),
+                    utils.Config.keys[13]: self.use_search_area.get(),
+                    # Notification settings.
+                    utils.Config.keys[14]: self.win_notify_sound.get(),
+                    utils.Config.keys[15]: self.win_notify_loop_sound.get()
+                }
             )
         except tk.TclError:
             logger.warning("An error occurred value(s) not saved!")
