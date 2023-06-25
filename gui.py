@@ -127,9 +127,8 @@ class SubtitleExtractorGUI:
         # Create frame slider widget in video frame and label to display value.
         video_work_frame = ttk.Frame(video_frame)
         video_work_frame.grid(column=0, row=1, sticky="W")
-        self.video_scale = ttk.Scale(
-            video_work_frame, command=self._frame_slider, orient=tk.HORIZONTAL, length=600, state="disabled"
-        )
+        self.video_scale = ttk.Scale(video_work_frame, command=self._frame_slider, orient=tk.HORIZONTAL, length=600,
+                                     state="disabled")
         self.video_scale.grid(column=0, row=1, padx=60)
         # Show timecode of the video scale.
         self.current_scale_value = ttk.Label(video_work_frame)
@@ -185,6 +184,16 @@ class SubtitleExtractorGUI:
         # Resize output frame if main frame is resized.
         output_frame.grid_columnconfigure(0, weight=1)
         output_frame.grid_rowconfigure(0, weight=1)
+
+    def bind_keys_to_scale(self) -> None:
+        """
+        Bind keyboard arrows to scale through root.
+        """
+        logger.debug("Binding keyboard keys")
+        self.root.bind("<Left>", lambda e: self.video_scale.set(self.video_scale.get() - self.current_fps))
+        self.root.bind("<Right>", lambda e: self.video_scale.set(self.video_scale.get() + self.current_fps))
+        self.root.bind("<Up>", lambda e: self.video_scale.set(self.video_scale.get() + self.current_fps * 15))
+        self.root.bind("<Down>", lambda e: self.video_scale.set(self.video_scale.get() - self.current_fps * 15))
 
     def _reset_batch_layout(self) -> None:
         """
@@ -403,6 +412,7 @@ class SubtitleExtractorGUI:
         total_time_duration = self.sub_ex.frame_no_to_duration(self.current_frame_total, self.current_fps)
         self.current_scale_value.configure(text="00:00:00:000")
         self.total_scale_value.configure(text=f"/ {total_time_duration}")
+        self.bind_keys_to_scale()
 
     def _set_current_start_frame(self) -> None:
         """
