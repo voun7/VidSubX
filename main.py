@@ -50,8 +50,8 @@ class SubtitleDetector:
         frame_chunks = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
         frame_chunks_len = len(frame_chunks)
         logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
-        start_duration = self.sub_ex.timecode(self.sub_ex.frame_no_to_ms(relative_start, self.fps)).replace(",", ":")
-        stop_duration = self.sub_ex.timecode(self.sub_ex.frame_no_to_ms(relative_stop, self.fps)).replace(",", ":")
+        start_duration = self.sub_ex.frame_no_to_duration(relative_start, self.fps)
+        stop_duration = self.sub_ex.frame_no_to_duration(relative_stop, self.fps)
         logger.info(f"Split Start = {start_duration}, Split Stop = {stop_duration}")
         if frame_chunks_len > 3:
             middle_chunk = int(frame_chunks_len / 2)
@@ -189,9 +189,13 @@ class SubtitleExtractor:
         x1, y1, x2, y2 = 0, int(frame_height * utils.Config.subarea_height_scaler), frame_width, frame_height
         return x1, y1, x2, y2
 
-    @staticmethod
-    def frame_no_to_ms(frame_no: float | int, fps: float | int) -> float:
-        return (frame_no / fps) * 1000
+    def frame_no_to_duration(self, frame_no: float | int, fps: float | int) -> str:
+        """
+        Covert frame number to milliseconds then to time code duration.
+        """
+        frame_no_to_ms = (frame_no / fps) * 1000
+        duration = self.timecode(frame_no_to_ms).replace(",", ":")
+        return duration
 
     def _empty_cache(self) -> None:
         """

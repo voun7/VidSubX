@@ -385,10 +385,9 @@ class SubtitleExtractorGUI:
         :param scale_value: current position of the slider.
         """
         scale_value = float(scale_value)
-        current_duration = self.sub_ex.frame_no_to_ms(scale_value, self.current_fps)
         # Update timecode label as slider is moved.
-        current_time = self.sub_ex.timecode(current_duration).replace(",", ":")
-        self.current_scale_value.configure(text=current_time)
+        current_duration = self.sub_ex.frame_no_to_duration(scale_value, self.current_fps)
+        self.current_scale_value.configure(text=current_duration)
         self._display_video_frame(scale_value)
         self._elevate_non_subarea()
         self._draw_current_subtitle_area()
@@ -401,10 +400,9 @@ class SubtitleExtractorGUI:
         # Set the max size of the frame slider. Size reduced by 1 to prevent cv2.error when slider reaches end.
         self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total - 1, value=0)
         # Set the durations labels.
-        video_duration = self.sub_ex.frame_no_to_ms(self.current_frame_total, self.current_fps)
-        total_time = self.sub_ex.timecode(video_duration).replace(",", ":")
+        total_time_duration = self.sub_ex.frame_no_to_duration(self.current_frame_total, self.current_fps)
         self.current_scale_value.configure(text="00:00:00:000")
-        self.total_scale_value.configure(text=f"/ {total_time}")
+        self.total_scale_value.configure(text=f"/ {total_time_duration}")
 
     def _set_current_start_frame(self) -> None:
         """
@@ -417,8 +415,7 @@ class SubtitleExtractorGUI:
             self.status_label.configure(text="Start frame must be before stop frame!")
             return
         self.video_queue[f"{self.current_video}"][1] = current_frame
-        current_frame_ms = self.sub_ex.frame_no_to_ms(current_frame, self.current_fps)
-        current_frame_timecode = self.sub_ex.timecode(current_frame_ms).replace(",", ":")
+        current_frame_timecode = self.sub_ex.frame_no_to_duration(current_frame, self.current_fps)
         self.status_label.configure(text=f"Start Frame set to {current_frame_timecode}")
 
     def _set_current_stop_frame(self) -> None:
@@ -432,8 +429,7 @@ class SubtitleExtractorGUI:
             self.status_label.configure(text="Stop frame must be after start frame!")
             return
         self.video_queue[f"{self.current_video}"][2] = current_frame
-        current_frame_ms = self.sub_ex.frame_no_to_ms(current_frame, self.current_fps)
-        current_frame_timecode = self.sub_ex.timecode(current_frame_ms).replace(",", ":")
+        current_frame_timecode = self.sub_ex.frame_no_to_duration(current_frame, self.current_fps)
         self.status_label.configure(text=f"Stop Frame set to {current_frame_timecode}")
 
     def _video_indexer(self) -> tuple:
