@@ -412,7 +412,7 @@ class SubtitleExtractorGUI:
         current_frame = self.video_scale.get()
         stop_frame = self.video_queue[f"{self.current_video}"][2]
         if stop_frame and current_frame >= stop_frame:
-            self.status_label.configure(text="Start frame must be before stop frame!")
+            self.status_label.configure(text="Start Frame must be before Stop Frame!")
             return
         self.video_queue[f"{self.current_video}"][1] = current_frame
         current_frame_timecode = self.sub_ex.frame_no_to_duration(current_frame, self.current_fps)
@@ -426,7 +426,7 @@ class SubtitleExtractorGUI:
         current_frame = self.video_scale.get()
         start_frame = self.video_queue[f"{self.current_video}"][1]
         if start_frame and current_frame <= start_frame:
-            self.status_label.configure(text="Stop frame must be after start frame!")
+            self.status_label.configure(text="Stop Frame must be after Start Frame!")
             return
         self.video_queue[f"{self.current_video}"][2] = current_frame
         current_frame_timecode = self.sub_ex.frame_no_to_duration(current_frame, self.current_fps)
