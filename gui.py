@@ -122,6 +122,7 @@ class SubtitleExtractorGUI:
         self.canvas = tk.Canvas(video_frame, cursor="tcross", borderwidth=0, highlightthickness=0)
         self.canvas.grid(column=0, row=0)
         self.canvas.bind("<Button-1>", self._on_click)  # Bind mouse click to canvas.
+        self.canvas.bind("<B1-Motion>", self._on_motion)
 
         # Create frame slider widget in video frame and label to display value.
         video_work_frame = ttk.Frame(video_frame)
@@ -290,7 +291,6 @@ class SubtitleExtractorGUI:
         if self.current_video and not self.thread_running:
             self.mouse_start = event.x, event.y
             self.canvas.bind('<Button-1>', self._on_click_rectangle)
-            self.canvas.bind('<B1-Motion>', self._on_motion)
 
     def _on_click_rectangle(self, event: tk.Event) -> None:
         """
