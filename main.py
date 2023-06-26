@@ -228,12 +228,10 @@ class SubtitleExtractor:
         :param divider: Characters for separating time durations in file name.
         """
         logger.debug("Merging adjacent equal texts")
-        no_of_files = len(list(self.text_output.iterdir()))
-        starting_file = None
+        starting_file, no_of_files = None, len(list(self.text_output.iterdir()))
         for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
                                                start=2):
-            file1_text = file1.read_text(encoding="utf-8")
-            file2_text = file2.read_text(encoding="utf-8")
+            file1_text, file2_text = file1.read_text(encoding="utf-8"), file2.read_text(encoding="utf-8")
             # print(index, no_of_files, file1.name, file2.name, file1_text, file2_text)
             if file1_text == file2_text and index != no_of_files:
                 if not starting_file:
