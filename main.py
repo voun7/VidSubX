@@ -205,9 +205,9 @@ class SubtitleExtractor:
             shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
 
-    def timecode_duration_sort(self, path: Path) -> float:
+    def timecode_sort(self, path: Path) -> float:
         """
-        Helps sort timecodes by turning the first value into a float.
+        Helps sort timecode durations by turning the first value into a float.
         """
         first_timecode = path.stem.split(self.div1)[0]
         return float(first_timecode)
