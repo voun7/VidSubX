@@ -415,7 +415,7 @@ class SubtitleExtractorGUI:
 
     def _set_current_start_frame(self) -> None:
         """
-        Sets the point where frame extraction will start for subtitles.
+        Sets the point where frame extraction will start for subtitles for current video.
         """
         logger.debug("Setting start frame.")
         current_frame = self.video_scale.get()
@@ -429,7 +429,7 @@ class SubtitleExtractorGUI:
 
     def _set_current_stop_frame(self) -> None:
         """
-        Sets the point where frame extraction will stop for subtitles.
+        Sets the point where frame extraction will stop for subtitles for current video.
         """
         logger.debug("Setting stop frame.")
         current_frame = self.video_scale.get()
@@ -443,7 +443,7 @@ class SubtitleExtractorGUI:
 
     def _video_indexer(self) -> tuple:
         """
-        Checks the index of the given video in the video queue dictionary using its key.
+        Checks the index of the current video in the video queue dictionary using its key.
         """
         index = list(self.video_queue).index(self.current_video)
         queue_len = len(self.video_queue)
@@ -519,7 +519,7 @@ class SubtitleExtractorGUI:
 
     def _set_opened_videos(self, filenames: tuple) -> None:
         """
-        Add all opened videos to a queue along with default subtitles.
+        Add all opened videos to a queue along with default values.
         """
         logger.info("Opening video(s)...")
         self.thread_running = True
