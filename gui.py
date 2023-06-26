@@ -536,7 +536,7 @@ class SubtitleExtractorGUI:
             self.video_queue[filename] = [default_subarea, None, None]
         self.thread_running = False
         logger.info("All video(s) opened!\n")
-        self._set_run_state("normal", "opening")
+        self._set_gui_state("normal", "opening")
         self._set_video()  # Set one of the opened videos to current video.
 
     def _open_files(self) -> None:
@@ -556,7 +556,7 @@ class SubtitleExtractorGUI:
             self.clear_output()
             self.progress_bar.configure(value=0)
             utils.Process.start_process()
-            self._set_run_state("disabled", "opening")
+            self._set_gui_state("disabled", "opening")
             Thread(target=self._set_opened_videos, args=(filenames,), daemon=True).start()
 
     def _console_redirector(self) -> None:
@@ -645,7 +645,7 @@ class SubtitleExtractorGUI:
         logger.debug("Stop detection button clicked")
         utils.Process.stop_process()
         if not self.thread_running:
-            self._set_run_state("normal", "detection")
+            self._set_gui_state("normal", "detection")
             self.menubar.entryconfig(2, label="Detect Subtitles", command=self._run_sub_detection)
 
     def _run_sub_detection(self) -> None:
@@ -653,7 +653,7 @@ class SubtitleExtractorGUI:
         Create a thread to run subtitle detection.
         """
         utils.Process.start_process()
-        self._set_run_state("disabled", "detection")
+        self._set_gui_state("disabled", "detection")
         self.menubar.entryconfig(2, label="Stop Sub Detection", command=self._stop_sub_detection_process)
         Thread(target=self._detect_subtitles, daemon=True).start()
 
@@ -690,7 +690,7 @@ class SubtitleExtractorGUI:
         utils.Process.stop_process()
         if not self.thread_running:
             self.run_button.configure(text="Run", command=self._run_sub_extraction)
-            self._set_run_state("normal")
+            self._set_gui_state("normal")
 
     def _run_sub_extraction(self) -> None:
         """
@@ -702,7 +702,7 @@ class SubtitleExtractorGUI:
             self.video_capture.release()
             utils.Process.start_process()
             self.run_button.configure(text='Stop', command=self._stop_sub_extraction_process)
-            self._set_run_state("disabled", "extraction")
+            self._set_gui_state("disabled", "extraction")
             self.progress_bar.configure(value=0)
             self._reset_batch_layout()
             Thread(target=self.extract_subtitles, daemon=True).start()
@@ -711,11 +711,11 @@ class SubtitleExtractorGUI:
         else:
             logger.info("No video has been opened!")
 
-    def _set_run_state(self, state: str, process_name: str = None) -> None:
+    def _set_gui_state(self, state: str, process_name: str = None) -> None:
         """
         Set state for widgets while process is running.
         """
-        logger.debug("Setting run state")
+        logger.debug("Setting gui state")
         self.menu_file.entryconfig(0, state=state)  # Open file button.
         self.menubar.entryconfig(1, state=state)  # Preferences button.
 
