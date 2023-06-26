@@ -121,8 +121,7 @@ class SubtitleExtractorGUI:
         # Border width and highlight thickness set to 0 to prevent hidden rectangle parts.
         self.canvas = tk.Canvas(video_frame, cursor="tcross", borderwidth=0, highlightthickness=0)
         self.canvas.grid(column=0, row=0)
-        self.canvas.bind("<Button-1>", self._on_click)
-        self.canvas.bind("<B1-Motion>", self._on_motion)
+        self.canvas.bind("<Button-1>", self._on_click)  # Bind mouse click to canvas.
 
         # Create frame slider widget in video frame and label to display value.
         video_work_frame = ttk.Frame(video_frame)
