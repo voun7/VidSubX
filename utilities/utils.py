@@ -183,7 +183,7 @@ def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '
     :param decimals: positive number of decimals in percent complete
     :param bar_length: character length of bar
     """
-    if not total:
+    if not total:  # prevent error if total is zero.
         return
 
     format_str = "{0:." + str(decimals) + "f}"  # format the % done number string
