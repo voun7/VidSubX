@@ -76,6 +76,7 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
 
     files = [file for file in frame_output.iterdir()]
     file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
+    logger.debug(f"Text extraction chunks = {file_chunks}")
 
     prefix = "Extracting text from frame chunks"
     logger.debug("Using multiprocessing for extracting text")
