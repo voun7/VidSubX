@@ -229,14 +229,13 @@ class SubtitleExtractor:
         """
         logger.debug("Merging adjacent equal texts")
         no_of_files = len(list(self.text_output.iterdir()))
-        counter = 1
         starting_file = None
-        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
+        for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
+                                               start=2):
             file1_text = file1.read_text(encoding="utf-8")
             file2_text = file2.read_text(encoding="utf-8")
-            counter += 1
-            # print(file1.name, file2.name, file1_text, file2_text)
-            if file1_text == file2_text and counter != no_of_files:
+            # print(index, no_of_files, file1.name, file2.name, file1_text, file2_text)
+            if file1_text == file2_text and index != no_of_files:
                 if not starting_file:
                     starting_file = file1
             else:
@@ -244,7 +243,8 @@ class SubtitleExtractor:
                 if not starting_file:  # This condition is used when the file doesn't match the previous or next file.
                     starting_file = file1
                 ending_file = file1
-                if counter == no_of_files:
+                if index == no_of_files:
+                    # print("No of files reached!")
                     ending_file = file2
                 new_file_name = f"{starting_file.stem}{divider}{ending_file.stem}.txt"
                 starting_file.rename(f"{starting_file.parent}/{new_file_name}")
@@ -286,17 +286,17 @@ class SubtitleExtractor:
         logger.debug("Merging adjacent similar texts")
         similarity_threshold = utils.Config.text_similarity_threshold  # Cut off point to determine similarity.
         no_of_files = len(list(self.text_output.iterdir()))
-        counter = 1
         starting_file = file_text = file_duration = None
-        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
+        for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
+                                               start=2):
             file1_text, file1_duration = file1.read_text(encoding="utf-8"), self._name_to_duration(file1.stem, old_div)
             file2_text, file2_duration = file2.read_text(encoding="utf-8"), self._name_to_duration(file2.stem, old_div)
             similarity = self.similarity(file1_text, file2_text)
-            counter += 1
-            # print(f"File 1 Name: {file1.name}, Duration: {file1_duration}, Text: {file1_text}\n"
+            # print(f"Index: {index}, No of Files: {no_of_files} "
+            #       f"File 1 Name: {file1.name}, Duration: {file1_duration}, Text: {file1_text}\n"
             #       f"File 2 Name: {file2.name}, Duration: {file2_duration}, Text: {file2_text}\n"
             #       f"File 1 & 2 Similarity: {similarity}")
-            if similarity >= similarity_threshold and counter != no_of_files:
+            if similarity >= similarity_threshold and index != no_of_files:
                 if not starting_file:
                     starting_file = file1
                     file_text = file1_text
@@ -319,7 +319,8 @@ class SubtitleExtractor:
                 with open(new_file_name, 'w', encoding="utf-8") as text_file:
                     text_file.write(file_text)
 
-                if counter == no_of_files:
+                if index == no_of_files:
+                    # print("No of files reached!")
                     new_name = file2.name.replace(old_div, divider)
                     new_file_name = f"{self.text_output}/{new_name}"
                     file_text = file2_text
@@ -340,19 +341,21 @@ class SubtitleExtractor:
         in consecutive rows.
         :param divider: String in file name that separates the time stamps.
         """
+        logger.debug("Removing short duration subs")
         # Minimum allowed time in milliseconds.
         min_sub_duration = utils.Config.min_sub_duration_ms
         # Maximum allowed number of short durations in a row.
         max_consecutive_short_durs = utils.Config.max_consecutive_short_durs
 
-        counter, short_dur_files, no_of_files = 1, set(), len(list(self.text_output.iterdir()))
-        for file1, file2 in pairwise(sorted(self.text_output.iterdir(), key=self.timecode_duration_sort)):
+        short_dur_files, no_of_files = set(), len(list(self.text_output.iterdir()))
+        for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
+                                               start=2):
             file1_duration = self._name_to_duration(file1.stem, divider)
             file2_duration = self._name_to_duration(file2.stem, divider)
-            counter += 1
-            # print(f"File 1 Name: {file1.name}, Duration: {file1_duration}\n"
+            # print(f"Index: {index}, No of Files: {no_of_files}, "
+            #       f"File 1 Name: {file1.name}, Duration: {file1_duration}\n"
             #       f"File 2 Name: {file2.name}, Duration: {file2_duration}")
-            if file1_duration < min_sub_duration and file2_duration < min_sub_duration and counter != no_of_files:
+            if file1_duration < min_sub_duration and file2_duration < min_sub_duration and index != no_of_files:
                 short_dur_files.add(file1)
                 short_dur_files.add(file2)
             else:
@@ -408,10 +411,8 @@ class SubtitleExtractor:
         self._remove_duplicate_texts(div2)
         self._remove_short_duration_subs(div2)
         subtitles = []
-        line_code = 0
-        for file in sorted(self.text_output.iterdir(), key=self.timecode_duration_sort):
+        for line_code, file in enumerate(sorted(self.text_output.iterdir(), key=self.timecode_sort), start=1):
             file_name = file.stem.split(div2)
-            line_code += 1
             frame_start = self.timecode(float(file_name[0]))
             frame_end = self.timecode(float(file_name[1]))
             file_content = file.read_text(encoding="utf-8")
