@@ -72,6 +72,8 @@ class SubtitleDetector:
     def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
         Prevent boundary box from being too close to text by adding padding.
+        The x paddings are relative to the width of the video. Different resolutions will have different x paddings.
+        The y paddings are absolute to the height of the vide. All resolutions will have the same y paddings.
         """
         x_padding = utils.Config.sub_area_x_rel_padding
         y_padding = utils.Config.sub_area_y_abs_padding
@@ -330,13 +332,17 @@ class SubtitleExtractor:
 
     @staticmethod
     def delete_files(file_paths: set) -> None:
+        """
+        Delete all files paths in the set if they exist.
+        :param file_paths: a set of file paths.
+        """
         for file_path in file_paths:
             Path(file_path).unlink(missing_ok=True)
 
     def _remove_short_duration_subs(self, divider: str) -> None:
         """
-        Deletes files that contain subtitles that have durations that are shorter than the minimum duration
-        in consecutive rows.
+        Deletes files that contain subtitles that have durations that are shorter than the given minimum duration
+        in the given number of consecutive rows.
         :param divider: String in file name that separates the time stamps.
         """
         logger.debug("Removing short duration subs")
