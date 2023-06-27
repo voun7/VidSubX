@@ -215,7 +215,13 @@ class SubtitleExtractorGUI:
         self.next_button.grid(column=4, row=0, padx=10)
 
     def _preferences(self) -> None:
-        self.preference_window = PreferencesUI(self.icon_file)
+        """
+        Open preferences window and set the icon and window location.
+        The windows opening location will always be on top of the main window.
+        """
+        root_x, root_y = self.root.winfo_rootx(), self.root.winfo_rooty()
+        win_x, win_y = root_x + 100, root_y + 50
+        self.preference_window = PreferencesUI(self.icon_file, win_x, win_y)
 
     def _get_scale_value(self) -> float:
         """
@@ -743,9 +749,10 @@ class SubtitleExtractorGUI:
 
 
 class PreferencesUI(tk.Toplevel):
-    def __init__(self, icon_file: str) -> None:
+    def __init__(self, icon_file: str, win_x: int, win_y: int) -> None:
         super().__init__()
         self.icon_file = icon_file
+        self.geometry(f"+{win_x}+{win_y}")  # Set window position.
         self.focus()
         self.grab_set()
         self._create_layout()
