@@ -290,7 +290,7 @@ class SubtitleExtractor:
             file1_text, file1_duration = file1.read_text(encoding="utf-8"), self._name_to_duration(file1.stem, old_div)
             file2_text, file2_duration = file2.read_text(encoding="utf-8"), self._name_to_duration(file2.stem, old_div)
             similarity = self.similarity(file1_text, file2_text)
-            # print(f"Index: {index}, No of Files: {no_of_files} "
+            # print(f"Index: {index}, No of Files: {no_of_files}\n"
             #       f"File 1 Name: {file1.name}, Duration: {file1_duration}, Text: {file1_text}\n"
             #       f"File 2 Name: {file2.name}, Duration: {file2_duration}, Text: {file2_text}\n"
             #       f"File 1 & 2 Similarity: {similarity}")
