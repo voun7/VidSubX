@@ -1006,13 +1006,13 @@ class PreferencesUI(tk.Toplevel):
         )
         self.max_consecutive_short_durs = tk.IntVar(value=utils.Config.max_consecutive_short_durs)
         self.max_consecutive_short_durs.trace_add("write", self._set_reset_button)
-        check_int = (self.register(self._check_integer), '%P')
-        ttk.Entry(
+        ttk.Spinbox(
             subtitle_generator_frame,
+            from_=2, to=10,
+            increment=1,
             textvariable=self.max_consecutive_short_durs,
-            validate='key',
-            validatecommand=check_int,
-            width=self.entry_size
+            state="readonly",
+            width=self.spinbox_size
         ).grid(column=1, row=2)
 
         ttk.Label(subtitle_generator_frame, text="Minimum Sub Duration (ms):").grid(column=0, row=3)
