@@ -989,7 +989,7 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(subtitle_generator_frame, text="Minimum Sub duration (ms):").grid(column=0, row=1)
+        ttk.Label(subtitle_generator_frame, text="Minimum Sub Duration (ms):").grid(column=0, row=1)
         self.min_sub_duration_ms = tk.DoubleVar(value=utils.Config.min_sub_duration_ms)
         self.min_sub_duration_ms.trace_add("write", self._set_reset_button)
         check_float = (self.register(self._check_float), '%P')
