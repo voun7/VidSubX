@@ -221,6 +221,7 @@ class SubtitleExtractor:
         logger.debug("Deleting duplicate texts...")
         for file in self.text_output.iterdir():
             if divider not in file.name:
+                # print(f"Deleting file name: {file.name}")
                 file.unlink()
 
     def _merge_adjacent_equal_texts(self, divider: str) -> None:
