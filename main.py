@@ -363,8 +363,6 @@ class SubtitleExtractor:
                 short_dur_files.add(file1)
                 short_dur_files.add(file2)
             else:
-                if file2_dur < min_consecutive_sub_dur:
-                    short_dur_files.add(file2)
                 if len(short_dur_files) >= max_consecutive_short_durs:
                     self.delete_files(short_dur_files)
                     # print(f"Deleting short durations found! Files ({len(short_dur_files)}) = {short_dur_files}\n")
