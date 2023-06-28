@@ -132,8 +132,7 @@ class SubtitleDetector:
         A more accurate area containing the subtitle in the video is returned.
         """
         video_path = Path(self.video_file)
-        new_sub_area = None
-        if not video_path.exists():
+        if not video_path.exists() or not video_path.is_file():
             logger.error(f"Video file: {video_path.name} ...could not be found!\n")
             return
         # Empty cache at the beginning of program run before it recreates itself.
@@ -144,6 +143,7 @@ class SubtitleDetector:
         logger.info(f"Video name: {video_path.name}")
         self._get_key_frames()
         bboxes = extract_bboxes(self.frame_output)
+        new_sub_area = None
         if bboxes:
             top_left, bottom_right = self._get_max_boundaries(bboxes)
             top_left, bottom_right = self._pad_sub_area(top_left, bottom_right)
@@ -444,7 +444,7 @@ class SubtitleExtractor:
         Run through the steps of extracting texts from subtitle area in video to create subtitle.
         """
         self.video_path = Path(video_path)
-        if not self.video_path.exists():
+        if not self.video_path.exists() or not self.video_path.is_file():
             logger.error(f"Video file: {self.video_path.name} ...could not be found!\n")
             return
         start = cv.getTickCount()
