@@ -339,36 +339,50 @@ class SubtitleExtractor:
         for file_path in file_paths:
             Path(file_path).unlink(missing_ok=True)
 
-    def _remove_short_duration_subs(self, divider: str) -> None:
+    def _remove_short_duration_consecutive_subs(self, divider: str) -> None:
         """
         Deletes files that contain subtitles that have durations that are shorter than the given minimum duration
         in the given number of consecutive rows.
         :param divider: String in file name that separates the time stamps.
         """
-        logger.debug("Removing short duration subs")
-        # Minimum allowed time in milliseconds.
-        min_sub_duration = utils.Config.min_sub_duration_ms
+        logger.debug("Removing short duration consecutive subs")
+        # Minimum allowed consecutive duration in milliseconds.
+        min_consecutive_sub_dur = utils.Config.min_consecutive_sub_dur_ms
         # Maximum allowed number of short durations in a row.
         max_consecutive_short_durs = utils.Config.max_consecutive_short_durs
 
         short_dur_files, no_of_files = set(), len(list(self.text_output.iterdir()))
         for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
                                                start=2):
-            file1_duration = self._name_to_duration(file1.stem, divider)
-            file2_duration = self._name_to_duration(file2.stem, divider)
+            file1_dur = self._name_to_duration(file1.stem, divider)
+            file2_dur = self._name_to_duration(file2.stem, divider)
             # print(f"Index: {index}, No of Files: {no_of_files}, "
-            #       f"File 1 Name: {file1.name}, Duration: {file1_duration}\n"
-            #       f"File 2 Name: {file2.name}, Duration: {file2_duration}")
-            if file1_duration < min_sub_duration and file2_duration < min_sub_duration and index != no_of_files:
+            #       f"File 1 Name: {file1.name}, Duration: {file1_dur}\n"
+            #       f"File 2 Name: {file2.name}, Duration: {file2_dur}")
+            if file1_dur < min_consecutive_sub_dur and file2_dur < min_consecutive_sub_dur and index != no_of_files:
                 short_dur_files.add(file1)
                 short_dur_files.add(file2)
             else:
-                if file2_duration < min_sub_duration:
+                if file2_dur < min_consecutive_sub_dur:
                     short_dur_files.add(file2)
                 if len(short_dur_files) >= max_consecutive_short_durs:
                     self.delete_files(short_dur_files)
                     # print(f"Deleting short durations found! Files ({len(short_dur_files)}) = {short_dur_files}\n")
                 short_dur_files = set()
+
+    def _remove_short_duration_subs(self, divider: str) -> None:
+        """
+        Deletes file that contain subtitles that have durations that are shorter than the minimum duration.
+        :param divider: String in file name that separates the time stamps.
+        """
+        logger.debug("Removing short duration subs")
+        # Minimum allowed time in milliseconds.
+        min_sub_duration = utils.Config.min_sub_duration_ms
+        for file in self.text_output.iterdir():
+            duration = self._name_to_duration(file.stem, divider)
+            if duration <= min_sub_duration:
+                # print(f"Deleting short duration found. \nFile name: {file.name}, \nDuration: {duration}\n")
+                file.unlink()
 
     @staticmethod
     def timecode(frame_no_in_milliseconds: float) -> str:
@@ -413,6 +427,7 @@ class SubtitleExtractor:
         self._remove_duplicate_texts(self.div1)
         self._merge_adjacent_similar_texts(self.div1, div2)
         self._remove_duplicate_texts(div2)
+        self._remove_short_duration_consecutive_subs(div2)
         self._remove_short_duration_subs(div2)
         subtitles = []
         for line_code, file in enumerate(sorted(self.text_output.iterdir(), key=self.timecode_sort), start=1):

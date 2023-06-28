@@ -989,13 +989,13 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(subtitle_generator_frame, text="Minimum Sub Duration (ms):").grid(column=0, row=1)
-        self.min_sub_duration_ms = tk.DoubleVar(value=utils.Config.min_sub_duration_ms)
-        self.min_sub_duration_ms.trace_add("write", self._set_reset_button)
+        ttk.Label(subtitle_generator_frame, text="Minimum Consecutive Sub Duration (ms):").grid(column=0, row=1)
+        self.min_consecutive_sub_dur_ms = tk.DoubleVar(value=utils.Config.min_consecutive_sub_dur_ms)
+        self.min_consecutive_sub_dur_ms.trace_add("write", self._set_reset_button)
         check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
             subtitle_generator_frame,
-            textvariable=self.min_sub_duration_ms,
+            textvariable=self.min_consecutive_sub_dur_ms,
             validate='key',
             validatecommand=check_float,
             width=self.entry_size
@@ -1014,6 +1014,18 @@ class PreferencesUI(tk.Toplevel):
             validatecommand=check_int,
             width=self.entry_size
         ).grid(column=1, row=2)
+
+        ttk.Label(subtitle_generator_frame, text="Minimum Sub Duration (ms):").grid(column=0, row=3)
+        self.min_sub_duration_ms = tk.DoubleVar(value=utils.Config.min_sub_duration_ms)
+        self.min_sub_duration_ms.trace_add("write", self._set_reset_button)
+        check_float = (self.register(self._check_float), '%P')
+        ttk.Entry(
+            subtitle_generator_frame,
+            textvariable=self.min_sub_duration_ms,
+            validate='key',
+            validatecommand=check_float,
+            width=self.entry_size
+        ).grid(column=1, row=3)
 
     def _notifications_tab(self) -> None:
         """
@@ -1069,8 +1081,9 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_ocr_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_similarity_threshold,
-            utils.Config.default_min_sub_duration_ms,
+            utils.Config.default_min_consecutive_sub_dur_ms,
             utils.Config.default_max_consecutive_short_durs,
+            utils.Config.default_min_sub_duration_ms,
             utils.Config.default_split_start,
             utils.Config.default_split_stop,
             utils.Config.default_no_of_frames,
@@ -1089,8 +1102,9 @@ class PreferencesUI(tk.Toplevel):
                 self.ocr_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_similarity_threshold.get(),
-                self.min_sub_duration_ms.get(),
+                self.min_consecutive_sub_dur_ms.get(),
                 self.max_consecutive_short_durs.get(),
+                self.min_sub_duration_ms.get(),
                 self.split_start.get(),
                 self.split_stop.get(),
                 self.no_of_frames.get(),
@@ -1147,8 +1161,9 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
-        self.min_sub_duration_ms.set(utils.Config.default_min_sub_duration_ms)
+        self.min_consecutive_sub_dur_ms.set(utils.Config.default_min_consecutive_sub_dur_ms)
         self.max_consecutive_short_durs.set(utils.Config.default_max_consecutive_short_durs)
+        self.min_sub_duration_ms.set(utils.Config.default_min_sub_duration_ms)
         # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)
         self.split_stop.set(utils.Config.default_split_stop)
@@ -1176,18 +1191,19 @@ class PreferencesUI(tk.Toplevel):
                     utils.Config.keys[4]: self.ocr_rec_language.get(),
                     # Subtitle generator settings.
                     utils.Config.keys[5]: self.text_similarity_threshold.get(),
-                    utils.Config.keys[6]: self.min_sub_duration_ms.get(),
+                    utils.Config.keys[6]: self.min_consecutive_sub_dur_ms.get(),
                     utils.Config.keys[7]: self.max_consecutive_short_durs.get(),
+                    utils.Config.keys[8]: self.min_sub_duration_ms.get(),
                     # Subtitle detection settings.
-                    utils.Config.keys[8]: self.split_start.get(),
-                    utils.Config.keys[9]: self.split_stop.get(),
-                    utils.Config.keys[10]: self.no_of_frames.get(),
-                    utils.Config.keys[11]: self.sub_area_x_rel_padding.get(),
-                    utils.Config.keys[12]: self.sub_area_y_abs_padding.get(),
-                    utils.Config.keys[13]: self.use_search_area.get(),
+                    utils.Config.keys[9]: self.split_start.get(),
+                    utils.Config.keys[10]: self.split_stop.get(),
+                    utils.Config.keys[11]: self.no_of_frames.get(),
+                    utils.Config.keys[12]: self.sub_area_x_rel_padding.get(),
+                    utils.Config.keys[13]: self.sub_area_y_abs_padding.get(),
+                    utils.Config.keys[14]: self.use_search_area.get(),
                     # Notification settings.
-                    utils.Config.keys[14]: self.win_notify_sound.get(),
-                    utils.Config.keys[15]: self.win_notify_loop_sound.get()
+                    utils.Config.keys[15]: self.win_notify_sound.get(),
+                    utils.Config.keys[16]: self.win_notify_loop_sound.get()
                 }
             )
         except tk.TclError:
