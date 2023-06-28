@@ -161,12 +161,9 @@ class SubtitleExtractor:
         Extracts hardcoded subtitles from video.
         """
         self.video_path = None
-        # Create cache directory.
-        self.vd_output_dir = Path(f"{Path.cwd()}/output")
-        # Extracted video frame storage directory.
-        self.frame_output = self.vd_output_dir / "frames"
-        # Extracted text file storage directory.
-        self.text_output = self.vd_output_dir / "extracted texts"
+        self.subtitle_texts = {}
+        self.divider = "--"  # Characters for separating time durations(ms) in key name.
+        self.vd_output_dir = Path(f"{Path.cwd()}/output")  # Create cache directory.
 
     @staticmethod
     def video_details(video_path: str) -> tuple:
@@ -207,144 +204,107 @@ class SubtitleExtractor:
             shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
 
-    def timecode_sort(self, path: Path) -> float:
-        """
-        Helps sort timecode durations by turning the first value into a float.
-        """
-        first_timecode = path.stem.split(self.div1)[0]
-        return float(first_timecode)
-
-    def _remove_duplicate_texts(self, divider: str) -> None:
-        """
-        Remove all texts from text output that don't have the given divider in their name.
-        """
-        logger.debug("Deleting duplicate texts...")
-        for file in self.text_output.iterdir():
-            if divider not in file.name:
-                # print(f"Deleting file name: {file.name}")
-                file.unlink()
-
-    def _merge_adjacent_equal_texts(self, divider: str) -> None:
+    def merge_adjacent_equal_texts(self) -> None:
         """
         Merge texts that are beside each other and are the exact same.
         Use divider for duration in text name.
-        :param divider: Characters for separating time durations in file name.
         """
         logger.debug("Merging adjacent equal texts")
-        starting_file, no_of_files = None, len(list(self.text_output.iterdir()))
-        for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
-                                               start=2):
-            file1_text, file2_text = file1.read_text(encoding="utf-8"), file2.read_text(encoding="utf-8")
-            # print(index, no_of_files, file1.name, file2.name, file1_text, file2_text)
-            if file1_text == file2_text and index != no_of_files:
-                if not starting_file:
-                    starting_file = file1
+        new_subtitle_dict, starting_key, no_of_keys = {}, None, len(self.subtitle_texts)
+        for index, (key1, key2) in enumerate(pairwise(self.subtitle_texts.items()), start=2):
+            key1_name, key1_text, key2_name, key2_text = key1[0], key1[1], key2[0], key2[1]
+            # print(index, no_of_keys, key1_name, key1_text, key2_name, key2_text)
+            if key1_text == key2_text and index != no_of_keys:
+                if not starting_key:
+                    starting_key = key1_name
             else:
                 # print("Text not equal\n")
-                if not starting_file:  # This condition is used when the file doesn't match the previous or next file.
-                    starting_file = file1
-                ending_file = file1
-                if index == no_of_files:
-                    # print("No of files reached!")
-                    ending_file = file2
-                new_file_name = f"{starting_file.stem}{divider}{ending_file.stem}.txt"
-                starting_file.rename(f"{starting_file.parent}/{new_file_name}")
-                starting_file = None
+                if not starting_key:  # This condition is used when the key doesn't match the previous or next key.
+                    starting_key = key1_name
+                duration = f"{starting_key}{self.divider}{key1_name}"
+                new_subtitle_dict[duration] = key1_text
+                if index == no_of_keys:  # The last key is always added to end of dictionary to avoid being skipped.
+                    # print("No of keys reached!")
+                    duration = f"{key2_name}{self.divider}{key2_name}"
+                    new_subtitle_dict[duration] = key2_text
+                starting_key = None
+        self.subtitle_texts = new_subtitle_dict
 
     @staticmethod
     def similarity(text1: str, text2: str) -> float:
         return SequenceMatcher(a=text1, b=text2).quick_ratio()
 
-    @staticmethod
-    def _similar_text_name_gen(start_name: str, end_name: str, divider: str, old_divider) -> str:
+    def similar_text_name_gen(self, start_name: str, end_name: str) -> str:
         """
-        Takes 2 file name durations and creates a new file name.
+        Takes 2 name durations and creates a new name.
         """
-        start_name = start_name.split(old_divider)[0]
-        end_name = end_name.split(old_divider)[1]
-        new_name = f"{start_name}{divider}{end_name}.txt"
+        start_name = start_name.split(self.divider)[0]
+        end_name = end_name.split(self.divider)[1]
+        new_name = f"{start_name}{self.divider}{end_name}"
         return new_name
 
-    @staticmethod
-    def _name_to_duration(name: str, divider: str) -> float:
+    def name_to_duration(self, name: str) -> float:
         """
         Takes a name with two numbers and subtracts to get the duration in milliseconds.
         :param name: Name numbers should seperated by identifier.
-        :param divider: Value for splitting string.
         :return: Duration
         """
-        name_timecode = name.split(divider)
+        name_timecode = name.split(self.divider)
         duration = float(name_timecode[1]) - float(name_timecode[0])
         return duration
 
-    def _merge_adjacent_similar_texts(self, old_div: str, divider: str) -> None:
+    def merge_adjacent_similar_texts(self) -> None:
         """
         Merge texts that are not the same but beside each other and similar.
         The text that has the longest duration becomes the text for all similar texts.
-        :param old_div: Old characters for separating time durations in file name.
-        :param divider: Characters for separating time durations in file name.
         """
         logger.debug("Merging adjacent similar texts")
         similarity_threshold = utils.Config.text_similarity_threshold  # Cut off point to determine similarity.
-        no_of_files = len(list(self.text_output.iterdir()))
-        starting_file = file_text = file_duration = None
-        for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
-                                               start=2):
-            file1_text, file1_duration = file1.read_text(encoding="utf-8"), self._name_to_duration(file1.stem, old_div)
-            file2_text, file2_duration = file2.read_text(encoding="utf-8"), self._name_to_duration(file2.stem, old_div)
-            similarity = self.similarity(file1_text, file2_text)
-            # print(f"Index: {index}, No of Files: {no_of_files}\n"
-            #       f"File 1 Name: {file1.name}, Duration: {file1_duration}, Text: {file1_text}\n"
-            #       f"File 2 Name: {file2.name}, Duration: {file2_duration}, Text: {file2_text}\n"
-            #       f"File 1 & 2 Similarity: {similarity}")
-            if similarity >= similarity_threshold and index != no_of_files:
-                if not starting_file:
-                    starting_file = file1
-                    file_text = file1_text
-                    file_duration = file1_duration
+        new_subtitle_dict, no_of_keys = {}, len(self.subtitle_texts)
+        starting_key = starting_key_txt = starting_key_dur = None
+        for index, (key1, key2) in enumerate(pairwise(self.subtitle_texts.items()), start=2):
+            key1_name, key1_txt, key1_dur = key1[0], key1[1], self.name_to_duration(key1[0])
+            key2_name, key2_txt, key2_dur = key2[0], key2[1], self.name_to_duration(key2[0])
+            similarity = self.similarity(key1_txt, key2_txt)
+            # print(f"Index: {index}, No of Keys: {no_of_keys}\n"
+            #       f"Key 1 Name: {key1_name}, Duration: {key1_dur}, Text: {key1_txt}\n"
+            #       f"Key 2 Name: {key2_name}, Duration: {key2_dur}, Text: {key2_txt}\n"
+            #       f"Key 1 & 2 Similarity: {similarity}")
+            if similarity >= similarity_threshold and index != no_of_keys:
+                if not starting_key:
+                    starting_key, starting_key_txt, starting_key_dur = key1_name, key1_txt, key1_dur
 
-                if file2_duration > file_duration:  # Change text and duration when longer duration is found.
-                    # print(f"--- Longer duration found: {file2_duration} ---")
-                    file_text = file2_text
-                    file_duration = file2_duration
+                if key2_dur > starting_key_dur:  # Change text and duration when longer duration is found.
+                    # print(f"--- Longer duration found: {key2_dur} ---")
+                    starting_key_txt, starting_key_dur = key2_txt, key2_dur
             else:
-                if not starting_file:  # This condition is used when the file doesn't match the previous or next file.
-                    starting_file = file1
-                    file_text = file1_text
+                if not starting_key:  # This condition is used when the key doesn't match the previous or next key.
+                    starting_key, starting_key_txt = key1_name, key1_txt
 
-                ending_file = file1
+                if index == no_of_keys:
+                    # print("No of keys reached!")
+                    ending_key = key2_name  # This doesn't work well when the last key's text is not similar.
+                else:
+                    ending_key = key1_name
 
-                new_name = self._similar_text_name_gen(starting_file.stem, ending_file.stem, divider, old_div)
-                new_file_name = f"{self.text_output}/{new_name}"
-                # print(f"New file name: {new_file_name} \nNew file text: {file_text}\n")
-                with open(new_file_name, 'w', encoding="utf-8") as text_file:
-                    text_file.write(file_text)
+                new_key_name = self.similar_text_name_gen(starting_key, ending_key)
+                # print(f"New key name: {new_key_name} \nNew key text: {starting_key_txt}\n")
+                new_subtitle_dict[new_key_name] = starting_key_txt
+                starting_key = starting_key_txt = starting_key_dur = None
+        self.subtitle_texts = new_subtitle_dict
 
-                if index == no_of_files:
-                    # print("No of files reached!")
-                    new_name = file2.name.replace(old_div, divider)
-                    new_file_name = f"{self.text_output}/{new_name}"
-                    file_text = file2_text
-                    # print(f"New file name: {new_file_name} \nNew file text: {file_text}\n")
-                    with open(new_file_name, 'w', encoding="utf-8") as text_file:
-                        text_file.write(file_text)
-
-                starting_file = file_text = file_duration = None
-
-    @staticmethod
-    def delete_files(file_paths: set) -> None:
+    def delete_keys(self, keys: set) -> None:
         """
-        Delete all files paths in the set if they exist.
-        :param file_paths: a set of file paths.
+        Delete all key durations in the set if they exist.
         """
-        for file_path in file_paths:
-            Path(file_path).unlink(missing_ok=True)
+        for key in keys:
+            if key in self.subtitle_texts:
+                del self.subtitle_texts[key]
 
-    def _remove_short_duration_consecutive_subs(self, divider: str) -> None:
+    def remove_short_duration_consecutive_subs(self) -> None:
         """
-        Deletes files that contain subtitles that have durations that are shorter than the given minimum duration
+        Deletes keys that contain subtitles that have durations that are shorter than the given minimum duration
         in the given number of consecutive rows.
-        :param divider: String in file name that separates the time stamps.
         """
         logger.debug("Removing short duration consecutive subs")
         # Minimum allowed consecutive duration in milliseconds.
@@ -352,36 +312,35 @@ class SubtitleExtractor:
         # Maximum allowed number of short durations in a row.
         max_consecutive_short_durs = utils.Config.max_consecutive_short_durs
 
-        short_dur_files, no_of_files = set(), len(list(self.text_output.iterdir()))
-        for index, (file1, file2) in enumerate(pairwise(sorted(self.text_output.iterdir(), key=self.timecode_sort)),
-                                               start=2):
-            file1_dur = self._name_to_duration(file1.stem, divider)
-            file2_dur = self._name_to_duration(file2.stem, divider)
-            # print(f"Index: {index}, No of Files: {no_of_files}, "
-            #       f"File 1 Name: {file1.name}, Duration: {file1_dur}\n"
-            #       f"File 2 Name: {file2.name}, Duration: {file2_dur}")
-            if file1_dur < min_consecutive_sub_dur and file2_dur < min_consecutive_sub_dur and index != no_of_files:
-                short_dur_files.add(file1)
-                short_dur_files.add(file2)
+        keys_for_deletion, short_dur_keys, no_of_keys = set(), set(), len(self.subtitle_texts)
+        for index, (dur_1, dur_2) in enumerate(pairwise(self.subtitle_texts), start=2):
+            key1_dur, key2_dur = self.name_to_duration(dur_1), self.name_to_duration(dur_2)
+            # print(f"Index: {index}, No of Keys: {no_of_keys}\n"
+            #       f"Key 1 Name: {dur_1}, Duration: {key1_dur}\n"
+            #       f"Key 2 Name: {dur_2}, Duration: {key2_dur}")
+            if key1_dur < min_consecutive_sub_dur and key2_dur < min_consecutive_sub_dur and index != no_of_keys:
+                short_dur_keys.add(dur_1)
+                short_dur_keys.add(dur_2)
             else:
-                if len(short_dur_files) >= max_consecutive_short_durs:
-                    self.delete_files(short_dur_files)
-                    # print(f"Deleting short durations found! Files ({len(short_dur_files)}) = {short_dur_files}\n")
-                short_dur_files = set()
+                if len(short_dur_keys) >= max_consecutive_short_durs:
+                    # print(f"Short durations found for deletion! Keys: ({len(short_dur_keys)}) = {short_dur_keys}\n")
+                    keys_for_deletion.update(short_dur_keys)
+                short_dur_keys = set()
+        self.delete_keys(keys_for_deletion)
 
-    def _remove_short_duration_subs(self, divider: str) -> None:
+    def remove_short_duration_subs(self) -> None:
         """
-        Deletes file that contain subtitles that have durations that are shorter than the minimum duration.
-        :param divider: String in file name that separates the time stamps.
+        Deletes keys that contain subtitles that have durations that are shorter than the minimum duration.
         """
         logger.debug("Removing short duration subs")
         # Minimum allowed time in milliseconds.
         min_sub_duration = utils.Config.min_sub_duration_ms
-        for file in self.text_output.iterdir():
-            duration = self._name_to_duration(file.stem, divider)
+        short_dur_keys = set()
+        for ms_duration in self.subtitle_texts:
+            duration = self.name_to_duration(ms_duration)
             if duration <= min_sub_duration:
-                # print(f"Deleting short duration found. \nFile name: {file.name}, \nDuration: {duration}\n")
-                file.unlink()
+                short_dur_keys.add(ms_duration)
+        self.delete_keys(short_dur_keys)
 
     @staticmethod
     def timecode(frame_no_in_milliseconds: float) -> str:
@@ -401,7 +360,7 @@ class SubtitleExtractor:
         smpte_token = ','
         return "%02d:%02d:%02d%s%03d" % (hours, minutes, seconds, smpte_token, milliseconds)
 
-    def _save_subtitle(self, lines: list) -> None:
+    def save_subtitle(self, lines: list) -> None:
         name = self.video_path.with_suffix(".srt")
         if name.exists():
             current_time = time.strftime("%H;%M;%S")
@@ -410,9 +369,9 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
         logger.info(f"Subtitle file generated. Name: {name}")
 
-    def _generate_subtitle(self) -> None:
+    def generate_subtitle(self) -> None:
         """
-        Use text files in folder to create subtitle file.
+        Use text files in dictionary to create subtitle file.
         """
         # Cancel if process has been cancelled by gui.
         if utils.Process.interrupt_process:
@@ -420,24 +379,30 @@ class SubtitleExtractor:
             return
 
         logger.info("Generating subtitle...")
-        self.div1 = "--"
-        div2 = self.div1 + '-'
-        self._merge_adjacent_equal_texts(self.div1)
-        self._remove_duplicate_texts(self.div1)
-        self._merge_adjacent_similar_texts(self.div1, div2)
-        self._remove_duplicate_texts(div2)
-        self._remove_short_duration_consecutive_subs(div2)
-        self._remove_short_duration_subs(div2)
+        self.merge_adjacent_equal_texts()
+        self.merge_adjacent_similar_texts()
+        self.remove_short_duration_consecutive_subs()
+        self.remove_short_duration_subs()
         subtitles = []
-        for line_code, file in enumerate(sorted(self.text_output.iterdir(), key=self.timecode_sort), start=1):
-            file_name = file.stem.split(div2)
-            frame_start = self.timecode(float(file_name[0]))
-            frame_end = self.timecode(float(file_name[1]))
-            file_content = file.read_text(encoding="utf-8")
-            subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{file_content}\n\n"
+        for line_code, (ms_dur, txt) in enumerate(self.subtitle_texts.items(), start=1):
+            key_name = ms_dur.split(self.divider)
+            frame_start = self.timecode(float(key_name[0]))
+            frame_end = self.timecode(float(key_name[1]))
+            subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{txt}\n\n"
             subtitles.append(subtitle_line)
-        self._save_subtitle(subtitles)
+        self.save_subtitle(subtitles)
         logger.info("Subtitle generated!")
+
+    def load_subtitle_texts(self, text_folder: Path) -> None:
+        """
+        Load subtitle texts files in to dictionary. The name of the file which represents the duration in milliseconds
+        will be the key and text of the file will be the value.
+        The files will be sorted before being added to the dict, this prevents the need for sorting again.
+        :param text_folder: folder containing text files
+        """
+        for file in sorted(text_folder.iterdir(), key=lambda name: float(name.stem)):
+            file_text = file.read_text(encoding="utf-8")
+            self.subtitle_texts[file.stem] = file_text
 
     def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
                        stop_frame: int = None) -> None:
@@ -449,16 +414,16 @@ class SubtitleExtractor:
             logger.error(f"Video file: {self.video_path.name} ...could not be found!\n")
             return
         start = cv.getTickCount()
-        # Empty cache at the beginning of program run before it recreates itself.
-        self._empty_cache()
+        self._empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
+        # Extracted video frame storage directory. Extracted text file storage directory.
+        frame_output, text_output = self.vd_output_dir / "frames", self.vd_output_dir / "extracted texts"
         # If the directory does not exist, create the folder.
-        if not self.frame_output.exists():
-            self.frame_output.mkdir(parents=True)
-        if not self.text_output.exists():
-            self.text_output.mkdir(parents=True)
+        if not frame_output.exists():
+            frame_output.mkdir(parents=True)
+        if not text_output.exists():
+            text_output.mkdir(parents=True)
 
         fps, frame_total, frame_width, frame_height = self.video_details(video_path)
-
         sub_area = sub_area if sub_area is not None else self.default_sub_area(frame_width, frame_height)
 
         logger.info(f"File Path: {self.video_path}")
@@ -467,9 +432,10 @@ class SubtitleExtractor:
         logger.info(f"Subtitle Area: {sub_area}")
         logger.info(f"Start Frame: {start_frame}, Stop Frame: {stop_frame}")
 
-        video_to_frames(video_path, self.frame_output, sub_area, start_frame, stop_frame)
-        frames_to_text(self.frame_output, self.text_output)
-        self._generate_subtitle()
+        video_to_frames(video_path, frame_output, sub_area, start_frame, stop_frame)
+        frames_to_text(frame_output, text_output)
+        self.load_subtitle_texts(text_output)
+        self.generate_subtitle()
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
