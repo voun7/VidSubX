@@ -27,10 +27,8 @@ class SubtitleDetector:
         self.use_search_area = use_search_area
         self.sub_ex = SubtitleExtractor()
         self.fps, self.frame_total, self.frame_width, self.frame_height = self.sub_ex.video_details(self.video_file)
-        # Create cache directory.
-        self.vd_output_dir = Path(f"{Path.cwd()}/output")
-        # Extracted video frame storage directory.
-        self.frame_output = self.vd_output_dir / "sub detect frames"
+        self.vd_output_dir = Path(f"{Path.cwd()}/output")  # Create cache directory.
+        self.frame_output = self.vd_output_dir / "sub detect frames"  # Extracted video frame storage directory.
 
     def _get_key_frames(self) -> None:
         """
@@ -135,8 +133,7 @@ class SubtitleDetector:
         if not video_path.exists() or not video_path.is_file():
             logger.error(f"Video file: {video_path.name} ...could not be found!\n")
             return
-        # Empty cache at the beginning of program run before it recreates itself.
-        self._empty_cache()
+        self._empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
 
