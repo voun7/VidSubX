@@ -102,8 +102,8 @@ class SubtitleDetector:
         Delete all cache files produced during subtitle extraction.
         """
         if self.vd_output_dir.exists():
-            shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
+            shutil.rmtree(self.vd_output_dir)
 
     @staticmethod
     def _get_max_boundaries(bboxes: list) -> tuple:
@@ -198,11 +198,12 @@ class SubtitleExtractor:
 
     def _empty_cache(self) -> None:
         """
-        Delete all cache files produced during subtitle extraction.
+        Delete all cache files and dictionary content produced during subtitle extraction.
         """
         if self.vd_output_dir.exists():
-            shutil.rmtree(self.vd_output_dir)
             logger.debug("Emptying cache...")
+            shutil.rmtree(self.vd_output_dir)
+            self.subtitle_texts = {}
 
     def merge_adjacent_equal_texts(self) -> None:
         """
