@@ -103,7 +103,7 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     frame_chunks[-1][-1] = stop_frame  # make sure last chunk has correct end frame
     logger.debug(f"Frame extraction chunks = {frame_chunks}")
 
-    prefix = "Extracting frames from video chunks"  # a prefix string to be printed in progress bar
+    prefix = "Extracting frames"  # a prefix string to be printed in progress bar
     logger.debug("Using multiprocessing for extracting frames")
 
     # create a process pool to execute across multiple cpu cores to speed up processing
@@ -117,4 +117,4 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
                 logger.exception(error)
             # print it's progress
             utils.print_progress(i, len(frame_chunks) - 1, prefix=prefix, suffix='Complete')
-    logger.info("Frame Extraction Done!")
+    logger.info("Frame Extractions Done!")
