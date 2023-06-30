@@ -561,7 +561,7 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Open button clicked")
         title = "Select Video(s)"
-        file_types = (("mp4", "*.mp4"), ("mkv", "*.mkv"), ("All files", "*.*"))
+        file_types = (("All files", "*.*"), ("mp4", "*.mp4"), ("mkv", "*.mkv"))
         filenames = filedialog.askopenfilenames(title=title, filetypes=file_types)
 
         # This condition prevents the below methods from being called
