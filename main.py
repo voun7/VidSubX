@@ -428,7 +428,7 @@ class SubtitleExtractor:
         logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
         logger.info(f"Resolution: {frame_width} X {frame_height}")
         logger.info(f"Subtitle Area: {sub_area}")
-        logger.info(f"Start Frame: {start_frame}, Stop Frame: {stop_frame}")
+        logger.info(f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
 
         video_to_frames(video_path, frame_output, sub_area, start_frame, stop_frame)
         frames_to_text(frame_output, text_output)
