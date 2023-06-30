@@ -429,9 +429,8 @@ class SubtitleExtractorGUI:
         if stop_frame and current_frame >= stop_frame:
             self.status_label.configure(text="Start Frame must be before Stop Frame!")
             return
-        self.video_queue[f"{self.current_video}"][1] = current_frame
-        current_frame_timecode = self.sub_ex.frame_no_to_duration(current_frame, self.current_fps)
-        self.status_label.configure(text=f"Start Frame set to {current_frame_timecode}")
+        self.video_queue[f"{self.current_video}"][1] = current_frame  # Start frame changed in dict.
+        self._set_status_label()
 
     def _set_current_stop_frame(self) -> None:
         """
@@ -443,9 +442,21 @@ class SubtitleExtractorGUI:
         if start_frame and current_frame <= start_frame:
             self.status_label.configure(text="Stop Frame must be after Start Frame!")
             return
-        self.video_queue[f"{self.current_video}"][2] = current_frame
-        current_frame_timecode = self.sub_ex.frame_no_to_duration(current_frame, self.current_fps)
-        self.status_label.configure(text=f"Stop Frame set to {current_frame_timecode}")
+        self.video_queue[f"{self.current_video}"][2] = current_frame  # Stop frame changed in dict.
+        self._set_status_label()
+
+    def _set_status_label(self) -> None:
+        """
+        Set the status label according to the values of the start and stop frame in video queue.
+        """
+        start_frame = self.video_queue[f"{self.current_video}"][1]
+        stop_frame = self.video_queue[f"{self.current_video}"][2]
+        if start_frame or stop_frame:
+            start_dur = self.sub_ex.frame_no_to_duration(start_frame, self.current_fps) if start_frame else start_frame
+            stop_dur = self.sub_ex.frame_no_to_duration(stop_frame, self.current_fps) if stop_frame else stop_frame
+            self.status_label.configure(text=f"Start Frame: {start_dur}, Stop Frame: {stop_dur}")
+        else:
+            self.status_label.configure(text='')
 
     def _video_indexer(self) -> tuple:
         """
@@ -513,12 +524,12 @@ class SubtitleExtractorGUI:
         self.video_capture = cv.VideoCapture(self.current_video)
         self._set_canvas()
         self._set_frame_slider()
+        self._set_status_label()
         self._display_video_frame()
         self._set_current_non_subarea()
         self._draw_current_subtitle_area()
         self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
-        self.status_label.configure(text='')
 
         if len(self.video_queue) > 1:
             self._set_batch_layout()
