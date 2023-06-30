@@ -585,7 +585,7 @@ class SubtitleExtractorGUI:
         """
         Overwrite progress bar text in text widget, if detected in previous line.
         """
-        progress_pattern = re.compile(r'.+\s\|[#-]+\|\s[\d.]+%\s')
+        progress_pattern = re.compile(r'.+\s\|[ #-]+\|\s[\d.]+%\s')
         if progress_pattern.search(text):
             start, stop = 'end - 1 lines', 'end - 1 lines lineend'
             previous_line = self.text_output_widget.get(start, stop)

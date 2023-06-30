@@ -77,7 +77,7 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
     files = [file for file in frame_output.iterdir()]
     file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
-    prefix = "Extracting texts"
+    prefix = "Extracting text from frames"
     logger.debug("Using multiprocessing for extracting text")
 
     with ProcessPoolExecutor(max_workers=ocr_max_processes) as executor:
