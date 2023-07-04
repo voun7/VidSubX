@@ -26,7 +26,8 @@ class Process:
 
 
 class Config:
-    config_file = Path("config.ini")
+    # Config file location will always be the same regardless of which module starts the program.
+    config_file = Path(__file__).parent.parent / "config.ini"
     config = ConfigParser()
     config.read(config_file)
 
