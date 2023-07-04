@@ -5,7 +5,7 @@
 
 Program that extracts hard coded subtitles from video and creates external subtitles.
 
-Installation steps:
+## Installation steps:
 
 1st Miniconda must be installed and a virtual environment created and activated.
 
@@ -51,7 +51,7 @@ pip install pyclipper
 pip install lmdb
 ```
 
-```
+```commandline
 pip install --no-deps paddleocr
 ```
 
