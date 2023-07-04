@@ -41,8 +41,7 @@ class SubtitleDetector:
         # How many frames to look through after splits.
         no_of_frames = utils.Config.no_of_frames
 
-        relative_start = int(self.frame_total * split_start)
-        relative_stop = int(self.frame_total * split_stop)
+        relative_start, relative_stop = int(self.frame_total * split_start), int(self.frame_total * split_stop)
         logger.debug(f"Relative start frame = {relative_start}, Relative stop frame = {relative_stop}")
         # Split the frames into chunk lists.
         frame_chunks = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
@@ -236,8 +235,7 @@ class SubtitleExtractor:
         """
         Takes 2 name durations and creates a new name.
         """
-        start_name = start_name.split(self.divider)[0]
-        end_name = end_name.split(self.divider)[1]
+        start_name, end_name = start_name.split(self.divider)[0], end_name.split(self.divider)[1]
         new_name = f"{start_name}{self.divider}{end_name}"
         return new_name
 
@@ -384,8 +382,7 @@ class SubtitleExtractor:
         subtitles = []
         for line_code, (ms_dur, txt) in enumerate(self.subtitle_texts.items(), start=1):
             key_name = ms_dur.split(self.divider)
-            frame_start = self.timecode(float(key_name[0]))
-            frame_end = self.timecode(float(key_name[1]))
+            frame_start, frame_end = self.timecode(float(key_name[0])), self.timecode(float(key_name[1]))
             subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{txt}\n\n"
             subtitles.append(subtitle_line)
         self.save_subtitle(subtitles)

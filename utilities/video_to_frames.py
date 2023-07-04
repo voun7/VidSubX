@@ -95,8 +95,7 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
         logger.error("Video has no frames. Check your OpenCV installation")
         return  # end function call
 
-    start_frame = start_frame if start_frame else 0
-    stop_frame = stop_frame if stop_frame else frame_count
+    start_frame, stop_frame = start_frame or 0, stop_frame or frame_count
 
     # split the frames into chunk lists
     frame_chunks = [[i, i + chunk_size] for i in range(start_frame, stop_frame, chunk_size)]

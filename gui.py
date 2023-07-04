@@ -462,8 +462,7 @@ class SubtitleExtractorGUI:
         """
         Checks the index of the current video in the video queue dictionary using its key.
         """
-        index = list(self.video_queue).index(self.current_video)
-        queue_len = len(self.video_queue)
+        index, queue_len = list(self.video_queue).index(self.current_video), len(self.video_queue)
         video_index = f"Video {index + 1} of {queue_len}"
         return index, queue_len, video_index
 
