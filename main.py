@@ -356,23 +356,14 @@ class SubtitleExtractor:
         smpte_token = ','
         return "%02d:%02d:%02d%s%03d" % (hours, minutes, seconds, smpte_token, milliseconds)
 
-    def save_subtitle(self, lines: list) -> None:
-        name = self.video_path.with_suffix(".srt")
-        if name.exists():
-            current_time = time.strftime("%H;%M;%S")
-            name = f"{name.parent}/{name.stem} {current_time} (new copy).srt"
-        with open(name, 'w', encoding="utf-8") as new_sub:
-            new_sub.writelines(lines)
-        logger.info(f"Subtitle file generated. Name: {name}")
-
-    def generate_subtitle(self) -> None:
+    def generate_subtitle(self) -> list:
         """
         Use text files in dictionary to create subtitle file.
         """
         # Cancel if process has been cancelled by gui.
         if utils.Process.interrupt_process:
             logger.warning("Subtitle generation process interrupted!")
-            return
+            return []
 
         logger.info("Generating subtitle...")
         self.merge_adjacent_equal_texts()
@@ -385,8 +376,8 @@ class SubtitleExtractor:
             frame_start, frame_end = self.timecode(float(key_name[0])), self.timecode(float(key_name[1]))
             subtitle_line = f"{line_code}\n{frame_start} --> {frame_end}\n{txt}\n\n"
             subtitles.append(subtitle_line)
-        self.save_subtitle(subtitles)
         logger.info("Subtitle generated!")
+        return subtitles
 
     def load_subtitle_texts(self, text_folder: Path) -> None:
         """
@@ -398,6 +389,23 @@ class SubtitleExtractor:
         for file in sorted(text_folder.iterdir(), key=lambda name: float(name.stem)):
             file_text = file.read_text(encoding="utf-8")
             self.subtitle_texts[file.stem] = file_text
+
+    def save_subtitle(self, lines: list) -> None:
+        """
+        Save generated subtitle file in the same location as video file.
+        :param lines: subtitle lines to be written to file.
+        """
+        if not lines:
+            logger.debug(f"No lines in subtitles generated. Name: {self.video_path.name}")
+            return
+
+        name = self.video_path.with_suffix(".srt")
+        if name.exists():
+            current_time = time.strftime("%H;%M;%S")
+            name = f"{name.parent}/{name.stem} {current_time} (new copy).srt"
+        with open(name, 'w', encoding="utf-8") as new_sub:
+            new_sub.writelines(lines)
+        logger.info(f"Subtitle file generated. Name: {name}")
 
     def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
                        stop_frame: int = None) -> None:
@@ -428,7 +436,8 @@ class SubtitleExtractor:
         video_to_frames(video_path, frame_output, sub_area, start_frame, stop_frame)
         frames_to_text(frame_output, text_output)
         self.load_subtitle_texts(text_output)
-        self.generate_subtitle()
+        subtitles = self.generate_subtitle()
+        self.save_subtitle(subtitles)
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
