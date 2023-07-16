@@ -390,6 +390,23 @@ class SubtitleExtractor:
             file_text = file.read_text(encoding="utf-8")
             self.subtitle_texts[file.stem] = file_text
 
+    def gen_sub_file_name(self) -> Path:
+        """
+        If the file name doesn't exist, return it directly.
+        If the file name already exists, append a unique identifier to the file name.
+        :return: new file name with path.
+        """
+        name = self.video_path.with_suffix(".srt")
+        if not name.exists():
+            return name
+        else:
+            suffix = 1  # Find an available unique name by appending a number.
+            while True:
+                new_file_path = Path(f"{name.parent}/{name.stem} ({suffix}).srt")
+                if not new_file_path.exists():
+                    return new_file_path
+                suffix += 1
+
     def save_subtitle(self, lines: list) -> None:
         """
         Save generated subtitle file in the same location as video file.
@@ -398,11 +415,7 @@ class SubtitleExtractor:
         if not lines:
             logger.debug(f"No lines in subtitles generated. Name: {self.video_path.name}")
             return
-
-        name = self.video_path.with_suffix(".srt")
-        if name.exists():
-            current_time = time.strftime("%H;%M;%S")
-            name = f"{name.parent}/{name.stem} {current_time} (new copy).srt"
+        name = self.gen_sub_file_name()
         with open(name, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
         logger.info(f"Subtitle file generated. Name: {name}")
