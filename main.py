@@ -9,7 +9,6 @@ import cv2 as cv
 
 import utilities.utils as utils
 from utilities.frames_to_text import extract_bboxes, frames_to_text
-from utilities.logger_setup import get_logger
 from utilities.video_to_frames import extract_frames, video_to_frames
 
 logger = logging.getLogger(__name__)
@@ -457,13 +456,3 @@ class SubtitleExtractor:
         converted_time = time.strftime("%Hh:%Mm:%Ss", time.gmtime(total_time))
         logger.info(f"Subtitle Extraction Done! Total time: {converted_time}\n")
         self._empty_cache()
-
-
-if __name__ == '__main__':
-    get_logger()
-    logger.debug("\n\nMain program Started.")
-    test_video = r""
-    test_sub_area = SubtitleDetector(test_video, True).get_sub_area()
-    se = SubtitleExtractor()
-    se.run_extraction(test_video, test_sub_area)
-    logger.debug("Main program Ended.\n\n")
