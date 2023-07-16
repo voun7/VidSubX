@@ -427,7 +427,7 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
         logger.info(f"Subtitle file saved. Name: {name}")
 
-    def get_frames_and_texts(self, sub_area: tuple, start_frame: int, stop_frame: int) -> None:
+    def get_frames_and_texts(self, sub_area: tuple, start_frame: int | None, stop_frame: int | None) -> None:
         """
         Get the frames and the images from the video by calling external functions.
         """
