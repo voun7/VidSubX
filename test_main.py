@@ -9,6 +9,31 @@ class TestSubtitleDetector(TestCase):
         self.video_path = "test files/chinese_video_1.mp4"
         self.video_path_2 = "test files/chinese_video_2.mp4"
 
+    @classmethod
+    def setUpClass(cls):
+        cls.sd = SubtitleDetector("test files/chinese_video_1.mp4", True)
+
+    def test_dir(self):
+        self.assertTrue(self.sd.vd_output_dir.exists())
+
+    def test__get_key_frames(self):
+        self.sd.frame_output.mkdir(parents=True)
+        self.sd._get_key_frames()
+        no_of_frames = len(list(self.sd.frame_output.iterdir()))
+        self.assertEqual(no_of_frames, 20)
+
+    def test__pad_sub_area(self):
+        self.assertEqual(self.sd._pad_sub_area((698, 158), (1218, 224)), ((288, 148), (1632, 234)))
+
+    def test__reposition_sub_area(self):
+        self.assertEqual(self.sd._reposition_sub_area((288, 148), (1632, 234)), ((288, 958), (1632, 1044)))
+
+    def test__empty_cache(self):
+        self.sd.frame_output.mkdir(parents=True)
+        self.assertTrue(self.sd.vd_output_dir.exists())
+        self.sd._empty_cache()
+        self.assertFalse(self.sd.vd_output_dir.exists())
+
     def test_get_sub_area_search_area_1(self):
         sub_area = (288, 958, 1632, 1044)
         result = SubtitleDetector(self.video_path, True).get_sub_area()
