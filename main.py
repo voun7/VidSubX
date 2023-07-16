@@ -425,7 +425,7 @@ class SubtitleExtractor:
         name = self.gen_sub_file_name()
         with open(name, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
-        logger.info(f"Subtitle file generated. Name: {name}")
+        logger.info(f"Subtitle file saved. Name: {name}")
 
     def get_frames_and_texts(self, sub_area: tuple, start_frame: int, stop_frame: int) -> None:
         """
