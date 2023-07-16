@@ -159,6 +159,8 @@ class SubtitleExtractor:
         self.subtitle_texts = {}
         self.divider = "--"  # Characters for separating time durations(ms) in key name.
         self.vd_output_dir = Path(f"{Path.cwd()}/output")  # Create cache directory.
+        # Extracted video frame storage directory. Extracted text file storage directory.
+        self.frame_output, self.text_output = self.vd_output_dir / "frames", self.vd_output_dir / "extracted texts"
 
     @staticmethod
     def video_details(video_path: str) -> tuple:
@@ -378,14 +380,13 @@ class SubtitleExtractor:
         logger.info("Subtitle generated!")
         return subtitles
 
-    def load_subtitle_texts(self, text_folder: Path) -> None:
+    def load_subtitle_texts(self) -> None:
         """
         Load subtitle texts files in to dictionary. The name of the file which represents the duration in milliseconds
         will be the key and text of the file will be the value.
         The files will be sorted before being added to the dict, this prevents the need for sorting again.
-        :param text_folder: folder containing text files
         """
-        for file in sorted(text_folder.iterdir(), key=lambda name: float(name.stem)):
+        for file in sorted(self.text_output.iterdir(), key=lambda name: float(name.stem)):
             file_text = file.read_text(encoding="utf-8")
             self.subtitle_texts[file.stem] = file_text
 
@@ -419,6 +420,13 @@ class SubtitleExtractor:
             new_sub.writelines(lines)
         logger.info(f"Subtitle file generated. Name: {name}")
 
+    def get_frames_and_texts(self, sub_area: tuple, start_frame: int, stop_frame: int) -> None:
+        """
+        Get the frames and the images from the video by calling external functions.
+        """
+        video_to_frames(str(self.video_path), self.frame_output, sub_area, start_frame, stop_frame)
+        frames_to_text(self.frame_output, self.text_output)
+
     def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
                        stop_frame: int = None) -> None:
         """
@@ -430,11 +438,9 @@ class SubtitleExtractor:
             return
         start = cv.getTickCount()
         self._empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
-        # Extracted video frame storage directory. Extracted text file storage directory.
-        frame_output, text_output = self.vd_output_dir / "frames", self.vd_output_dir / "extracted texts"
-        # If the directory does not exist, create the folder.
-        frame_output.mkdir(parents=True, exist_ok=True)
-        text_output.mkdir(parents=True, exist_ok=True)
+        # If the directories do not exist, create the directories.
+        self.frame_output.mkdir(parents=True)
+        self.text_output.mkdir(parents=True)
 
         fps, frame_total, frame_width, frame_height = self.video_details(video_path)
         sub_area = sub_area or self.default_sub_area(frame_width, frame_height)
@@ -445,9 +451,8 @@ class SubtitleExtractor:
         logger.info(f"Subtitle Area: {sub_area}")
         logger.info(f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
 
-        video_to_frames(video_path, frame_output, sub_area, start_frame, stop_frame)
-        frames_to_text(frame_output, text_output)
-        self.load_subtitle_texts(text_output)
+        self.get_frames_and_texts(sub_area, start_frame, stop_frame)
+        self.load_subtitle_texts()
         subtitles = self.generate_subtitle()
         self.save_subtitle(subtitles)
 
