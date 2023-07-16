@@ -339,6 +339,16 @@ class SubtitleExtractor:
                 short_dur_keys.add(ms_duration)
         self.delete_keys(short_dur_keys)
 
+    def process_extracted_texts(self) -> None:
+        """
+        Process extracted texts in dictionary.
+        """
+        logger.debug("Processing extracted texts...")
+        self.merge_adjacent_equal_texts()
+        self.merge_adjacent_similar_texts()
+        self.remove_short_duration_consecutive_subs()
+        self.remove_short_duration_subs()
+
     @staticmethod
     def timecode(frame_no_in_milliseconds: float) -> str:
         """
@@ -359,7 +369,7 @@ class SubtitleExtractor:
 
     def generate_subtitle(self) -> list:
         """
-        Use text files in dictionary to create subtitle file.
+        Use processed text files in dictionary to create subtitle file.
         """
         # Cancel if process has been cancelled by gui.
         if utils.Process.interrupt_process:
@@ -367,10 +377,6 @@ class SubtitleExtractor:
             return []
 
         logger.info("Generating subtitle...")
-        self.merge_adjacent_equal_texts()
-        self.merge_adjacent_similar_texts()
-        self.remove_short_duration_consecutive_subs()
-        self.remove_short_duration_subs()
         subtitles = []
         for line_code, (ms_dur, txt) in enumerate(self.subtitle_texts.items(), start=1):
             key_name = ms_dur.split(self.divider)
@@ -380,12 +386,13 @@ class SubtitleExtractor:
         logger.info("Subtitle generated!")
         return subtitles
 
-    def load_subtitle_texts(self) -> None:
+    def load_extracted_texts(self) -> None:
         """
-        Load subtitle texts files in to dictionary. The name of the file which represents the duration in milliseconds
+        Load extracted texts files into dictionary. The name of the file which represents the duration in milliseconds
         will be the key and text of the file will be the value.
         The files will be sorted before being added to the dict, this prevents the need for sorting again.
         """
+        logger.debug("Loading extracted tests...")
         for file in sorted(self.text_output.iterdir(), key=lambda name: float(name.stem)):
             file_text = file.read_text(encoding="utf-8")
             self.subtitle_texts[file.stem] = file_text
@@ -452,7 +459,8 @@ class SubtitleExtractor:
         logger.info(f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
 
         self.get_frames_and_texts(sub_area, start_frame, stop_frame)
-        self.load_subtitle_texts()
+        self.load_extracted_texts()
+        self.process_extracted_texts()
         subtitles = self.generate_subtitle()
         self.save_subtitle(subtitles)
 
