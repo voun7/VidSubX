@@ -452,11 +452,11 @@ class SubtitleExtractor:
         fps, frame_total, frame_width, frame_height = self.video_details(video_path)
         sub_area = sub_area or self.default_sub_area(frame_width, frame_height)
 
-        logger.info(f"File Path: {self.video_path}")
-        logger.info(f"Frame Total: {frame_total}, Frame Rate: {fps}")
-        logger.info(f"Resolution: {frame_width} X {frame_height}")
-        logger.info(f"Subtitle Area: {sub_area}")
-        logger.info(f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
+        logger.info(f"File Path: {self.video_path}\n"
+                    f"Frame Total: {frame_total}, Frame Rate: {fps}\n"
+                    f"Resolution: {frame_width} X {frame_height}\n"
+                    f"Subtitle Area: {sub_area}\n"
+                    f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
 
         self.get_frames_and_texts(sub_area, start_frame, stop_frame)
         self.load_extracted_texts()
