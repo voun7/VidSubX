@@ -384,14 +384,14 @@ class SubtitleExtractorGUI:
         """
         self.video_capture.set(cv.CAP_PROP_POS_FRAMES, frame_no)  # CAP_PROP_POS_MSEC would be used for milliseconds.
         _, frame = self.video_capture.read()
+        if frame is not None:
+            cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
+            frame_resized = self.rescale(cv2image)  # Make image fit canvas (usually a down scale).
 
-        cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
-        frame_resized = self.rescale(cv2image)  # Make image fit canvas (usually a down scale).
-
-        img = Image.fromarray(frame_resized)
-        photo = ImageTk.PhotoImage(image=img)
-        self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
-        self.canvas.image = photo
+            img = Image.fromarray(frame_resized)
+            photo = ImageTk.PhotoImage(image=img)
+            self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
+            self.canvas.image = photo
 
     def _frame_slider(self, scale_value: str) -> None:
         """
@@ -411,8 +411,8 @@ class SubtitleExtractorGUI:
         Activate the slider, then set the starting and ending values of the slider.
         """
         logger.debug("Setting frame slider")
-        # Set the max size of the frame slider. Size reduced by fps to prevent cv2.error when slider reaches end.
-        self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total - self.current_fps, value=0)
+        # Set the max size of the frame slider.
+        self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total, value=0.0)
         # Set the durations labels.
         total_time_duration = self.sub_ex.frame_no_to_duration(self.current_frame_total, self.current_fps)
         self.current_scale_value.configure(text="00:00:00:000")
