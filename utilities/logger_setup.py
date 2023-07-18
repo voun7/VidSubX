@@ -22,7 +22,7 @@ def get_file_handler(log_path: Path, log_format: logging.Formatter) -> logging.h
     return file_handler
 
 
-def get_logger():
+def get_logger() -> None:
     """
     Use the following to add logger to other modules.
     import logging
