@@ -16,7 +16,7 @@ from PIL import Image, ImageTk
 
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
-from utilities.logger_setup import get_logger
+from utilities.logger_setup import setup_logging
 from utilities.win_notify import Notification, Sound
 
 logger = logging.getLogger(__name__)
@@ -1222,7 +1222,7 @@ class PreferencesUI(tk.Toplevel):
 
 
 if __name__ == '__main__':
-    get_logger()
+    setup_logging()
     logger.debug("\n\nGUI program Started.")
     set_dpi_scaling()
     rt = tk.Tk()
