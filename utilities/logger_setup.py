@@ -29,7 +29,7 @@ def get_logger():
     logger = logging.getLogger(__name__)
 
     The following suppress log messages. It will not log messages of given module unless they are at least warnings.
-    logging.getLogger("").setLevel(logging.WARNING)
+    logging.getLogger("module_name").setLevel(logging.WARNING)
     """
     # Create folder for file logs.
     log_dir = Path(__file__).parent.parent / "logs"
