@@ -56,6 +56,6 @@ def my_namer(default_name: str) -> str:
     base_filename, ext, date = default_name.split(".")
     return f"{base_filename}.{date}.{ext}"
 
-# Go to C:\Users\VOUN-XPS\miniconda3\envs\VSE\Lib\site-packages\paddle\distributed\utils\log_utils.py
+# Go to C:\Users\nwaez\miniconda3\envs\VSE\Lib\site-packages\paddle\distributed\utils\log_utils.py
 # Change the get_logger function's logging.getLogger(name) to logging.getLogger(__name__)
 # This prevents duplicate logs from paddle
