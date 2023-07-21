@@ -141,6 +141,8 @@ class TestSubtitleExtractor(TestCase):
         self.assertEqual(self.se.timecode(97879869), "27:11:19,869")
         self.assertEqual(self.se.timecode(309485036), "85:58:05,036")
         self.assertEqual(self.se.timecode(378786979), "105:13:06,979")
+        self.assertEqual(self.se.timecode(25234.7962452), "00:00:25,234")
+        self.assertEqual(self.se.timecode(6365.242454), "00:00:06,365")
 
     def test_run_extraction_1(self):
         print("\nRunning test for run_extraction method...")
