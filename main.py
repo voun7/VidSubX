@@ -354,18 +354,13 @@ class SubtitleExtractor:
         """
         Use to frame no in milliseconds to create timecode.
         """
-        seconds = frame_no_in_milliseconds // 1000
-        milliseconds = int(frame_no_in_milliseconds % 1000)
-        minutes = 0
-        hours = 0
-        if seconds >= 60:
-            minutes = int(seconds // 60)
-            seconds = int(seconds % 60)
-        if minutes >= 60:
-            hours = int(minutes // 60)
-            minutes = int(minutes % 60)
-        smpte_token = ','
-        return "%02d:%02d:%02d%s%03d" % (hours, minutes, seconds, smpte_token, milliseconds)
+        # Calculate the components of the timecode.
+        total_seconds = frame_no_in_milliseconds // 1000  # Convert milliseconds to total seconds.
+        milliseconds_remainder = frame_no_in_milliseconds % 1000  # Calculate the remaining milliseconds.
+        seconds = total_seconds % 60  # Calculate the seconds component (remainder after removing minutes).
+        minutes = (total_seconds // 60) % 60
+        hours = total_seconds // 3600  # Calculate the number of hours in the total seconds.
+        return "%02d:%02d:%02d,%03d" % (hours, minutes, seconds, milliseconds_remainder)
 
     def generate_subtitle(self) -> list:
         """
