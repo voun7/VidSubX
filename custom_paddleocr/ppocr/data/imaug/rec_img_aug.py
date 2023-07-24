@@ -21,7 +21,6 @@ from PIL import Image
 from paddle.vision.transforms import Compose
 
 from .abinet_aug import CVGeometry, CVDeterioration, CVColorJitter, SVTRGeometry, SVTRDeterioration
-from .text_image_aug import tia_perspective, tia_stretch, tia_distort
 
 
 class RecAug(object):

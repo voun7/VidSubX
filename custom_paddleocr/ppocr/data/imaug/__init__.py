@@ -38,7 +38,6 @@ from .rec_img_aug import BaseDataAugmentation, RecAug, RecConAug, RecResizeImg, 
 from .sast_process import *
 from .ssl_img_aug import SSLRotateResize
 from .table_ops import *
-from .vqa import *
 
 
 def transform(data, ops=None):
