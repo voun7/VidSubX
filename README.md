@@ -36,24 +36,9 @@ pip install opencv-python
 ```
 
 ```
-pip install tqdm
-```
-
-```
 pip install Shapely
 ```
 
 ```
 pip install pyclipper
 ```
-
-```
-pip install lmdb
-```
-
-```commandline
-pip install --no-deps paddleocr
-```
-
-Not all of paddleocr dependencies are needed, comment out the imports for the following packages in paddleocr:
-skimage, scipy, imgaug.

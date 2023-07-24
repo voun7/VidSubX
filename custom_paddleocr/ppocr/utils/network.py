@@ -18,7 +18,8 @@ import sys
 import tarfile
 
 import requests
-from tqdm import tqdm
+
+from utilities.utils import print_progress
 
 
 def download_with_progressbar(url, save_path):
@@ -27,13 +28,12 @@ def download_with_progressbar(url, save_path):
     if response.status_code == 200:
         total_size_in_bytes = int(response.headers.get('content-length', 1))
         block_size = 1024  # 1 Kibibyte
-        progress_bar = tqdm(
-            total=total_size_in_bytes, unit='iB', unit_scale=True)
+        data_progress = 0
         with open(save_path, 'wb') as file:
             for data in response.iter_content(block_size):
-                progress_bar.update(len(data))
+                data_progress += block_size
+                print_progress(data_progress, total_size_in_bytes, "Downloading model", "Complete")
                 file.write(data)
-        progress_bar.close()
     else:
         logger.error("Something went wrong while downloading models")
         sys.exit(0)

@@ -24,10 +24,7 @@ import signal
 from paddle.io import DataLoader, BatchSampler, DistributedBatchSampler
 
 from custom_paddleocr.ppocr.data.imaug import transform, create_operators
-from custom_paddleocr.ppocr.data.lmdb_dataset import LMDBDataSet, LMDBDataSetSR
 from custom_paddleocr.ppocr.data.pgnet_dataset import PGDataSet
-from custom_paddleocr.ppocr.data.pubtab_dataset import PubTabDataSet
-from custom_paddleocr.ppocr.data.simple_dataset import SimpleDataSet
 
 __all__ = ['build_dataloader', 'transform', 'create_operators']
 

@@ -199,7 +199,7 @@ def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '
     bar = '#' * filled_length + '-' * (bar_length - filled_length)  # generate the bar string
     print(f"\r{prefix} |{bar}| {percents}% {suffix}", end='', flush=True)  # prints progress on the same line
 
-    if "100" in percents:  # prevent next line from joining previous line
+    if "100.0" in percents:  # prevent next line from joining previous line
         print()
 
 
