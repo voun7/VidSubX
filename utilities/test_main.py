@@ -7,13 +7,12 @@ from main import SubtitleDetector, SubtitleExtractor
 class TestSubtitleDetector(TestCase):
     def setUp(self) -> None:
         print("\nRunning setUp method...")
-        self.video_path = "test files/chinese_video_1.mp4"
-        self.video_path_2 = "test files/chinese_video_2.mp4"
+        self.video_path, self.video_path_2 = "../test files/chinese_video_1.mp4", "../test files/chinese_video_2.mp4"
 
     @classmethod
     def setUpClass(cls):
         print("Running setUpClass method...")
-        cls.sd = SubtitleDetector("test files/chinese_video_1.mp4", True)
+        cls.sd = SubtitleDetector("../test files/chinese_video_1.mp4", True)
 
     def test_dir(self):
         print("\nRunning test for vd_output_dir existence...")
@@ -71,10 +70,11 @@ class TestSubtitleExtractor(TestCase):
     def setUpClass(cls) -> None:
         print("\nRunning setUpClass method...")
         cls.se = SubtitleExtractor()
-        cls.video_path, cls.video_sub = "test files/chinese_video_1.mp4", Path("test files/chinese_video_1.srt")
+        cls.video_path, cls.video_sub = "../test files/chinese_video_1.mp4", Path("../test files/chinese_video_1.srt")
         cls.fps, cls.frame_total, cls.frame_width, cls.frame_height = 30.0, 1830, 1920, 1080
 
-        cls.video_path_2, cls.video_sub_2 = "test files/chinese_video_2.mp4", Path("test files/chinese_video_2.srt")
+        cls.video_path_2 = "../test files/chinese_video_2.mp4"
+        cls.video_sub_2 = Path("../test files/chinese_video_2.srt")
         cls.fps_2, cls.frame_total_2, cls.frame_width_2, cls.frame_height_2 = 24.0, 1479, 1920, 1080
 
         cls.default_sub_area = 0, 810, 1920, 1080
