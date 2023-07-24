@@ -32,7 +32,7 @@ def download_with_progressbar(url, save_path):
         with open(save_path, 'wb') as file:
             for data in response.iter_content(block_size):
                 data_progress += block_size
-                print_progress(data_progress, total_size_in_bytes, "Downloading model", "Complete")
+                print_progress(data_progress, total_size_in_bytes, "Downloading model")
                 file.write(data)
     else:
         logger.error("Something went wrong while downloading models")

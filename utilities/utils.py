@@ -179,7 +179,7 @@ class Config:
         logger.debug("Configuration values changed!")
 
 
-def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '', decimals: int = 3,
+def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = 'Complete', decimals: int = 3,
                    bar_length: int = 25) -> None:
     """
     Call in a loop to create standard out progress bar.
