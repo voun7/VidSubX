@@ -1,3 +1,4 @@
+import io
 import logging
 import sys
 from logging.handlers import TimedRotatingFileHandler
@@ -22,6 +23,16 @@ def get_file_handler(log_dir: Path, log_format: logging.Formatter) -> logging.ha
     return file_handler
 
 
+def set_no_console_redirect() -> None:
+    """
+    When console is not available stdout and stderr values will be changed.
+    """
+    if sys.stdout is None:
+        sys.stdout = io.StringIO()
+    if sys.stderr is None:
+        sys.stderr = io.StringIO()
+
+
 def setup_logging() -> None:
     """
     Use the following to add logger to other modules.
@@ -31,6 +42,7 @@ def setup_logging() -> None:
     The following suppress log messages. It will not log messages of given module unless they are at least warnings.
     logging.getLogger("module_name").setLevel(logging.WARNING)
     """
+    set_no_console_redirect()
     # Create folder for file logs.
     log_dir = Path(__file__).parent.parent / "logs"
     log_dir.mkdir(exist_ok=True)
