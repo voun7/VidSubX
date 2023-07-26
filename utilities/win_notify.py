@@ -119,7 +119,18 @@ class Notification(object):
 
         self.script = WIN_TOAST_TEMPLATE.format(**self.__dict__)
 
-        subprocess.Popen(["powershell.exe", "-ExecutionPolicy", "Bypass", '-Command', self.script])
+        command = ["powershell.exe", "-ExecutionPolicy", "Bypass", '-Command', self.script]
+        self.run_no_console_command(command)
+
+    @staticmethod
+    def run_no_console_command(command: list) -> None:
+        """
+        Run subprocess commands without relying on a console being available
+        """
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        subprocess.Popen(command, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         stdin=subprocess.PIPE)
 
 
 if __name__ == '__main__':
