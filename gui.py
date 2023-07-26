@@ -5,6 +5,7 @@ import re
 import sys
 import time
 import tkinter as tk
+from multiprocessing import freeze_support
 from pathlib import Path
 from threading import Thread
 from tkinter import filedialog
@@ -1222,6 +1223,7 @@ class PreferencesUI(tk.Toplevel):
 
 
 if __name__ == '__main__':
+    freeze_support()
     setup_logging()
     logger.debug("\n\nGUI program Started.")
     set_dpi_scaling()
