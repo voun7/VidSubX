@@ -5,7 +5,6 @@ import re
 import sys
 import time
 import tkinter as tk
-from multiprocessing import freeze_support
 from pathlib import Path
 from threading import Thread
 from tkinter import filedialog
@@ -580,7 +579,7 @@ class SubtitleExtractorGUI:
         Redirect console statements to text widget.
         """
         sys.stdout.write = self.write_to_output
-        sys.stderr.write = self.write_to_output
+        # sys.stderr.write = self.write_to_output
 
     def clear_output(self, start: str = "1.0", stop: str = "end") -> None:
         """
@@ -1223,7 +1222,6 @@ class PreferencesUI(tk.Toplevel):
 
 
 if __name__ == '__main__':
-    freeze_support()
     setup_logging()
     logger.debug("\n\nGUI program Started.")
     set_dpi_scaling()
