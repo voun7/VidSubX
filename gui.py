@@ -580,15 +580,7 @@ class SubtitleExtractorGUI:
         Redirect console statements to text widget.
         """
         sys.stdout.write = self.write_to_output
-        sys.stderr.write = self.write_error_to_log
-
-    @staticmethod
-    def write_error_to_log(text: str) -> None:
-        """
-        Redirect console error messages to logger.
-        """
-        if text and text.strip():
-            logger.debug(f"[ERROR] {text.strip()}")
+        sys.stderr.write = self.write_to_output
 
     def clear_output(self, start: str = "1.0", stop: str = "end") -> None:
         """

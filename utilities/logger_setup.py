@@ -5,16 +5,53 @@ from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
 
+class LogLevelFilter(logging.Filter):
+    def __init__(self, level: int) -> None:
+        """
+        Initialize the LogLevelFilter with the specified log level.
+        :param level: The log level threshold. Log records with a level lower than this threshold will be allowed,
+        while higher-level records will be filtered out.
+        """
+        super().__init__()
+        self.level = level
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """
+        This method is called by log handlers to decide whether to process the log record.
+        If the log record's level is less than the filter's level, the record will be allowed,
+        and it will be processed further. Otherwise, the record will be filtered out.
+        :param record: The log record to be processed.
+        :return: True if the log record should be processed, False otherwise.
+        """
+        # Comparing the log level of the record to the filter's level
+        return record.levelno < self.level
+
+
+def get_console_error_handler() -> logging.handlers:
+    """
+    Determine how stderr messages for the console will be handled.
+    The console sends only messages by default no need for formatter.
+    """
+    error_handler = logging.StreamHandler()
+    error_handler.setLevel(logging.ERROR)
+    return error_handler
+
+
 def get_console_handler() -> logging.handlers:
     """
+    Determine how stdout messages for the console will be handled.
     The console sends only messages by default no need for formatter.
     """
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
+    console_handler.addFilter(LogLevelFilter(logging.ERROR))
     return console_handler
 
 
 def get_file_handler(log_dir: Path, log_format: logging.Formatter) -> logging.handlers:
+    """
+    Determine how the log messages are handled for log files.
+    """
     log_file = log_dir / "runtime.log"
     file_handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=7, encoding='utf-8')
     file_handler.namer = my_namer
@@ -33,6 +70,16 @@ def set_no_console_redirect() -> None:
         sys.stderr = io.StringIO()
 
 
+def reset_handlers() -> None:
+    """
+    Remove all handlers from the root logger.
+    This helps prevent duplicate logs from other handlers created by imported modules.
+    """
+    logger = logging.getLogger()
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+
+
 def setup_logging() -> None:
     """
     Use the following to add logger to other modules.
@@ -42,7 +89,10 @@ def setup_logging() -> None:
     The following suppress log messages. It will not log messages of given module unless they are at least warnings.
     logging.getLogger("module_name").setLevel(logging.WARNING)
     """
+    # Run pre logging setup functions.
+    reset_handlers()
     set_no_console_redirect()
+
     # Create folder for file logs.
     log_dir = Path(__file__).parent.parent / "logs"
     log_dir.mkdir(exist_ok=True)
@@ -56,6 +106,7 @@ def setup_logging() -> None:
 
     # Add handlers to the logger.
     logger.addHandler(get_console_handler())
+    logger.addHandler(get_console_error_handler())
     logger.addHandler(get_file_handler(log_dir, log_format))
 
 
@@ -67,7 +118,3 @@ def my_namer(default_name: str) -> str:
     """
     base_filename, ext, date = default_name.split(".")
     return f"{base_filename}.{date}.{ext}"
-
-# Go to C:\Users\nwaez\miniconda3\envs\VSE\Lib\site-packages\paddle\distributed\utils\log_utils.py
-# Change the get_logger function's logging.getLogger(name) to logging.getLogger(__name__)
-# This prevents duplicate logs from paddle
