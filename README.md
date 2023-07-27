@@ -19,7 +19,7 @@ https://conda.io/projects/conda/en/stable/user-guide/install/download.html
 conda install paddlepaddle-gpu==2.4.2 cudatoolkit=11.7 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
 ```
 
-Test if paddlepaddle installation its working:
+Test if paddlepaddle installation is working:
 
 ```
 import paddle
@@ -31,14 +31,14 @@ paddle.utils.run_check()
 
 3rd Install the following in the conda virtual environment:
 
-```
+```commandline
 pip install opencv-python
 ```
 
-```
+```commandline
 pip install Shapely
 ```
 
-```
+```commandline
 pip install pyclipper
 ```
