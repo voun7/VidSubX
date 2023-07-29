@@ -7,8 +7,7 @@ import time
 import tkinter as tk
 from pathlib import Path
 from threading import Thread
-from tkinter import filedialog
-from tkinter import ttk
+from tkinter import ttk, filedialog, messagebox
 
 import cv2 as cv
 import numpy as np
@@ -45,6 +44,62 @@ def set_dpi_scaling() -> None:
             ctypes.windll.shcore.SetProcessDpiAwareness(2)
         except Exception as dpi_error:
             logger.exception(f"An error occurred while setting the dpi: {dpi_error}")
+
+
+class CustomMessageBox(tk.Toplevel):
+    """
+    CustomMessageBox class represents a custom messagebox that appends messages on a single window.
+    The class inherits from tk.Toplevel and ensures that only one instance of the messagebox is created.
+    """
+    instance = None
+
+    def __init__(self, icon_file: str, win_title: str) -> None:
+        """
+        Initialize the CustomMessageBox instance.
+        If an instance of CustomMessageBox already exists, it is reused. Otherwise, a new instance is created.
+        """
+        if CustomMessageBox.instance is not None and CustomMessageBox.instance.winfo_exists():
+            # Reuse the existing instance.
+            self.__dict__ = CustomMessageBox.instance.__dict__
+            return
+
+        super().__init__()
+        CustomMessageBox.instance = self
+
+        self.iconbitmap(icon_file)
+        self.title(win_title)
+
+        self.text_box_width, self.text_box_height = 0, 0.0
+
+        self.text_box = tk.Text(self, state="disabled", borderwidth=10.0, relief="flat")
+        self.text_box.grid(sticky="N, S, E, W")
+
+        # Resize text message box frame if main frame is resized.
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+    def append_message(self, message: str) -> None:
+        """
+        Append a message to the CustomMessageBox.
+        :param message: The message to be appended to the CustomMessageBox.
+        """
+        self.text_box.configure(state="normal")
+        self.text_box.insert("end", message)
+        self.text_box.see("end")  # Auto-scroll to the end.
+        self.update_size(len(message))
+        self.text_box.configure(state="disabled")
+
+    def update_size(self, message_len: int) -> None:
+        """
+        Dynamically modify the dimensions of the text box widget as it increase.
+        """
+        widget_height = float(self.text_box.index("end"))
+        if message_len > self.text_box_width:
+            self.text_box_width = message_len
+            self.text_box.config(width=self.text_box_width)
+        if widget_height > self.text_box_height:
+            self.text_box_height = widget_height - 1
+            self.text_box.config(height=self.text_box_height)
 
 
 class SubtitleExtractorGUI:
@@ -498,6 +553,14 @@ class SubtitleExtractorGUI:
             del self.video_queue[video]
             self._set_video()
 
+    def error_msg(self, error_msg: str) -> None:
+        """
+        Use tkinter built in error message box to show error message.
+        The message is also appended as an error and logged.
+        """
+        logger.debug(f"ERROR: {error_msg}")
+        messagebox.showerror(f"{self.window_title} Error!", error_msg)
+
     def _set_video(self, video_index: int = 0) -> None:
         """
         Set the gui for the given current video queue index.
@@ -513,7 +576,7 @@ class SubtitleExtractorGUI:
 
         self.current_video = list(self.video_queue.keys())[video_index]
         if not Path(self.current_video).exists():  # Prevents errors that happen if the video goes missing.
-            logger.error("Video not found!")
+            self.error_msg(f"Video: {self.current_video} not found!")
             self.video_scale.configure(state="disabled")
             self._remove_video_from_queue(self.current_video)
             return
@@ -574,12 +637,19 @@ class SubtitleExtractorGUI:
             self._set_gui_state("disabled", "opening")
             Thread(target=self._set_opened_videos, args=(filenames,), daemon=True).start()
 
+    def error_message_handler(self, text: str) -> None:
+        """
+        Show the CustomMessageBox and append the error message or messages.
+        """
+        custom_messagebox = CustomMessageBox(self.icon_file, f"{self.window_title} - Error Message")
+        custom_messagebox.append_message(text)
+
     def _console_redirector(self) -> None:
         """
         Redirect console statements to text widget.
         """
         sys.stdout.write = self.write_to_output
-        # sys.stderr.write = self.write_to_output
+        sys.stderr.write = self.error_message_handler
 
     def clear_output(self, start: str = "1.0", stop: str = "end") -> None:
         """
