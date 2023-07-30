@@ -69,8 +69,6 @@ class CustomMessageBox(tk.Toplevel):
         self.iconbitmap(icon_file)
         self.title(win_title)
 
-        self.text_box_width, self.text_box_height = 0, 0.0
-
         self.text_box = tk.Text(self, state="disabled", borderwidth=10.0, relief="flat")
         self.text_box.grid(sticky="N, S, E, W")
 
@@ -86,20 +84,19 @@ class CustomMessageBox(tk.Toplevel):
         self.text_box.configure(state="normal")
         self.text_box.insert("end", message)
         self.text_box.see("end")  # Auto-scroll to the end.
-        self.update_size(len(message))
+        self.update_size()
         self.text_box.configure(state="disabled")
 
-    def update_size(self, message_len: int) -> None:
+    def update_size(self) -> None:
         """
         Dynamically modify the dimensions of the text box widget as it increase.
         """
+        widget_width = 0
         widget_height = float(self.text_box.index("end"))
-        if message_len > self.text_box_width:
-            self.text_box_width = message_len
-            self.text_box.config(width=self.text_box_width)
-        if widget_height > self.text_box_height:
-            self.text_box_height = widget_height - 1
-            self.text_box.config(height=self.text_box_height)
+        for line in self.text_box.get("1.0", "end").split("\n"):
+            if len(line) > widget_width:
+                widget_width = len(line)
+        self.text_box.config(width=widget_width, height=widget_height)
 
 
 class SubtitleExtractorGUI:
