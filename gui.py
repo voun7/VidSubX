@@ -822,7 +822,6 @@ class SubtitleExtractorGUI:
         utils.Process.stop_process()
         if not self.thread_running:
             self.root.quit()
-            exit()
 
 
 class PreferencesUI(tk.Toplevel):
