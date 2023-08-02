@@ -1033,7 +1033,8 @@ class PreferencesUI(tk.Toplevel):
         )
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
-        languages = ["ch", "en", "ru", "fr", "it", "japan", "korean", "chinese_cht"]
+        import custom_paddleocr.paddleocr as pd
+        languages = list(pd.MODEL_URLS['OCR']['PP-OCRv3']['rec'].keys())
         ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
