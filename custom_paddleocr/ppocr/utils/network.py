@@ -42,10 +42,8 @@ def download_with_progressbar(url, save_path):
 def maybe_download(model_storage_directory, url):
     # using custom model
     tar_file_name_list = ['.pdiparams', '.pdiparams.info', '.pdmodel']
-    if not os.path.exists(
-            os.path.join(model_storage_directory, 'inference.pdiparams')
-    ) or not os.path.exists(
-        os.path.join(model_storage_directory, 'inference.pdmodel')):
+    if not os.path.exists(os.path.join(model_storage_directory, 'inference.pdiparams')
+                          ) or not os.path.exists(os.path.join(model_storage_directory, 'inference.pdmodel')):
         assert url.endswith('.tar'), 'Only supports tar compressed package'
         tmp_path = os.path.join(model_storage_directory, url.split('/')[-1])
         print('download {} to {}'.format(url, tmp_path))
@@ -60,9 +58,7 @@ def maybe_download(model_storage_directory, url):
                 if filename is None:
                     continue
                 file = tarObj.extractfile(member)
-                with open(
-                        os.path.join(model_storage_directory, filename),
-                        'wb') as f:
+                with open(os.path.join(model_storage_directory, filename), 'wb') as f:
                     f.write(file.read())
         os.remove(tmp_path)
 
