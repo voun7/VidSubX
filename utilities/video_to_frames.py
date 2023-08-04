@@ -9,16 +9,15 @@ import utilities.utils as utils
 logger = logging.getLogger(__name__)
 
 
-def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, start: int, end: int, every: int) -> int:
+def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, start: int, end: int, every: int) -> None:
     """
-    Extract frames from a video using OpenCVs VideoCapture
-    :param video_path: path of the video
-    :param frames_dir: the directory to save the frames
-    :param key_area: coordinates of the frame containing subtitle
-    :param start: start frame
-    :param end: end frame
-    :param every: frame spacing
-    :return: count of images saved
+    Extract frames from a video using OpenCVs VideoCapture.
+    :param video_path: Path of the video.
+    :param frames_dir: The directory to save the frames.
+    :param key_area: Coordinates of the frame containing subtitle.
+    :param start: Start frame.
+    :param end: End frame.
+    :param every: Frame spacing.
     """
 
     capture = cv.VideoCapture(video_path)  # open the video using OpenCV
@@ -31,7 +30,6 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
     capture.set(1, start)  # set the starting frame of the capture
     frame = start  # keep track of which frame we are up to, starting from start
     while_safety = 0  # a safety counter to ensure we don't enter an infinite while loop (hopefully we won't need it)
-    saved_count = 0  # a count of how many frames we have saved
 
     while frame < end:  # let's loop through the frames until the end
 
@@ -54,12 +52,10 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
             frame_position = capture.get(cv.CAP_PROP_POS_MSEC)
             save_name = f"{frames_dir}/{frame_position}.jpg"  # create the save path
             cv.imwrite(save_name, image)  # save the extracted image
-            saved_count += 1  # increment our counter by one
 
         frame += 1  # increment our frame count
 
     capture.release()  # after the while has finished close the capture
-    return saved_count  # and return the count of the images we saved
 
 
 def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, start_frame: int = None,
@@ -71,7 +67,6 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     :param key_area: coordinates of the frame containing subtitle
     :param start_frame: The frame where image extractions from video starts.
     :param stop_frame: The frame where image extractions from video stops.
-    :return: path to the directory where the frames were saved, or None if fails
     """
     # extract every this many frames.
     every = utils.Config.frame_extraction_frequency
@@ -109,11 +104,6 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)
-        for i, f in enumerate(as_completed(futures)):  # as each process completes
-            error = f.exception()
-            if error:
-                logger.exception(f.result())
-                logger.exception(error)
-            # print it's progress
+        for i, _ in enumerate(as_completed(futures)):  # as each process completes
             utils.print_progress(i, len(frame_chunks) - 1, prefix)
     logger.info("Frame Extractions Done!")

@@ -35,14 +35,12 @@ def extract_bboxes(files: Path, drop_score: float = 0.9) -> list:
     return boxes
 
 
-def extract_text(text_output: Path, files: list) -> int:
+def extract_text(text_output: Path, files: list) -> None:
     """
-    Extract text from a frame using paddle ocr
-    :param text_output: directory for extracted texts
-    :param files: files with text for extraction
-    :return: count of texts extracted
+    Extract text from a frame using paddle ocr.
+    :param text_output: directory for extracted texts.
+    :param files: files with text for extraction.
     """
-    saved_count = 0
     for file in files:
         result = paddle_ocr.ocr(str(file))
         result = result[0]
@@ -52,8 +50,6 @@ def extract_text(text_output: Path, files: list) -> int:
             name = Path(f"{text_output}/{file.stem}.txt")
             with open(name, 'w', encoding="utf-8") as text_file:
                 text_file.write(text)
-        saved_count += 1
-    return saved_count
 
 
 def frames_to_text(frame_output: Path, text_output: Path) -> None:
@@ -81,11 +77,6 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
 
     with ProcessPoolExecutor(max_workers=ocr_max_processes) as executor:
         futures = [executor.submit(extract_text, text_output, files) for files in file_chunks]
-        for i, f in enumerate(as_completed(futures)):  # as each  process completes
-            error = f.exception()
-            if error:
-                logger.exception(f.result())
-                logger.exception(error)
-            # print it's progress
+        for i, _ in enumerate(as_completed(futures)):  # as each  process completes
             utils.print_progress(i, len(file_chunks) - 1, prefix)
     logger.info("Text Extractions Done!")
