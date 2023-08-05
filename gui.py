@@ -546,6 +546,18 @@ class SubtitleExtractorGUI:
         logger.debug(f"ERROR: {error_msg}")
         messagebox.showerror(f"{self.window_title} Error!", error_msg)
 
+    def current_video_exists(self) -> bool:
+        """
+        Check if a video exists, an error will be sent if the video doesn't exist.
+        """
+        if Path(self.current_video).exists():
+            return True
+        else:
+            self.error_msg(f"Video: {self.current_video} not found!")
+            self.video_scale.configure(state="disabled")
+            self._remove_video_from_queue(self.current_video)
+            return False
+
     def _set_video(self, video_index: int = 0) -> None:
         """
         Set the gui for the given current video queue index.
@@ -560,10 +572,7 @@ class SubtitleExtractorGUI:
                 self._reset_batch_layout()
 
         self.current_video = list(self.video_queue.keys())[video_index]
-        if not Path(self.current_video).exists():  # Prevents errors that happen if the video goes missing.
-            self.error_msg(f"Video: {self.current_video} not found!")
-            self.video_scale.configure(state="disabled")
-            self._remove_video_from_queue(self.current_video)
+        if not self.current_video_exists():  # Prevents errors that happen if the video goes missing.
             return
         self.current_sub_area = list(self.video_queue.values())[video_index][0]
         self.current_fps, self.current_frame_total, self.current_frame_width, self.current_frame_height \
