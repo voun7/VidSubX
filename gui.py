@@ -275,11 +275,12 @@ class SubtitleExtractorGUI:
         win_x, win_y = root_x + 100, root_y + 50
         self.preference_window = PreferencesUI(self.icon_file, win_x, win_y)
 
-    def _get_scale_value(self, target_height: float = 540.0) -> float:
+    def _get_rescale_factor(self, target_height: float = 540.0) -> float:
         """
         Use the frame height to determine which value will be used to scale the current video.
         :return: Rescale factor.
         """
+        logger.debug("Calculating the rescale factor")
         rescale_factor = target_height / self.current_frame_height
         return rescale_factor
 
@@ -288,7 +289,7 @@ class SubtitleExtractorGUI:
         """
         Method to rescale any frame, subtitle area and resolution.
         """
-        scale = scale or self._get_scale_value()
+        scale = scale or self.current_rescale_factor
 
         if frame is not None:
             height = int(frame.shape[0] * scale)
@@ -315,6 +316,7 @@ class SubtitleExtractorGUI:
         Set canvas size to the size of captured video.
         """
         logger.debug("Setting canvas size")
+        self.current_rescale_factor = self._get_rescale_factor()
         # The current frame size will be rescaled (down scale) to set the canvas size.
         frame_width, frame_height = self.rescale(resolution=(self.current_frame_width, self.current_frame_height))
         self.canvas.configure(width=frame_width, height=frame_height)
