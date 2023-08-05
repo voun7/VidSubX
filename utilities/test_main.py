@@ -171,8 +171,9 @@ class TestSubtitleExtractor(TestCase):
         self.se.save_subtitle(subtitles)
         test_sub_path = Path(f"{self.video_sub.parent}/{self.video_sub.stem} (1).srt")
         self.assertTrue(test_sub_path.exists())
-        self.assertEqual(test_sub_path.read_text(encoding="utf-8"), self.video_sub.read_text(encoding="utf-8"))
+        sub_text = test_sub_path.read_text(encoding="utf-8")
         test_sub_path.unlink()
+        self.assertEqual(sub_text, self.video_sub.read_text(encoding="utf-8"))
         self.se._empty_cache()
         self.assertFalse(self.se.vd_output_dir.exists())
 
