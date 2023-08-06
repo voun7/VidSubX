@@ -701,15 +701,18 @@ class SubtitleExtractorGUI:
         start = time.perf_counter()
         use_search_area = utils.Config.use_search_area
         self.thread_running = True
-        for video in self.video_queue.keys():
-            if utils.Process.interrupt_process:
-                logger.warning("Process interrupted\n")
-                self.thread_running = False
-                self._stop_sub_detection_process()
-                return
-            sub_dt = SubtitleDetector(video, use_search_area)
-            new_sub_area = sub_dt.get_sub_area()
-            self.video_queue[video][0] = new_sub_area
+        try:
+            for video in self.video_queue.keys():
+                if utils.Process.interrupt_process:
+                    logger.warning("Process interrupted\n")
+                    self.thread_running = False
+                    self._stop_sub_detection_process()
+                    return
+                sub_dt = SubtitleDetector(video, use_search_area)
+                new_sub_area = sub_dt.get_sub_area()
+                self.video_queue[video][0] = new_sub_area
+        except Exception as error:
+            logger.exception(f"An error occurred while detecting subtitles! \nError: {error}")
         self.thread_running = False
         self._stop_sub_detection_process()
         self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]][0]
@@ -747,18 +750,21 @@ class SubtitleExtractorGUI:
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}\n")
         self.thread_running = True
-        for video, sub_info in self.video_queue.items():
-            sub_area, start_frame, stop_frame = sub_info[0], sub_info[1], sub_info[2]
-            start_frame = int(start_frame) if start_frame else start_frame
-            stop_frame = int(stop_frame) if stop_frame else stop_frame
-            if utils.Process.interrupt_process:
-                logger.warning("Process interrupted\n")
-                self.thread_running = False
-                self._stop_sub_extraction_process()
-                return
-            self.sub_ex.run_extraction(video, sub_area, start_frame, stop_frame)
-            self.progress_bar['value'] += 1
-            self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
+        try:
+            for video, sub_info in self.video_queue.items():
+                sub_area, start_frame, stop_frame = sub_info[0], sub_info[1], sub_info[2]
+                start_frame = int(start_frame) if start_frame else start_frame
+                stop_frame = int(stop_frame) if stop_frame else stop_frame
+                if utils.Process.interrupt_process:
+                    logger.warning("Process interrupted\n")
+                    self.thread_running = False
+                    self._stop_sub_extraction_process()
+                    return
+                self.sub_ex.run_extraction(video, sub_area, start_frame, stop_frame)
+                self.progress_bar['value'] += 1
+                self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
+        except Exception as error:
+            logger.exception(f"An error occurred while extracting subtitles! \nError: {error}")
         self.thread_running = False
         self._stop_sub_extraction_process()
         self.send_notification("Subtitle Extraction Completed!")
