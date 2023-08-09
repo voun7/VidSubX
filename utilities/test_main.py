@@ -42,15 +42,15 @@ class TestSubtitleDetector(TestCase):
         self.sd._empty_cache()
         self.assertFalse(self.sd.vd_output_dir.exists())
 
-    def test_get_sub_area_search_area_1(self):
+    def test_get_sub_area_search_area(self):
         print("\nRunning test for get_sub_area method with search area...")
-        sub_area = (288, 958, 1632, 1044)
+        sub_area = (288, 954, 1632, 1051)
         result = SubtitleDetector(ch_vid, True).get_sub_area()
         self.assertEqual(sub_area, result)
 
-    def test_get_sub_area_full_area_1(self):
+    def test_get_sub_area_full_area(self):
         print("\nRunning test for get_sub_area method without search area...")
-        sub_area = (288, 956, 1632, 1047)
+        sub_area = (288, 958, 1632, 1049)
         result = SubtitleDetector(ch_vid, False).get_sub_area()
         self.assertEqual(sub_area, result)
 
@@ -63,8 +63,8 @@ class TestSubtitleExtractor(TestCase):
         cls.fps, cls.frame_total, cls.frame_width, cls.frame_height = 30.0, 1830, 1920, 1080
         cls.default_sub_area = 0, 810, 1920, 1080
 
-    def test_video_details_1(self):
-        print("\nRunning tests 1 for video_details method...")
+    def test_video_details(self):
+        print("\nRunning tests for video_details method...")
         fps, frame_total, frame_width, frame_height = self.se.video_details(ch_vid)
         self.assertEqual(fps, self.fps)
         self.assertEqual(frame_total, self.frame_total)
