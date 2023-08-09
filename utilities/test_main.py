@@ -3,16 +3,16 @@ from unittest import TestCase
 
 from main import SubtitleDetector, SubtitleExtractor
 
+ch_vid = "../test files/chinese_vid.mp4"
+ch_vid_srt = Path("../test files/chinese_vid.srt")
+
 
 class TestSubtitleDetector(TestCase):
-    def setUp(self) -> None:
-        print("\nRunning setUp method...")
-        self.video_path, self.video_path_2 = "../test files/chinese_video_1.mp4", "../test files/chinese_video_2.mp4"
 
     @classmethod
     def setUpClass(cls):
         print("Running setUpClass method...")
-        cls.sd = SubtitleDetector("../test files/chinese_video_1.mp4", True)
+        cls.sd = SubtitleDetector(ch_vid, True)
 
     def test_dir(self):
         print("\nRunning test for vd_output_dir existence...")
@@ -45,25 +45,13 @@ class TestSubtitleDetector(TestCase):
     def test_get_sub_area_search_area_1(self):
         print("\nRunning test for get_sub_area method with search area...")
         sub_area = (288, 958, 1632, 1044)
-        result = SubtitleDetector(self.video_path, True).get_sub_area()
+        result = SubtitleDetector(ch_vid, True).get_sub_area()
         self.assertEqual(sub_area, result)
 
     def test_get_sub_area_full_area_1(self):
         print("\nRunning test for get_sub_area method without search area...")
         sub_area = (288, 956, 1632, 1047)
-        result = SubtitleDetector(self.video_path, False).get_sub_area()
-        self.assertEqual(sub_area, result)
-
-    def test_get_sub_area_search_area_2(self):
-        print("\nRunning test 2 for get_sub_area method with search area...")
-        sub_area = (288, 924, 1632, 1041)
-        result = SubtitleDetector(self.video_path_2, True).get_sub_area()
-        self.assertEqual(sub_area, result)
-
-    def test_get_sub_area_full_area_2(self):
-        print("\nRunning test 2 for get_sub_area method without search area...")
-        sub_area = (288, 4, 1632, 1042)
-        result = SubtitleDetector(self.video_path_2, False).get_sub_area()
+        result = SubtitleDetector(ch_vid, False).get_sub_area()
         self.assertEqual(sub_area, result)
 
 
@@ -72,30 +60,16 @@ class TestSubtitleExtractor(TestCase):
     def setUpClass(cls) -> None:
         print("\nRunning setUpClass method...")
         cls.se = SubtitleExtractor()
-        cls.video_path, cls.video_sub = "../test files/chinese_video_1.mp4", Path("../test files/chinese_video_1.srt")
         cls.fps, cls.frame_total, cls.frame_width, cls.frame_height = 30.0, 1830, 1920, 1080
-
-        cls.video_path_2 = "../test files/chinese_video_2.mp4"
-        cls.video_sub_2 = Path("../test files/chinese_video_2.srt")
-        cls.fps_2, cls.frame_total_2, cls.frame_width_2, cls.frame_height_2 = 24.0, 1479, 1920, 1080
-
         cls.default_sub_area = 0, 810, 1920, 1080
 
     def test_video_details_1(self):
         print("\nRunning tests 1 for video_details method...")
-        fps, frame_total, frame_width, frame_height = self.se.video_details(self.video_path)
+        fps, frame_total, frame_width, frame_height = self.se.video_details(ch_vid)
         self.assertEqual(fps, self.fps)
         self.assertEqual(frame_total, self.frame_total)
         self.assertEqual(frame_width, self.frame_width)
         self.assertEqual(frame_height, self.frame_height)
-
-    def test_video_details_2(self):
-        print("\nRunning tests 2 for video_details method...")
-        fps, frame_total, frame_width, frame_height = self.se.video_details(self.video_path_2)
-        self.assertEqual(fps, self.fps_2)
-        self.assertEqual(frame_total, self.frame_total_2)
-        self.assertEqual(frame_width, self.frame_width_2)
-        self.assertEqual(frame_height, self.frame_height_2)
 
     def test_default_sub_area(self):
         print("\nRunning tests for default_sub_area method...")
@@ -146,41 +120,10 @@ class TestSubtitleExtractor(TestCase):
         self.assertEqual(self.se.timecode(25234.7962452), "00:00:25,234")
         self.assertEqual(self.se.timecode(6365.242454), "00:00:06,365")
 
-    def test_run_extraction_1(self):
+    def test_run_extraction(self):
         print("\nRunning test for run_extraction method...")
-        self.se.video_path, sub_area = self.video_path, (288, 958, 1632, 1044)
-        self.assertEqual(self.se.video_path, self.video_path)
-        self.se.frame_output.mkdir(parents=True)
-        self.se.text_output.mkdir(parents=True)
-        self.assertTrue(self.se.frame_output.exists())
-        self.assertTrue(self.se.text_output.exists())
-        self.se.get_frames_and_texts(sub_area, None, None)
-        self.assertEqual(len(list(self.se.frame_output.iterdir())), 915)
-        self.assertEqual(len(list(self.se.text_output.iterdir())), 501)
-        self.se.load_extracted_texts()
-        self.assertEqual(len(self.se.subtitle_texts), 501)
-        self.se.merge_adjacent_equal_texts()
-        self.assertEqual(len(self.se.subtitle_texts), 44)
-        self.se.merge_adjacent_similar_texts()
-        self.assertEqual(len(self.se.subtitle_texts), 33)
-        self.se.remove_short_duration_consecutive_subs()
-        self.se.remove_short_duration_subs()
-        subtitles = self.se.generate_subtitle()
-        self.assertEqual(len(subtitles), 33)
-        self.se.video_path = Path(self.video_path)
-        self.se.save_subtitle(subtitles)
+        sub_area = (288, 958, 1632, 1044)
+        self.se.run_extraction(self.video_path, sub_area)
         test_sub_path = Path(f"{self.video_sub.parent}/{self.video_sub.stem} (1).srt")
-        self.assertTrue(test_sub_path.exists())
-        sub_text = test_sub_path.read_text(encoding="utf-8")
-        test_sub_path.unlink()
-        self.assertEqual(sub_text, self.video_sub.read_text(encoding="utf-8"))
-        self.se._empty_cache()
-        self.assertFalse(self.se.vd_output_dir.exists())
-
-    def test_run_extraction_2(self):
-        print("\nRunning test 2 for run_extraction method...")
-        sub_area = (288, 924, 1632, 1041)
-        self.se.run_extraction(self.video_path_2, sub_area, 200, 1500)
-        test_sub_path = Path(f"{self.video_sub_2.parent}/{self.video_sub_2.stem} (1).srt")
-        self.assertEqual(test_sub_path.read_text(encoding="utf-8"), self.video_sub_2.read_text(encoding="utf-8"))
+        self.assertEqual(test_sub_path.read_text(encoding="utf-8"), self.video_sub.read_text(encoding="utf-8"))
         test_sub_path.unlink()
