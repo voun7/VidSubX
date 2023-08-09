@@ -410,18 +410,20 @@ class SubtitleExtractor:
                     return new_file_path
                 suffix += 1
 
-    def save_subtitle(self, lines: list) -> None:
+    def save_subtitle(self, lines: list) -> Path | None:
         """
         Save generated subtitle file in the same location as video file.
         :param lines: subtitle lines to be written to file.
+        :return: The save path of generated subtitle.
         """
         if not lines:
             logger.debug(f"No lines in subtitles generated. Name: {self.video_path.name}")
             return
-        name = self.gen_sub_file_name()
-        with open(name, 'w', encoding="utf-8") as new_sub:
+        save_path = self.gen_sub_file_name()
+        with open(save_path, 'w', encoding="utf-8") as new_sub:
             new_sub.writelines(lines)
-        logger.info(f"Subtitle file saved. Name: {name}")
+        logger.info(f"Subtitle file saved. Save Path: {save_path}")
+        return save_path
 
     def get_frames_and_texts(self, sub_area: tuple, start_frame: int | None, stop_frame: int | None) -> None:
         """
@@ -431,7 +433,7 @@ class SubtitleExtractor:
         frames_to_text(self.frame_output, self.text_output)
 
     def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
-                       stop_frame: int = None) -> None:
+                       stop_frame: int = None) -> Path | None:
         """
         Run through the steps of extracting texts from subtitle area in video to create subtitle.
         """
@@ -458,13 +460,14 @@ class SubtitleExtractor:
         self.load_extracted_texts()
         self.process_extracted_texts()
         subtitles = self.generate_subtitle()
-        self.save_subtitle(subtitles)
+        save_path = self.save_subtitle(subtitles)
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
         converted_time = time.strftime("%Hh:%Mm:%Ss", time.gmtime(total_time))
         logger.info(f"Subtitle Extraction Done! Total time: {converted_time}\n")
         self._empty_cache()
+        return save_path
 
 
 if __name__ == '__main__':

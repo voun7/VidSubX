@@ -123,7 +123,7 @@ class TestSubtitleExtractor(TestCase):
     def test_run_extraction(self):
         print("\nRunning test for run_extraction method...")
         sub_area = (288, 958, 1632, 1044)
-        self.se.run_extraction(self.video_path, sub_area)
-        test_sub_path = Path(f"{self.video_sub.parent}/{self.video_sub.stem} (1).srt")
-        self.assertEqual(test_sub_path.read_text(encoding="utf-8"), self.video_sub.read_text(encoding="utf-8"))
+        test_sub_path = self.se.run_extraction(ch_vid, sub_area)
+        test_sub_txt = test_sub_path.read_text(encoding="utf-8")
         test_sub_path.unlink()
+        self.assertEqual(test_sub_txt, ch_vid_srt.read_text(encoding="utf-8"))
