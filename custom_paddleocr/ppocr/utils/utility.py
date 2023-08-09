@@ -15,11 +15,13 @@
 import importlib.util
 import logging
 import os
+import random
 import subprocess
 import sys
 
 import cv2
 import numpy as np
+import paddle
 
 
 def print_dict(d, logger, delimiter=0):
@@ -37,6 +39,17 @@ def print_dict(d, logger, delimiter=0):
                 print_dict(value, logger, delimiter + 4)
         else:
             logger.info("{}{} : {}".format(delimiter * " ", k, v))
+
+
+def get_check_global_params(mode):
+    check_params = ['use_gpu', 'max_text_length', 'image_shape', \
+                    'image_shape', 'character_type', 'loss_type']
+    if mode == "train_eval":
+        check_params = check_params + [ \
+            'train_batch_size_per_card', 'test_batch_size_per_card']
+    elif mode == "test":
+        check_params = check_params + ['test_batch_size_per_card']
+    return check_params
 
 
 def _check_image_file(path):
@@ -115,6 +128,12 @@ def load_vqa_bio_label_maps(label_map_path):
     return label2id_map, id2label_map
 
 
+def set_seed(seed=1024):
+    random.seed(seed)
+    np.random.seed(seed)
+    paddle.seed(seed)
+
+
 def check_install(module_name, install_name):
     spec = importlib.util.find_spec(module_name)
     if spec is None:
@@ -133,3 +152,22 @@ def check_install(module_name, install_name):
                 f"Install {module_name} failed, please install manually")
     else:
         print(f"{module_name} has been installed.")
+
+
+class AverageMeter:
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        """reset"""
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        """update"""
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count

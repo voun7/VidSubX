@@ -29,6 +29,7 @@ from .make_border_map import MakeBorderMap
 from .make_pse_gt import MakePseGt
 from .make_shrink_map import MakeShrinkMap
 from .operators import *
+from .pg_process import *
 from .randaugment import RandAugment
 from .random_crop_data import EastRandomCropData, RandomCropImgMask
 from .rec_img_aug import BaseDataAugmentation, RecAug, RecConAug, RecResizeImg, ClsResizeImg, \
@@ -38,6 +39,7 @@ from .rec_img_aug import BaseDataAugmentation, RecAug, RecConAug, RecResizeImg, 
 from .sast_process import *
 from .ssl_img_aug import SSLRotateResize
 from .table_ops import *
+from .vqa import *
 
 
 def transform(data, ops=None):

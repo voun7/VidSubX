@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 import random
 
 import numpy as np
-# import six
+import six
 from PIL import Image, ImageEnhance, ImageOps
 
 

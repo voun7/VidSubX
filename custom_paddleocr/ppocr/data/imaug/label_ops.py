@@ -25,6 +25,8 @@ from random import sample
 import numpy as np
 from shapely.geometry import LineString, Point, Polygon
 
+from custom_paddleocr.ppocr.data.imaug.vqa.augment import order_by_tbyx
+
 
 class ClsLabelEncode(object):
     def __init__(self, label_list, **kwargs):
@@ -883,6 +885,62 @@ class SARLabelEncode(BaseRecLabelEncode):
         return [self.padding_idx]
 
 
+class SATRNLabelEncode(BaseRecLabelEncode):
+    """ Convert between text-label and text-index """
+
+    def __init__(self,
+                 max_text_length,
+                 character_dict_path=None,
+                 use_space_char=False,
+                 lower=False,
+                 **kwargs):
+        super(SATRNLabelEncode, self).__init__(
+            max_text_length, character_dict_path, use_space_char)
+        self.lower = lower
+
+    def add_special_char(self, dict_character):
+        beg_end_str = "<BOS/EOS>"
+        unknown_str = "<UKN>"
+        padding_str = "<PAD>"
+        dict_character = dict_character + [unknown_str]
+        self.unknown_idx = len(dict_character) - 1
+        dict_character = dict_character + [beg_end_str]
+        self.start_idx = len(dict_character) - 1
+        self.end_idx = len(dict_character) - 1
+        dict_character = dict_character + [padding_str]
+        self.padding_idx = len(dict_character) - 1
+
+        return dict_character
+
+    def encode(self, text):
+        if self.lower:
+            text = text.lower()
+        text_list = []
+        for char in text:
+            text_list.append(self.dict.get(char, self.unknown_idx))
+        if len(text_list) == 0:
+            return None
+        return text_list
+
+    def __call__(self, data):
+        text = data['label']
+        text = self.encode(text)
+        if text is None:
+            return None
+        data['length'] = np.array(len(text))
+        target = [self.start_idx] + text + [self.end_idx]
+        padded_text = [self.padding_idx for _ in range(self.max_text_len)]
+        if len(target) > self.max_text_len:
+            padded_text = target[:self.max_text_len]
+        else:
+            padded_text[:len(target)] = target
+        data['label'] = np.array(padded_text)
+        return data
+
+    def get_ignored_tokens(self):
+        return [self.padding_idx]
+
+
 class PRENLabelEncode(BaseRecLabelEncode):
     def __init__(self,
                  max_text_length,
@@ -930,32 +988,287 @@ class PRENLabelEncode(BaseRecLabelEncode):
         return data
 
 
+class VQATokenLabelEncode(object):
+    """
+    Label encode for NLP VQA methods
+    """
+
+    def __init__(self,
+                 class_path,
+                 contains_re=False,
+                 add_special_ids=False,
+                 algorithm='LayoutXLM',
+                 use_textline_bbox_info=True,
+                 order_method=None,
+                 infer_mode=False,
+                 ocr_engine=None,
+                 **kwargs):
+        super(VQATokenLabelEncode, self).__init__()
+        from paddlenlp.transformers import LayoutXLMTokenizer, LayoutLMTokenizer, LayoutLMv2Tokenizer
+        from custom_paddleocr.ppocr.utils.utility import load_vqa_bio_label_maps
+        tokenizer_dict = {
+            'LayoutXLM': {
+                'class': LayoutXLMTokenizer,
+                'pretrained_model': 'layoutxlm-base-uncased'
+            },
+            'LayoutLM': {
+                'class': LayoutLMTokenizer,
+                'pretrained_model': 'layoutlm-base-uncased'
+            },
+            'LayoutLMv2': {
+                'class': LayoutLMv2Tokenizer,
+                'pretrained_model': 'layoutlmv2-base-uncased'
+            }
+        }
+        self.contains_re = contains_re
+        tokenizer_config = tokenizer_dict[algorithm]
+        self.tokenizer = tokenizer_config['class'].from_pretrained(
+            tokenizer_config['pretrained_model'])
+        self.label2id_map, id2label_map = load_vqa_bio_label_maps(class_path)
+        self.add_special_ids = add_special_ids
+        self.infer_mode = infer_mode
+        self.ocr_engine = ocr_engine
+        self.use_textline_bbox_info = use_textline_bbox_info
+        self.order_method = order_method
+        assert self.order_method in [None, "tb-yx"]
+
+    def split_bbox(self, bbox, text, tokenizer):
+        words = text.split()
+        token_bboxes = []
+        curr_word_idx = 0
+        x1, y1, x2, y2 = bbox
+        unit_w = (x2 - x1) / len(text)
+        for idx, word in enumerate(words):
+            curr_w = len(word) * unit_w
+            word_bbox = [x1, y1, x1 + curr_w, y2]
+            token_bboxes.extend([word_bbox] * len(tokenizer.tokenize(word)))
+            x1 += (len(word) + 1) * unit_w
+        return token_bboxes
+
+    def filter_empty_contents(self, ocr_info):
+        """
+        find out the empty texts and remove the links
+        """
+        new_ocr_info = []
+        empty_index = []
+        for idx, info in enumerate(ocr_info):
+            if len(info["transcription"]) > 0:
+                new_ocr_info.append(copy.deepcopy(info))
+            else:
+                empty_index.append(info["id"])
+
+        for idx, info in enumerate(new_ocr_info):
+            new_link = []
+            for link in info["linking"]:
+                if link[0] in empty_index or link[1] in empty_index:
+                    continue
+                new_link.append(link)
+            new_ocr_info[idx]["linking"] = new_link
+        return new_ocr_info
+
+    def __call__(self, data):
+        # load bbox and label info
+        ocr_info = self._load_ocr_info(data)
+
+        for idx in range(len(ocr_info)):
+            if "bbox" not in ocr_info[idx]:
+                ocr_info[idx]["bbox"] = self.trans_poly_to_bbox(ocr_info[idx][
+                                                                    "points"])
+
+        if self.order_method == "tb-yx":
+            ocr_info = order_by_tbyx(ocr_info)
+
+        # for re
+        train_re = self.contains_re and not self.infer_mode
+        if train_re:
+            ocr_info = self.filter_empty_contents(ocr_info)
+
+        height, width, _ = data['image'].shape
+
+        words_list = []
+        bbox_list = []
+        input_ids_list = []
+        token_type_ids_list = []
+        segment_offset_id = []
+        gt_label_list = []
+
+        entities = []
+
+        if train_re:
+            relations = []
+            id2label = {}
+            entity_id_to_index_map = {}
+            empty_entity = set()
+
+        data['ocr_info'] = copy.deepcopy(ocr_info)
+
+        for info in ocr_info:
+            text = info["transcription"]
+            if len(text) <= 0:
+                continue
+            if train_re:
+                # for re
+                if len(text) == 0:
+                    empty_entity.add(info["id"])
+                    continue
+                id2label[info["id"]] = info["label"]
+                relations.extend([tuple(sorted(l)) for l in info["linking"]])
+            # smooth_box
+            info["bbox"] = self.trans_poly_to_bbox(info["points"])
+
+            encode_res = self.tokenizer.encode(
+                text,
+                pad_to_max_seq_len=False,
+                return_attention_mask=True,
+                return_token_type_ids=True)
+
+            if not self.add_special_ids:
+                encode_res["input_ids"] = encode_res["input_ids"][1:-1]
+                encode_res["token_type_ids"] = encode_res["token_type_ids"][1:
+                                                                            -1]
+                encode_res["attention_mask"] = encode_res["attention_mask"][1:
+                                                                            -1]
+
+            if self.use_textline_bbox_info:
+                bbox = [info["bbox"]] * len(encode_res["input_ids"])
+            else:
+                bbox = self.split_bbox(info["bbox"], info["transcription"],
+                                       self.tokenizer)
+            if len(bbox) <= 0:
+                continue
+            bbox = self._smooth_box(bbox, height, width)
+            if self.add_special_ids:
+                bbox.insert(0, [0, 0, 0, 0])
+                bbox.append([0, 0, 0, 0])
+
+            # parse label
+            if not self.infer_mode:
+                label = info['label']
+                gt_label = self._parse_label(label, encode_res)
+
+            # construct entities for re
+            if train_re:
+                if gt_label[0] != self.label2id_map["O"]:
+                    entity_id_to_index_map[info["id"]] = len(entities)
+                    label = label.upper()
+                    entities.append({
+                        "start": len(input_ids_list),
+                        "end":
+                            len(input_ids_list) + len(encode_res["input_ids"]),
+                        "label": label.upper(),
+                    })
+            else:
+                entities.append({
+                    "start": len(input_ids_list),
+                    "end": len(input_ids_list) + len(encode_res["input_ids"]),
+                    "label": 'O',
+                })
+            input_ids_list.extend(encode_res["input_ids"])
+            token_type_ids_list.extend(encode_res["token_type_ids"])
+            bbox_list.extend(bbox)
+            words_list.append(text)
+            segment_offset_id.append(len(input_ids_list))
+            if not self.infer_mode:
+                gt_label_list.extend(gt_label)
+
+        data['input_ids'] = input_ids_list
+        data['token_type_ids'] = token_type_ids_list
+        data['bbox'] = bbox_list
+        data['attention_mask'] = [1] * len(input_ids_list)
+        data['labels'] = gt_label_list
+        data['segment_offset_id'] = segment_offset_id
+        data['tokenizer_params'] = dict(
+            padding_side=self.tokenizer.padding_side,
+            pad_token_type_id=self.tokenizer.pad_token_type_id,
+            pad_token_id=self.tokenizer.pad_token_id)
+        data['entities'] = entities
+
+        if train_re:
+            data['relations'] = relations
+            data['id2label'] = id2label
+            data['empty_entity'] = empty_entity
+            data['entity_id_to_index_map'] = entity_id_to_index_map
+        return data
+
+    def trans_poly_to_bbox(self, poly):
+        x1 = int(np.min([p[0] for p in poly]))
+        x2 = int(np.max([p[0] for p in poly]))
+        y1 = int(np.min([p[1] for p in poly]))
+        y2 = int(np.max([p[1] for p in poly]))
+        return [x1, y1, x2, y2]
+
+    def _load_ocr_info(self, data):
+        if self.infer_mode:
+            ocr_result = self.ocr_engine.ocr(data['image'], cls=False)[0]
+            ocr_info = []
+            for res in ocr_result:
+                ocr_info.append({
+                    "transcription": res[1][0],
+                    "bbox": self.trans_poly_to_bbox(res[0]),
+                    "points": res[0],
+                })
+            return ocr_info
+        else:
+            info = data['label']
+            # read text info
+            info_dict = json.loads(info)
+            return info_dict
+
+    def _smooth_box(self, bboxes, height, width):
+        bboxes = np.array(bboxes)
+        bboxes[:, 0] = bboxes[:, 0] * 1000 / width
+        bboxes[:, 2] = bboxes[:, 2] * 1000 / width
+        bboxes[:, 1] = bboxes[:, 1] * 1000 / height
+        bboxes[:, 3] = bboxes[:, 3] * 1000 / height
+        bboxes = bboxes.astype("int64").tolist()
+        return bboxes
+
+    def _parse_label(self, label, encode_res):
+        gt_label = []
+        if label.lower() in ["other", "others", "ignore"]:
+            gt_label.extend([0] * len(encode_res["input_ids"]))
+        else:
+            gt_label.append(self.label2id_map[("b-" + label).upper()])
+            gt_label.extend([self.label2id_map[("i-" + label).upper()]] *
+                            (len(encode_res["input_ids"]) - 1))
+        return gt_label
+
+
 class MultiLabelEncode(BaseRecLabelEncode):
     def __init__(self,
                  max_text_length,
                  character_dict_path=None,
                  use_space_char=False,
+                 gtc_encode=None,
                  **kwargs):
         super(MultiLabelEncode, self).__init__(
             max_text_length, character_dict_path, use_space_char)
 
         self.ctc_encode = CTCLabelEncode(max_text_length, character_dict_path,
                                          use_space_char, **kwargs)
-        self.sar_encode = SARLabelEncode(max_text_length, character_dict_path,
-                                         use_space_char, **kwargs)
+        self.gtc_encode_type = gtc_encode
+        if gtc_encode is None:
+            self.gtc_encode = SARLabelEncode(
+                max_text_length, character_dict_path, use_space_char, **kwargs)
+        else:
+            self.gtc_encode = eval(gtc_encode)(
+                max_text_length, character_dict_path, use_space_char, **kwargs)
 
     def __call__(self, data):
         data_ctc = copy.deepcopy(data)
-        data_sar = copy.deepcopy(data)
+        data_gtc = copy.deepcopy(data)
         data_out = dict()
         data_out['img_path'] = data.get('img_path', None)
         data_out['image'] = data['image']
         ctc = self.ctc_encode.__call__(data_ctc)
-        sar = self.sar_encode.__call__(data_sar)
-        if ctc is None or sar is None:
+        gtc = self.gtc_encode.__call__(data_gtc)
+        if ctc is None or gtc is None:
             return None
         data_out['label_ctc'] = ctc['label']
-        data_out['label_sar'] = sar['label']
+        if self.gtc_encode_type is not None:
+            data_out['label_gtc'] = gtc['label']
+        else:
+            data_out['label_sar'] = gtc['label']
         data_out['length'] = ctc['length']
         return data_out
 
