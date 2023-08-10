@@ -70,17 +70,19 @@ class SubtitleDetector:
         """
         Prevent boundary box from being too close to text by adding padding.
         The x paddings are relative to the width of the video. Different resolutions will have different x paddings.
-        The y paddings are absolute to the height of the vide. All resolutions will have the same y paddings.
+        Detected texts default x boundary will be used if larger than the relative padding.
+        The y paddings are absolute to the height of the video. All resolutions will have the same y paddings.
         """
-        x_padding = utils.Config.sub_area_x_rel_padding
-        y_padding = utils.Config.sub_area_y_abs_padding
+        x_padding, y_padding = utils.Config.sub_area_x_rel_padding, utils.Config.sub_area_y_abs_padding
         relative_x_padding = int(self.frame_width * x_padding)
-        logger.debug(f"Padding sub area with relative_x_padding = {relative_x_padding}, y_padding = {y_padding}")
-        # Use frame width of video to determine width for padding sub area.
-        # This makes sure that the width padding will be same for all video resolutions. Relative to width of video.
-        top_left = self.frame_width - relative_x_padding, top_left[1] - y_padding
-        bottom_right = relative_x_padding, bottom_right[1] + y_padding
-        return top_left, bottom_right
+        rel_top_left_x, rel_bottom_right_x = self.frame_width - relative_x_padding, relative_x_padding
+
+        top_left_x, top_left_y = top_left[0], top_left[1] - y_padding
+        top_left_x = top_left_x if top_left_x < rel_top_left_x else rel_top_left_x
+
+        bottom_right_x, bottom_right_y = bottom_right[0], bottom_right[1] + y_padding
+        bottom_right_x = bottom_right_x if bottom_right_x > rel_bottom_right_x else rel_bottom_right_x
+        return (top_left_x, top_left_y), (bottom_right_x, bottom_right_y)
 
     def _reposition_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:
         """
