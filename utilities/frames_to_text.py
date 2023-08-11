@@ -2,15 +2,16 @@ import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
+import custom_paddleocr.paddleocr as cp
 import utilities.utils as utils
-from custom_paddleocr import PaddleOCR
 
 logger = logging.getLogger(__name__)
 
-paddle_ocr = PaddleOCR(
-    det_model_dir=f"{Path(__file__).parent.parent}/models/{utils.Config.ocr_rec_language}/det",
-    rec_model_dir=f"{Path(__file__).parent.parent}/models/{utils.Config.ocr_rec_language}/rec",
-    cls_model_dir=f"{Path(__file__).parent.parent}/models/{utils.Config.ocr_rec_language}/cls",
+MODEL_PATH = Path(__file__).parent.parent / "models" / cp.DEFAULT_OCR_MODEL_VERSION / utils.Config.ocr_rec_language
+paddle_ocr = cp.PaddleOCR(
+    det_model_dir=f"{MODEL_PATH}/det",
+    rec_model_dir=f"{MODEL_PATH}/rec",
+    cls_model_dir=f"{MODEL_PATH}/cls",
     use_angle_cls=True,
     lang=utils.Config.ocr_rec_language,
     show_log=False
