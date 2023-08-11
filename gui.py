@@ -1033,13 +1033,13 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=1)
 
-        ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(
+        ttk.Label(text_extraction_frame, text="OCR Recognition Language:\n(Change requires program restart)").grid(
             column=0, row=2, pady=self.wgt_y_padding
         )
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
-        import custom_paddleocr.paddleocr as pd
-        languages = list(pd.MODEL_URLS['OCR'][pd.DEFAULT_OCR_MODEL_VERSION]['rec'].keys())
+        import custom_paddleocr.paddleocr as cp
+        languages = list(cp.MODEL_URLS['OCR'][cp.DEFAULT_OCR_MODEL_VERSION]['rec'].keys())
         ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
