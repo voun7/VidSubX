@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import sys
 import tarfile
@@ -20,8 +19,6 @@ import tarfile
 import requests
 
 from utilities.utils import print_progress
-
-logger = logging.getLogger(__name__)
 
 
 def download_with_progressbar(url, save_path):
@@ -35,9 +32,9 @@ def download_with_progressbar(url, save_path):
                 data_progress += block_size
                 print_progress(data_progress, total_size_in_bytes, "Downloading model")
                 file.write(data)
-            logger.info("Download complete.\n")
+            print("Download complete.")
     else:
-        logger.error("Something went wrong while downloading the model.")
+        print("Something went wrong while downloading the model.")
         sys.exit(0)
 
 
@@ -48,7 +45,7 @@ def maybe_download(model_storage_directory, url):
                           ) or not os.path.exists(os.path.join(model_storage_directory, 'inference.pdmodel')):
         assert url.endswith('.tar'), 'Only supports tar compressed package'
         tmp_path = os.path.join(model_storage_directory, url.split('/')[-1])
-        logger.info(f'\nDownloading model from: {url}')
+        print(f'\nDownloading model from: {url}\nto: {tmp_path}')
         os.makedirs(model_storage_directory, exist_ok=True)
         download_with_progressbar(url, tmp_path)
         with tarfile.open(tmp_path, 'r') as tarObj:
