@@ -785,14 +785,16 @@ class SubtitleExtractorGUI:
         """
         logger.debug("Run button clicked")
         if self.video_queue and self.current_video:
-            self.current_video = None
-            self.video_capture.release()
-            utils.Process.start_process()
-            self.run_button.configure(text='Stop', command=self._stop_sub_extraction_process)
-            self._set_gui_state("disabled", "extraction")
-            self.progress_bar.configure(value=0)
-            self._reset_batch_layout()
-            Thread(target=self.extract_subtitles, daemon=True).start()
+            confirmation = messagebox.askyesno(title='Confirmation', message='Start Subtitle Extraction?')
+            if confirmation:
+                self.current_video = None
+                self.video_capture.release()
+                utils.Process.start_process()
+                self.run_button.configure(text='Stop', command=self._stop_sub_extraction_process)
+                self._set_gui_state("disabled", "extraction")
+                self.progress_bar.configure(value=0)
+                self._reset_batch_layout()
+                Thread(target=self.extract_subtitles, daemon=True).start()
         elif self.video_queue:
             logger.info("Open new video(s)!")
         else:
