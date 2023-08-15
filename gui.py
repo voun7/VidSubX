@@ -178,10 +178,10 @@ class SubtitleExtractorGUI:
 
         # Create frame slider widget in video frame and label to display value.
         video_work_frame = ttk.Frame(video_frame)
-        video_work_frame.grid(column=0, row=1, sticky="W")
+        video_work_frame.grid(column=0, row=1)
         self.video_scale = ttk.Scale(video_work_frame, command=self._frame_slider, orient=tk.HORIZONTAL, length=600,
                                      state="disabled")
-        self.video_scale.grid(column=0, row=1, padx=60)
+        self.video_scale.grid(column=0, row=1, padx=(0, 60))  # Only the right side is padded.
         # Show timecode of the video scale.
         self.current_scale_value = ttk.Label(video_work_frame)
         self.current_scale_value.grid(column=1, row=1)
