@@ -13,6 +13,7 @@ import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
 
+import custom_paddleocr.paddleocr as cp
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
 from utilities.logger_setup import setup_logging
@@ -1040,7 +1041,6 @@ class PreferencesUI(tk.Toplevel):
         )
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
-        import custom_paddleocr.paddleocr as cp
         languages = list(cp.MODEL_URLS['OCR'][cp.DEFAULT_OCR_MODEL_VERSION]['rec'].keys())
         ttk.Combobox(
             text_extraction_frame,
