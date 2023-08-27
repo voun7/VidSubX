@@ -262,7 +262,7 @@ class SubtitleExtractorGUI:
         Activate the batch layout from the work frame on the gui.
         """
         logger.debug("Setting batch layout")
-        self.progress_bar.configure(length=500)
+        self.progress_bar.configure(length=400)
         self.video_label.configure(text=self._video_indexer()[2])
         self.previous_button.grid(column=2, row=0, padx=10)
         self.next_button.grid(column=4, row=0, padx=10)
