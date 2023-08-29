@@ -19,7 +19,6 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
     :param end: End frame.
     :param every: Frame spacing.
     """
-
     capture = cv.VideoCapture(video_path)  # open the video using OpenCV
 
     if start < 0:  # if start isn't specified lets assume 0
@@ -32,7 +31,6 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
     while_safety = 0  # a safety counter to ensure we don't enter an infinite while loop (hopefully we won't need it)
 
     while frame < end:  # let's loop through the frames until the end
-
         _, image = capture.read()  # read an image from the capture
 
         if while_safety > 500:  # break the while if our safety max's out at 500
@@ -54,7 +52,6 @@ def extract_frames(video_path: str, frames_dir: Path, key_area: tuple | None, st
             cv.imwrite(save_name, image)  # save the extracted image
 
         frame += 1  # increment our frame count
-
     capture.release()  # after the while has finished close the capture
 
 
@@ -77,7 +74,7 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
         logger.warning("Frame extraction process interrupted!")
         return
 
-    logger.info("Starting to extracting video keyframes...")
+    logger.info("Starting frame extraction from video...")
 
     capture = cv.VideoCapture(video_path)  # load the video
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
@@ -91,19 +88,17 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
         return  # end function call
 
     start_frame, stop_frame = start_frame or 0, stop_frame or frame_count
-
     # split the frames into chunk lists
     frame_chunks = [[i, i + chunk_size] for i in range(start_frame, stop_frame, chunk_size)]
     frame_chunks[-1][-1] = stop_frame  # make sure last chunk has correct end frame
     logger.debug(f"Frame extraction chunks = {frame_chunks}")
 
-    prefix = "Extracting frames from video"  # a prefix string to be printed in progress bar
-    logger.debug("Using multiprocessing for extracting frames")
-
+    prefix = "Frame Extraction"  # a prefix string to be printed in progress bar
+    logger.debug("Using multiprocessing for frame extraction")
     # create a process pool to execute across multiple cpu cores to speed up processing
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)
         for i, _ in enumerate(as_completed(futures)):  # as each process completes
             utils.print_progress(i, len(frame_chunks) - 1, prefix)
-    logger.info("Frame Extractions Done!")
+    logger.info("Frame extraction done!")
