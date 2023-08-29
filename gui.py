@@ -223,7 +223,7 @@ class SubtitleExtractorGUI:
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(column=0, row=2, sticky="N, S, E, W")
 
-        # Create text widget for showing the text extraction details in the output. Does not allow input from gui.
+        # Create text widget for showing the subtitle extraction details in the output. Does not allow input from gui.
         self.text_output_widget = tk.Text(output_frame, height=12, state="disabled")
         self.text_output_widget.grid(column=0, row=0, sticky="N, S, E, W")
 
