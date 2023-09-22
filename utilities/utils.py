@@ -49,7 +49,7 @@ class Config:
     default_ocr_max_processes = 4
     default_ocr_rec_language = "ch"
 
-    default_text_similarity_threshold = 0.65
+    default_text_similarity_threshold = 0.7
     default_min_consecutive_sub_dur_ms = 500.0
     default_max_consecutive_short_durs = 4
     default_min_sub_duration_ms = 120.0
