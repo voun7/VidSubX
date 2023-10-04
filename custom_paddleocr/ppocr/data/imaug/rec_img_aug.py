@@ -407,7 +407,7 @@ class GrayRecResizeImg(object):
     def __init__(self,
                  image_shape,
                  resize_type,
-                 inter_type="Image.Resampling.LANCZOS",
+                 inter_type='Image.LANCZOS',
                  scale=True,
                  padding=False,
                  **kwargs):

@@ -11,21 +11,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
-import math
 import os
-import time
-import traceback
+import sys
+
+from PIL import Image
+
+__dir__ = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(__dir__)
+sys.path.insert(0, os.path.abspath(os.path.join(__dir__, '../..')))
+
+os.environ["FLAGS_allocator_strategy"] = 'auto_growth'
 
 import cv2
 import numpy as np
-from PIL import Image
+import math
+import time
+import traceback
 
-import custom_paddleocr.tools.infer.utility as utility
-from custom_paddleocr.ppocr.postprocess import build_post_process
-from custom_paddleocr.ppocr.utils.utility import get_image_file_list, check_and_read
+import tools.infer.utility as utility
+from ppocr.postprocess import build_post_process
+from ppocr.utils.logging import get_logger
+from ppocr.utils.utility import check_and_read
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 
 class TextRecognizer(object):
@@ -149,7 +157,7 @@ class TextRecognizer(object):
             if self.rec_algorithm == 'ViTSTR':
                 img = image_pil.resize([imgW, imgH], Image.BICUBIC)
             else:
-                img = image_pil.resize([imgW, imgH], Image.LANCZOS)
+                img = image_pil.resize([imgW, imgH], Image.ANTIALIAS)
             img = np.array(img)
             norm_img = np.expand_dims(img, -1)
             norm_img = norm_img.transpose((2, 0, 1))
@@ -617,7 +625,6 @@ class TextRecognizer(object):
                         preds = outputs
                     else:
                         preds = outputs[0]
-                    self.predictor.try_shrink_memory()
             rec_result = self.postprocess_op(preds)
             for rno in range(len(rec_result)):
                 rec_res[indices[beg_img_no + rno]] = rec_result[rno]
@@ -627,7 +634,36 @@ class TextRecognizer(object):
 
 
 def main(args):
-    image_file_list = get_image_file_list(args.image_dir)
+    # image_file_list = get_image_file_list(args.image_dir)
+    def _check_image_file(path):
+        img_end = {'jpg', 'bmp', 'png', 'jpeg', 'rgb', 'tif', 'tiff', 'gif'}
+        return any([path.lower().endswith(e) for e in img_end])
+
+    def get_image_file_list_from_txt(img_file):
+        imgs_lists = []
+        label_lists = []
+        if img_file is None or not os.path.exists(img_file):
+            raise Exception("not found any img file in {}".format(img_file))
+
+        img_end = {'jpg', 'bmp', 'png', 'jpeg', 'rgb', 'tif', 'tiff', 'gif'}
+        # root_dir = 'test_data/v4_test_rec_crop_fromjson/'
+        root_dir = ''
+        with open(img_file, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.replace('\n', '').split('\t')
+                file_path, label = line[0], line[1]
+                file_path = os.path.join(root_dir, file_path)
+                if os.path.isfile(file_path) and _check_image_file(file_path):
+                    imgs_lists.append(file_path)
+                    label_lists.append(label)
+
+        if len(imgs_lists) == 0:
+            raise Exception("not found any img file in {}".format(img_file))
+        return imgs_lists, label_lists
+
+    image_file_list, label_list = get_image_file_list_from_txt(args.image_dir)
+
     text_recognizer = TextRecognizer(args)
     valid_image_file_list = []
     img_list = []
@@ -658,9 +694,33 @@ def main(args):
         logger.info(traceback.format_exc())
         logger.info(E)
         exit()
+    # for ino in range(len(img_list)):
+    #     logger.info("Predicts of {}:{}".format(valid_image_file_list[ino],
+    #                                            rec_res[ino]))
+    # save_res
+    out_res = []
     for ino in range(len(img_list)):
-        logger.info("Predicts of {}:{}".format(valid_image_file_list[ino],
-                                               rec_res[ino]))
+        pred = rec_res[ino][0]
+        score = rec_res[ino][1]
+        gt = label_list[ino]
+        # line = valid_image_file_list[ino] + '\t' + gt + '\t' + pred + '\t' + str(score) + '\n'
+        line = valid_image_file_list[ino] + '\t' + pred + '\n'
+        out_res.append(line)
+    with open('rec_400w_f1_styletext.txt', 'a+') as fd:
+        fd.writelines(out_res)
+    # end save
+
+    # eval acc
+    correct_num = 0
+    for ino in range(len(img_list)):
+        pred = rec_res[ino][0]
+        gt = label_list[ino]
+        if pred == gt:
+            correct_num += 1
+    acc = correct_num * 1.0 / len(img_list)
+    print('predict rec eval on ', args.image_dir)
+    print('acc: ', acc)
+    # end eval
     if args.benchmark:
         text_recognizer.autolog.report()
 

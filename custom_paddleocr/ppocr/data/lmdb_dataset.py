@@ -18,7 +18,7 @@ import string
 # import lmdb
 import cv2
 import numpy as np
-import six
+# import six
 from PIL import Image
 from paddle.io import Dataset
 
