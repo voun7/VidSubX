@@ -1025,19 +1025,8 @@ class PreferencesUI(tk.Toplevel):
             width=self.entry_size
         ).grid(column=1, row=0)
 
-        ttk.Label(text_extraction_frame, text="OCR Max Processes:").grid(column=0, row=1)
-        self.ocr_max_processes = tk.IntVar(value=utils.Config.ocr_max_processes)
-        self.ocr_max_processes.trace_add("write", self._set_reset_button)
-        ttk.Spinbox(
-            text_extraction_frame,
-            from_=1.0, to=24,
-            textvariable=self.ocr_max_processes,
-            state="readonly",
-            width=self.spinbox_size
-        ).grid(column=1, row=1)
-
         ttk.Label(text_extraction_frame, text="OCR Recognition Language:\n(Change requires program restart)").grid(
-            column=0, row=2, pady=self.wgt_y_padding
+            column=0, row=1
         )
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
@@ -1048,7 +1037,7 @@ class PreferencesUI(tk.Toplevel):
             values=languages,
             state="readonly",
             width=self.combobox_size
-        ).grid(column=1, row=2)
+        ).grid(column=1, row=1)
 
     def _subtitle_generator_tab(self) -> None:
         """
@@ -1162,7 +1151,6 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_frame_extraction_frequency,
             utils.Config.default_frame_extraction_chunk_size,
             utils.Config.default_text_extraction_chunk_size,
-            utils.Config.default_ocr_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_similarity_threshold,
             utils.Config.default_min_consecutive_sub_dur_ms,
@@ -1183,7 +1171,6 @@ class PreferencesUI(tk.Toplevel):
                 self.frame_extraction_frequency.get(),
                 self.frame_extraction_chunk_size.get(),
                 self.text_extraction_chunk_size.get(),
-                self.ocr_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_similarity_threshold.get(),
                 self.min_consecutive_sub_dur_ms.get(),
@@ -1241,7 +1228,6 @@ class PreferencesUI(tk.Toplevel):
         self.frame_extraction_chunk_size.set(utils.Config.default_frame_extraction_chunk_size)
         # Text extraction settings.
         self.text_extraction_chunk_size.set(utils.Config.default_text_extraction_chunk_size)
-        self.ocr_max_processes.set(utils.Config.default_ocr_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
@@ -1271,23 +1257,22 @@ class PreferencesUI(tk.Toplevel):
                     utils.Config.keys[1]: self.frame_extraction_chunk_size.get(),
                     # Text extraction settings.
                     utils.Config.keys[2]: self.text_extraction_chunk_size.get(),
-                    utils.Config.keys[3]: self.ocr_max_processes.get(),
-                    utils.Config.keys[4]: self.ocr_rec_language.get(),
+                    utils.Config.keys[3]: self.ocr_rec_language.get(),
                     # Subtitle generator settings.
-                    utils.Config.keys[5]: self.text_similarity_threshold.get(),
-                    utils.Config.keys[6]: self.min_consecutive_sub_dur_ms.get(),
-                    utils.Config.keys[7]: self.max_consecutive_short_durs.get(),
-                    utils.Config.keys[8]: self.min_sub_duration_ms.get(),
+                    utils.Config.keys[4]: self.text_similarity_threshold.get(),
+                    utils.Config.keys[5]: self.min_consecutive_sub_dur_ms.get(),
+                    utils.Config.keys[6]: self.max_consecutive_short_durs.get(),
+                    utils.Config.keys[7]: self.min_sub_duration_ms.get(),
                     # Subtitle detection settings.
-                    utils.Config.keys[9]: self.split_start.get(),
-                    utils.Config.keys[10]: self.split_stop.get(),
-                    utils.Config.keys[11]: self.no_of_frames.get(),
-                    utils.Config.keys[12]: self.sub_area_x_rel_padding.get(),
-                    utils.Config.keys[13]: self.sub_area_y_abs_padding.get(),
-                    utils.Config.keys[14]: self.use_search_area.get(),
+                    utils.Config.keys[8]: self.split_start.get(),
+                    utils.Config.keys[9]: self.split_stop.get(),
+                    utils.Config.keys[10]: self.no_of_frames.get(),
+                    utils.Config.keys[11]: self.sub_area_x_rel_padding.get(),
+                    utils.Config.keys[12]: self.sub_area_y_abs_padding.get(),
+                    utils.Config.keys[13]: self.use_search_area.get(),
                     # Notification settings.
-                    utils.Config.keys[15]: self.win_notify_sound.get(),
-                    utils.Config.keys[16]: self.win_notify_loop_sound.get()
+                    utils.Config.keys[14]: self.win_notify_sound.get(),
+                    utils.Config.keys[15]: self.win_notify_loop_sound.get()
                 }
             )
         except tk.TclError:
