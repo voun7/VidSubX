@@ -443,7 +443,6 @@ class SubtitleExtractor:
         if not self.video_path.exists() or not self.video_path.is_file():
             logger.error(f"Video file: {self.video_path.name} ...could not be found!\n")
             return
-        start = cv.getTickCount()
         self._empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
         # If the directories do not exist, create the directories.
         self.frame_output.mkdir(parents=True)
@@ -457,6 +456,7 @@ class SubtitleExtractor:
                     f"Resolution: {frame_width} X {frame_height}\n"
                     f"Subtitle Area: {sub_area}\n"
                     f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
+        start = cv.getTickCount()
 
         self.get_frames_and_texts(sub_area, start_frame, stop_frame)
         self.load_extracted_texts()
