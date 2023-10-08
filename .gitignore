@@ -3,3 +3,5 @@
 /models/
 /output/
 /config.ini
+/gui.build/
+/gui.dist/

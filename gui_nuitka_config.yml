@@ -1,0 +1,23 @@
+# yamllint disable rule:line-length
+# yamllint disable rule:indentation
+# yamllint disable rule:comments-indentation
+# too many spelling things, spell-checker: disable
+---
+- module-name: 'paddle'
+  dlls:
+    - from_filenames:
+        relative_path: 'libs'
+        prefixes:
+          - 'lib'
+          - 'mkl'
+          - 'war'
+
+- module-name: 'astor'
+  data-files:
+    patterns:
+      - 'VERSION'
+
+- module-name: 'custom_paddleocr'
+  data-files:
+    dirs:
+      - 'ppocr/utils'
