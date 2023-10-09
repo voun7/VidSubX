@@ -116,5 +116,7 @@ def my_namer(default_name: str) -> str:
     default_name is the default filename that would be assigned, e.g. Rotate_Test.txt.YYYY-MM-DD
     Do any manipulations to that name here, for example this function changes the name to Rotate_Test.YYYY-MM-DD.txt
     """
-    base_filename, ext, date = default_name.split(".")
-    return f"{base_filename}.{date}.{ext}"
+    default_name = Path(default_name)
+    file_path, ext, date = default_name.parent, default_name.suffixes[0], default_name.suffixes[1]
+    base_filename = default_name.stem.replace(ext, "")
+    return f"{file_path}/{base_filename}{date}{ext}"
