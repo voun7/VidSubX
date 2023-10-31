@@ -120,8 +120,8 @@ class SubtitleExtractorGUI:
         self.icon_file = "VSE.ico"
         self.root.title(self.window_title)
         self.root.iconbitmap(self.icon_file)
-        # Do not allow window to be resizable.
-        self.root.resizable(tk.FALSE, tk.FALSE)
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(0, weight=1)
 
         # Create window menu bar.
         self._menu_bar()
@@ -130,6 +130,10 @@ class SubtitleExtractorGUI:
         self.main_frame = ttk.Frame(self.root, padding=(5, 5, 5, 0))
         # Main frame's position in root window.
         self.main_frame.grid(column=0, row=0, sticky="N, S, E, W")
+        self.main_frame.grid_columnconfigure(0, weight=1)
+        self.main_frame.grid_rowconfigure(0, weight=1)  # Video Frame
+        self.main_frame.grid_rowconfigure(1, weight=1)  # Work Frame
+        self.main_frame.grid_rowconfigure(2, weight=1)  # Output Frame
 
         # Frames created in main frame.
         self._video_frame()
@@ -169,6 +173,8 @@ class SubtitleExtractorGUI:
         # Create video frame in main frame.
         video_frame = ttk.Frame(self.main_frame)
         video_frame.grid(column=0, row=0)
+        video_frame.grid_columnconfigure(0, weight=1)
+        video_frame.grid_rowconfigure(0, weight=1)
 
         # Create canvas widget in video frame.
         # Border width and highlight thickness set to 0 to prevent hidden rectangle parts.
@@ -180,6 +186,9 @@ class SubtitleExtractorGUI:
         # Create frame slider widget in video frame and label to display value.
         video_work_frame = ttk.Frame(video_frame)
         video_work_frame.grid(column=0, row=1)
+        video_work_frame.grid_columnconfigure(0, weight=1)
+        video_work_frame.grid_rowconfigure(0, weight=1)
+
         self.video_scale = ttk.Scale(video_work_frame, command=self._frame_slider, orient=tk.HORIZONTAL, length=600,
                                      state="disabled")
         self.video_scale.grid(column=0, row=1, padx=(0, 60))  # Only the right side is padded.
@@ -196,6 +205,8 @@ class SubtitleExtractorGUI:
         # Create work frame in main frame.
         progress_frame = ttk.Frame(self.main_frame)
         progress_frame.grid(column=0, row=1)
+        progress_frame.grid_columnconfigure(0, weight=1)
+        progress_frame.grid_rowconfigure(0, weight=1)
 
         # Create button widget for starting the text extraction.
         self.run_button = ttk.Button(progress_frame, text="Run", command=self._run_sub_extraction)
@@ -215,6 +226,11 @@ class SubtitleExtractorGUI:
         # Create button widget for next video in queue for subtitle area selection.
         self.next_button = ttk.Button(progress_frame, text="Next Video", command=self._next_video)
 
+        progress_frame.grid_columnconfigure(1, weight=2)  # Progress Bar
+        progress_frame.grid_columnconfigure(2, weight=1)  # Previous
+        progress_frame.grid_columnconfigure(3, weight=1)  # Video Label
+        progress_frame.grid_columnconfigure(4, weight=1)  # Next
+
     def _output_frame(self) -> None:
         """
         Frame that contains the widgets for the extraction text output.
@@ -222,6 +238,9 @@ class SubtitleExtractorGUI:
         # Create output frame in main frame.
         output_frame = ttk.Frame(self.main_frame)
         output_frame.grid(column=0, row=2, sticky="N, S, E, W")
+        # Resize output frame if main frame is resized.
+        output_frame.grid_columnconfigure(0, weight=1)
+        output_frame.grid_rowconfigure(0, weight=1)
 
         # Create text widget for showing the subtitle extraction details in the output. Does not allow input from gui.
         self.text_output_widget = tk.Text(output_frame, height=12, state="disabled")
@@ -233,10 +252,6 @@ class SubtitleExtractorGUI:
 
         # Connect text and scrollbar widgets.
         self.text_output_widget.configure(yscrollcommand=output_scroll.set)
-
-        # Resize output frame if main frame is resized.
-        output_frame.grid_columnconfigure(0, weight=1)
-        output_frame.grid_rowconfigure(0, weight=1)
 
     def bind_keys_to_scale(self) -> None:
         """
