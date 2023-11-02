@@ -226,7 +226,7 @@ class SubtitleExtractorGUI:
         # Create button widget for next video in queue for subtitle area selection.
         self.next_button = ttk.Button(progress_frame, text="Next Video", command=self._next_video)
 
-        progress_frame.grid_columnconfigure(1, weight=2)  # Progress Bar
+        progress_frame.grid_columnconfigure(1, weight=10)  # Progress Bar
         progress_frame.grid_columnconfigure(2, weight=1)  # Previous
         progress_frame.grid_columnconfigure(3, weight=1)  # Video Label
         progress_frame.grid_columnconfigure(4, weight=1)  # Next
