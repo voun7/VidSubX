@@ -602,7 +602,6 @@ class SubtitleExtractorGUI:
         self._display_video_frame()
         self._set_current_non_subarea()
         self._draw_current_subtitle_area()
-        self.root.geometry("")  # Make sure the window is always properly resized after Thread is done opening videos.
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
 
         if len(self.video_queue) > 1:
