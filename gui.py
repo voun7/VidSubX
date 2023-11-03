@@ -705,6 +705,7 @@ class SubtitleExtractorGUI:
                 duration="long"
             )
             sound = Sound.get_sound_value(utils.Config.win_notify_sound)
+            toast.clear()
             toast.set_audio(sound, loop=utils.Config.win_notify_loop_sound)
             toast.show()
 

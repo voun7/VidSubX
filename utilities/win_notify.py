@@ -1,3 +1,4 @@
+# Source: https://pypi.org/project/winotify/
 import subprocess
 
 
@@ -73,7 +74,7 @@ $Notifier.Show($Toast);
 """
 
 
-class Notification(object):
+class Notification:
     def __init__(self, app_id: str, title: str, msg: str = "", icon: str = "", duration: str = 'short') -> None:
         """
         Construct a new notification
@@ -114,23 +115,32 @@ class Notification(object):
         """
         Show the toast
         """
-        if self.audio == Sound.Silent:
+        if Sound.Silent in self.audio:
             self.audio = '<audio silent="true" />'
 
         self.script = WIN_TOAST_TEMPLATE.format(**self.__dict__)
-
-        command = ["powershell.exe", "-ExecutionPolicy", "Bypass", '-Command', self.script]
-        self.run_no_console_command(command)
+        self.run_no_console_command(self.script)
 
     @staticmethod
-    def run_no_console_command(command: list) -> None:
+    def run_no_console_command(script: str) -> None:
         """
         Run subprocess commands without relying on a console being available
         """
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        subprocess.Popen(command, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         stdin=subprocess.PIPE)
+        command = ["powershell.exe", "-ExecutionPolicy", "Bypass", '-Command', script]
+        sub_arg = subprocess.PIPE
+        subprocess.Popen(command, startupinfo=startupinfo, stdout=sub_arg, stderr=sub_arg, stdin=sub_arg)
+
+    def clear(self) -> None:
+        """
+        Clear all notification created by this module from action center.
+        """
+        script = f"""\
+        [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
+        [Windows.UI.Notifications.ToastNotificationManager]::History.Clear('{self.app_id}')
+        """
+        self.run_no_console_command(script)
 
 
 if __name__ == '__main__':
@@ -139,5 +149,6 @@ if __name__ == '__main__':
         title="test title",
         msg="hey toast"
     )
+    test_toast.clear()
     test_toast.set_audio(Sound.Default, loop=False)
     test_toast.show()
