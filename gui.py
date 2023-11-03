@@ -293,12 +293,14 @@ class SubtitleExtractorGUI:
         win_x, win_y = root_x + 100, root_y + 50
         self.preference_window = PreferencesUI(self.icon_file, win_x, win_y)
 
-    def _get_rescale_factor(self, target_height: float = 540.0) -> float:
+    def _get_rescale_factor(self) -> float:
         """
         Use the frame height to determine which value will be used to scale the current video.
         :return: Rescale factor.
         """
         logger.debug("Calculating the rescale factor")
+        target_height = self.root.winfo_screenheight() / 2
+        logger.debug(f"{target_height = }")
         rescale_factor = target_height / self.current_frame_height
         return rescale_factor
 
