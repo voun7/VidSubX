@@ -125,6 +125,7 @@ class SubtitleExtractorGUI:
         self.sub_ex = SubtitleExtractor()
         self.video_queue = {}
         self.current_video = self.video_capture = self.subtitle_rect = self.non_subarea_rect = None
+        self.video_target_height = 500
         self.thread_running = False
         self._console_redirector()
 
@@ -278,17 +279,25 @@ class SubtitleExtractorGUI:
         # Connect text and scrollbar widgets.
         self.text_output_widget.configure(yscrollcommand=output_scroll.set)
 
-    def _video_zoom_in(self) -> None:
+    def _video_zoom_in(self, zoom_value: int = 50) -> None:
         """
         Increase the video display and canvas size.
         """
-        pass
+        if self.video_queue:
+            self.video_target_height = self.video_target_height + zoom_value
+            self._set_video(self._video_indexer()[0])
+        else:
+            logger.warning("Video queue empty! Video height not changed!")
 
-    def _video_zoom_out(self) -> None:
+    def _video_zoom_out(self, zoom_value: int = 50) -> None:
         """
         Decrease the video display and canvas size.
         """
-        pass
+        if self.video_queue:
+            self.video_target_height = self.video_target_height - zoom_value
+            self._set_video(self._video_indexer()[0])
+        else:
+            logger.warning("Video queue empty! Video height not changed!")
 
     def bind_keys_to_scale(self) -> None:
         """
@@ -328,13 +337,13 @@ class SubtitleExtractorGUI:
         win_x, win_y = root_x + 100, root_y + 50
         self.preference_window = PreferencesUI(self.icon_file, win_x, win_y)
 
-    def _get_rescale_factor(self, target_height: float = 540.0) -> float:
+    def _get_rescale_factor(self) -> float:
         """
         Use the frame height to determine which value will be used to scale the current video.
         :return: Rescale factor.
         """
         logger.debug("Calculating the rescale factor")
-        rescale_factor = target_height / self.current_frame_height
+        rescale_factor = self.video_target_height / self.current_frame_height
         return rescale_factor
 
     def rescale(self, frame: np.ndarray = None, subtitle_area: tuple = None, resolution: tuple = None,
