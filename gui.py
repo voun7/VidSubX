@@ -590,8 +590,9 @@ class SubtitleExtractorGUI:
         """
         if not self.thread_running:  # To prevent dictionary from changing size during iteration.
             logger.warning(f"Removing {Path(video).name} from queue.\n")
+            new_index = self._video_indexer()[0] - 1  # Get previous video index before removing missing video.
             del self.video_queue[video]
-            self._set_video()
+            self._set_video(new_index)
 
     def error_msg(self, error_msg: str) -> None:
         """
