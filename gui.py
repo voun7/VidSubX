@@ -69,6 +69,9 @@ class CustomMessageBox(tk.Toplevel):
 
         self.iconbitmap(icon_file)
         self.title(win_title)
+        self.focus()
+        self.grab_set()
+        self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
         self.text_box = tk.Text(self, state="disabled", borderwidth=10.0, relief="flat")
         self.text_box.grid(sticky="N, S, E, W")
@@ -98,6 +101,20 @@ class CustomMessageBox(tk.Toplevel):
             if len(line) > widget_width:
                 widget_width = len(line)
         self.text_box.config(width=widget_width, height=widget_height)
+
+    def log_errors(self) -> None:
+        """
+        Send all the error messages from the widget to the log.
+        """
+        error_msgs = self.text_box.get("1.0", "end")
+        logger.debug(f"ERROR: \n{error_msgs}")
+
+    def _on_closing(self) -> None:
+        """
+        Destroy custom message box.
+        """
+        self.log_errors()
+        self.destroy()
 
 
 class SubtitleExtractorGUI:
