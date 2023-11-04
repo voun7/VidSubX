@@ -152,9 +152,11 @@ class SubtitleExtractorGUI:
         self.root.config(menu=self.menubar)
 
         # Create menus for menu bar.
-        self.menu_file = tk.Menu(self.menubar)
+        self.file_menu = tk.Menu(self.menubar)
+        self.view_menu = tk.Menu(self.menubar)
 
-        self.menubar.add_cascade(menu=self.menu_file, label="File")
+        self.menubar.add_cascade(menu=self.file_menu, label="File")
+        self.menubar.add_cascade(menu=self.view_menu, label="View")
         self.menubar.add_command(label="Preferences", command=self._preferences)
         self.menubar.add_command(label="Detect Subtitles", command=self._run_sub_detection, state="disabled")
         self.menubar.add_command(label="Hide Non-SubArea", command=self._hide_non_subarea, state="disabled")
@@ -163,8 +165,12 @@ class SubtitleExtractorGUI:
         self.menubar.add_command(label="Set Stop Frame", command=self._set_current_stop_frame, state="disabled")
 
         # Add menu items to file menu.
-        self.menu_file.add_command(label="Open file(s)", command=self._open_files)
-        self.menu_file.add_command(label="Close", command=self._on_closing)
+        self.file_menu.add_command(label="Open file(s)", command=self._open_files)
+        self.file_menu.add_command(label="Close", command=self._on_closing)
+
+        # Add menu items to view menu.
+        self.view_menu.add_command(label=f"Video Zoom In   (Ctrl+Plus)", command=self._video_zoom_in)
+        self.view_menu.add_command(label=f"Video Zoom Out  (Ctrl+Minus)", command=self._video_zoom_out)
 
     def _video_frame(self) -> None:
         """
@@ -254,6 +260,18 @@ class SubtitleExtractorGUI:
 
         # Connect text and scrollbar widgets.
         self.text_output_widget.configure(yscrollcommand=output_scroll.set)
+
+    def _video_zoom_in(self) -> None:
+        """
+        Increase the video display and canvas size.
+        """
+        pass
+
+    def _video_zoom_out(self) -> None:
+        """
+        Decrease the video display and canvas size.
+        """
+        pass
 
     def bind_keys_to_scale(self) -> None:
         """
@@ -397,7 +415,7 @@ class SubtitleExtractorGUI:
             logger.debug("Rectangle for non subtitle area created.")
             x1, y1, x2, y2 = self.rescale(subtitle_area=self.current_non_subarea())
             self.non_subarea_rect = self.canvas.create_rectangle(x1, y1, x2, y2, fill="black")
-        self.menubar.entryconfig(3, label="Show Non-SubArea", command=self._show_non_subarea)  # Change button config.
+        self.menubar.entryconfig(4, label="Show Non-SubArea", command=self._show_non_subarea)  # Change button config.
 
     def _show_non_subarea(self) -> None:
         """
@@ -406,7 +424,7 @@ class SubtitleExtractorGUI:
         logger.debug("Rectangle for non subtitle area deleted.")
         self.canvas.delete(self.non_subarea_rect)
         self.non_subarea_rect = None
-        self.menubar.entryconfig(3, label="Hide Non-SubArea", command=self._hide_non_subarea)
+        self.menubar.entryconfig(4, label="Hide Non-SubArea", command=self._hide_non_subarea)
 
     def _set_current_non_subarea(self) -> None:
         """
@@ -748,7 +766,7 @@ class SubtitleExtractorGUI:
         utils.Process.stop_process()
         if not self.thread_running:
             self._set_gui_state("normal", "detection")
-            self.menubar.entryconfig(2, label="Detect Subtitles", command=self._run_sub_detection)
+            self.menubar.entryconfig(3, label="Detect Subtitles", command=self._run_sub_detection)
 
     def _run_sub_detection(self) -> None:
         """
@@ -756,7 +774,7 @@ class SubtitleExtractorGUI:
         """
         utils.Process.start_process()
         self._set_gui_state("disabled", "detection")
-        self.menubar.entryconfig(2, label="Stop Sub Detection", command=self._stop_sub_detection_process)
+        self.menubar.entryconfig(3, label="Stop Sub Detection", command=self._stop_sub_detection_process)
         Thread(target=self._detect_subtitles, daemon=True).start()
 
     def extract_subtitles(self) -> None:
@@ -823,8 +841,9 @@ class SubtitleExtractorGUI:
         Set state for widgets while process is running.
         """
         logger.debug("Setting gui state")
-        self.menu_file.entryconfig(0, state=state)  # Open file button.
-        self.menubar.entryconfig(1, state=state)  # Preferences button.
+        self.file_menu.entryconfig(0, state=state)  # Open File button.
+        self.menubar.entryconfig(1, state=state)  # Open View button.
+        self.menubar.entryconfig(2, state=state)  # Preferences button.
 
         if process_name == "opening":
             self.previous_button.configure(state=state)
@@ -834,10 +853,10 @@ class SubtitleExtractorGUI:
             self.run_button.configure(state=state)
 
         if process_name in ("extraction", "opening"):
-            self.menubar.entryconfig(2, state=state)  # Detect button.
-            self.menubar.entryconfig(3, state=state)  # Hide Non-SubArea button.
-            self.menubar.entryconfig(5, state=state)  # Set Start Frame button.
-            self.menubar.entryconfig(6, state=state)  # Set Stop Frame button.
+            self.menubar.entryconfig(3, state=state)  # Detect button.
+            self.menubar.entryconfig(4, state=state)  # Hide Non-SubArea button.
+            self.menubar.entryconfig(6, state=state)  # Set Start Frame button.
+            self.menubar.entryconfig(7, state=state)  # Set Stop Frame button.
             self.video_scale.configure(state=state)
 
     def _on_closing(self) -> None:
