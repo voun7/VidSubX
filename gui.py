@@ -187,8 +187,10 @@ class SubtitleExtractorGUI:
         self.file_menu.add_command(label="Close", command=self._on_closing)
 
         # Add menu items to view menu.
-        self.view_menu.add_command(label=f"Video Zoom In   (Ctrl+Plus)", command=self._video_zoom_in)
-        self.view_menu.add_command(label=f"Video Zoom Out  (Ctrl+Minus)", command=self._video_zoom_out)
+        self.view_menu.add_command(label=f"Video Zoom In   (Ctrl+Plus)", command=lambda: self.resize_video("equal"))
+        self.view_menu.add_command(label=f"Video Zoom Out  (Ctrl+Minus)", command=lambda: self.resize_video("minus"))
+        self.root.bind("<Control-equal>", self.resize_video)  # equal is used instead plus, it prevents need for shift
+        self.root.bind("<Control-minus>", self.resize_video)
 
     def _video_frame(self) -> None:
         """
@@ -279,25 +281,16 @@ class SubtitleExtractorGUI:
         # Connect text and scrollbar widgets.
         self.text_output_widget.configure(yscrollcommand=output_scroll.set)
 
-    def _video_zoom_in(self, zoom_value: int = 50) -> None:
+    def resize_video(self, *args: tuple[tk.Event | str] | str) -> None:
         """
-        Increase the video display and canvas size.
+        Increase or decrease the video display and canvas size.
         """
-        if self.video_queue:
-            self.video_target_height = self.video_target_height + zoom_value
+        if self.current_video and not self.thread_running:
+            if "minus" in str(args):
+                self.video_target_height = self.video_target_height - 50
+            elif "equal" in str(args):
+                self.video_target_height = self.video_target_height + 50
             self._set_video(self._video_indexer()[0])
-        else:
-            logger.warning("Video queue empty! Video height not changed!")
-
-    def _video_zoom_out(self, zoom_value: int = 50) -> None:
-        """
-        Decrease the video display and canvas size.
-        """
-        if self.video_queue:
-            self.video_target_height = self.video_target_height - zoom_value
-            self._set_video(self._video_indexer()[0])
-        else:
-            logger.warning("Video queue empty! Video height not changed!")
 
     def bind_keys_to_scale(self) -> None:
         """
