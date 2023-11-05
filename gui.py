@@ -287,10 +287,11 @@ class SubtitleExtractorGUI:
         Increase or decrease the video display and canvas size.
         """
         if self.current_video and not self.thread_running:
-            if "minus" in str(args):
-                self.video_target_height = self.video_target_height - 50
-            elif "equal" in str(args):
-                self.video_target_height = self.video_target_height + 50
+            args, zoom_value = str(args), 50
+            if "minus" in args and self.video_target_height > zoom_value:
+                self.video_target_height -= zoom_value
+            elif "equal" in args:
+                self.video_target_height += zoom_value
             self._set_video(self._video_indexer()[0], self.video_scale.get())
 
     def bind_keys_to_scale(self) -> None:
