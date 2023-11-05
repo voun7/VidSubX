@@ -189,7 +189,7 @@ class SubtitleExtractorGUI:
         # Add menu items to view menu.
         self.view_menu.add_command(label=f"Video Zoom In   (Ctrl+Plus)", command=lambda: self.resize_video("equal"))
         self.view_menu.add_command(label=f"Video Zoom Out  (Ctrl+Minus)", command=lambda: self.resize_video("minus"))
-        self.root.bind("<Control-equal>", self.resize_video)  # equal is used instead plus, it prevents need for shift
+        self.root.bind("<Control-equal>", self.resize_video)  # equal instead of plus. It prevents need for shift key.
         self.root.bind("<Control-minus>", self.resize_video)
 
     def _video_frame(self) -> None:
@@ -484,7 +484,6 @@ class SubtitleExtractorGUI:
         if frame is not None:
             cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
             frame_resized = self.rescale(cv2image)  # Make image fit canvas (usually a down scale).
-
             img = Image.fromarray(frame_resized)
             photo = ImageTk.PhotoImage(image=img)
             self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
