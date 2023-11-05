@@ -54,7 +54,7 @@ class CustomMessageBox(tk.Toplevel):
     """
     instance = None
 
-    def __init__(self, icon_file: str, win_title: str) -> None:
+    def __init__(self, icon_file: str, win_title: str, win_x: int, win_y: int) -> None:
         """
         Initialize the CustomMessageBox instance.
         If an instance of CustomMessageBox already exists, it is reused. Otherwise, a new instance is created.
@@ -69,6 +69,7 @@ class CustomMessageBox(tk.Toplevel):
 
         self.iconbitmap(icon_file)
         self.title(win_title)
+        self.geometry(f"+{win_x}+{win_y}")  # Set window position.
         self.focus()
         self.grab_set()
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -694,7 +695,9 @@ class SubtitleExtractorGUI:
         """
         Show the CustomMessageBox and append the error message or messages.
         """
-        custom_messagebox = CustomMessageBox(self.icon_file, f"{self.window_title} - Error Message")
+        root_x, root_y = self.root.winfo_rootx(), self.root.winfo_rooty()
+        win_x, win_y = root_x + 10, root_y + 50
+        custom_messagebox = CustomMessageBox(self.icon_file, f"{self.window_title} - Error Message", win_x, win_y)
         custom_messagebox.append_message(text)
 
     def _console_redirector(self) -> None:
