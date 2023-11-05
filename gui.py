@@ -290,7 +290,7 @@ class SubtitleExtractorGUI:
                 self.video_target_height = self.video_target_height - 50
             elif "equal" in str(args):
                 self.video_target_height = self.video_target_height + 50
-            self._set_video(self._video_indexer()[0])
+            self._set_video(self._video_indexer()[0], self.video_scale.get())
 
     def bind_keys_to_scale(self) -> None:
         """
@@ -474,7 +474,7 @@ class SubtitleExtractorGUI:
             self.canvas.coords(self.subtitle_rect, self.rescale(subtitle_area=self.current_sub_area))
             self.canvas.tag_raise(self.subtitle_rect)
 
-    def _display_video_frame(self, frame_no: float = 0) -> None:
+    def _display_video_frame(self, frame_no: float) -> None:
         """
         Find captured video frame through corresponding frame number and display on video canvas.
         :param frame_no: default corresponding frame_no.
@@ -503,16 +503,18 @@ class SubtitleExtractorGUI:
         self._elevate_non_subarea()
         self._draw_current_subtitle_area()
 
-    def _set_frame_slider(self) -> None:
+    def _set_frame_slider(self, frame_no: float) -> None:
         """
         Activate the slider, then set the starting and ending values of the slider.
+        :param frame_no: Corresponding frame_no.
         """
         logger.debug("Setting frame slider")
         # Set the max size of the frame slider.
-        self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total, value=0.0)
+        self.video_scale.configure(state="normal", from_=0.0, to=self.current_frame_total, value=frame_no)
         # Set the durations labels.
         total_time_duration = self.sub_ex.frame_no_to_duration(self.current_frame_total, self.current_fps)
-        self.current_scale_value.configure(text="00:00:00:000")
+        scale_value = "00:00:00:000" if not frame_no else self.sub_ex.frame_no_to_duration(frame_no, self.current_fps)
+        self.current_scale_value.configure(text=scale_value)
         self.total_scale_value.configure(text=f"/ {total_time_duration}")
         self.bind_keys_to_scale()
 
@@ -616,10 +618,11 @@ class SubtitleExtractorGUI:
             self._remove_video_from_queue(self.current_video)
             return False
 
-    def _set_video(self, video_index: int = 0) -> None:
+    def _set_video(self, video_index: int = 0, frame_no: float = 0) -> None:
         """
         Set the gui for the given current video queue index.
         :param video_index: Index of video that should be set to current. Defaults to first index.
+        :param frame_no: Corresponding frame_no.
         """
         if self.video_capture is not None:
             logger.debug("Closing open video")
@@ -637,9 +640,9 @@ class SubtitleExtractorGUI:
             = self.sub_ex.video_details(self.current_video)
         self.video_capture = cv.VideoCapture(self.current_video)
         self._set_canvas()
-        self._set_frame_slider()
         self._set_status_label()
-        self._display_video_frame()
+        self._set_frame_slider(frame_no)
+        self._display_video_frame(frame_no)
         self._set_current_non_subarea()
         self._draw_current_subtitle_area()
         self.root.title(f"{self.window_title} - {Path(self.current_video).name}")
