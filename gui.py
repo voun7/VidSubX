@@ -293,6 +293,7 @@ class SubtitleExtractorGUI:
             elif "equal" in args:
                 self.video_target_height += zoom_value
             self._set_video(self._video_indexer()[0], self.video_scale.get())
+            self._elevate_non_subarea()
 
     def bind_keys_to_scale(self) -> None:
         """
