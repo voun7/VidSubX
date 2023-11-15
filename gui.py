@@ -242,7 +242,7 @@ class SubtitleExtractorGUI:
         self.run_button.grid(column=0, row=0, pady=6, padx=10)
 
         # Create progress bar widget for showing the text extraction progress.
-        self.progress_bar = ttk.Progressbar(progress_frame, orient=tk.HORIZONTAL, length=600, mode='determinate')
+        self.progress_bar = ttk.Progressbar(progress_frame, orient=tk.HORIZONTAL, length=500, mode='determinate')
         self.progress_bar.grid(column=1, row=0, padx=10)
 
         # Create button widget for previous video in queue for subtitle area selection.
@@ -312,7 +312,7 @@ class SubtitleExtractorGUI:
         logger.debug("Batch layout deactivated")
         self.previous_button.grid_remove()
         self.next_button.grid_remove()
-        self.progress_bar.configure(length=600)
+        self.progress_bar.configure(length=500)
 
     def _set_batch_layout(self) -> None:
         """
