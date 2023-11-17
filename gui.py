@@ -42,7 +42,7 @@ def set_dpi_scaling() -> None:
 
         # Set DPI Awareness  (Windows 10 and 8).
         try:
-            ctypes.windll.shcore.SetProcessDpiAwareness(2)
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
         except Exception as dpi_error:
             logger.exception(f"An error occurred while setting the dpi: {dpi_error}")
 
