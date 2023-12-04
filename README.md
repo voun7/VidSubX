@@ -5,6 +5,34 @@
 
 Program that extracts hard coded subtitles from video and creates external subtitles.
 
+## Setup Instructions:
+
+### Download and Install:
+
+[Latest Version of Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170)
+
+### Install the following packages:
+
+```commandline
+pip install paddlepaddle
+```
+
+```commandline
+pip install opencv-python
+```
+
+```commandline
+pip install requests
+```
+
+```commandline
+pip install pyclipper
+```
+
+```commandline
+pip install shapely
+```
+
 ## Nuitka compile command:
 
 ```
