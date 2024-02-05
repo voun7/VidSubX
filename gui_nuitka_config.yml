@@ -8,14 +8,10 @@
     - from_filenames:
         relative_path: 'libs'
         prefixes:
+          - 'com'
           - 'lib'
           - 'mkl'
           - 'war'
-
-- module-name: 'astor'
-  data-files:
-    patterns:
-      - 'VERSION'
 
 - module-name: 'custom_paddleocr'
   data-files:
