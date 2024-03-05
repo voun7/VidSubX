@@ -886,12 +886,22 @@ class SubtitleExtractorGUI:
             self.menubar.entryconfig(7, state=state)  # Set Stop Frame button.
             self.video_scale.configure(state=state)
 
+    def clear_notifications(self) -> None:
+        """
+        Remove all the previous created notification that are still in the notification window.
+        """
+        operating_system = platform.system()
+        if operating_system == "Windows":
+            toast = Notification(self.window_title, "")
+            toast.clear()
+
     def _on_closing(self) -> None:
         """
         Method called when window is closed.
         """
         utils.Process.stop_process()
         if not self.thread_running:
+            self.clear_notifications()
             self.root.quit()
 
 
