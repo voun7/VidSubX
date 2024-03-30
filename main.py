@@ -1,6 +1,6 @@
 import logging
 import shutil
-import time
+from datetime import timedelta
 from difflib import SequenceMatcher
 from itertools import pairwise
 from pathlib import Path
@@ -466,8 +466,8 @@ class SubtitleExtractor:
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        converted_time = time.strftime("%Hh:%Mm:%Ss", time.gmtime(total_time))
-        logger.info(f"Subtitle Extraction Done! Total time: {converted_time}\n")
+        total_time = timedelta(seconds=total_time)
+        logger.info(f"Subtitle Extraction Done! Total time: {total_time}\n")
         self._empty_cache()
         return save_path
 
