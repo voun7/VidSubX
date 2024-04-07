@@ -466,7 +466,7 @@ class SubtitleExtractor:
 
         end = cv.getTickCount()
         total_time = (end - start) / cv.getTickFrequency()
-        total_time = timedelta(seconds=total_time)
+        total_time = timedelta(seconds=round(total_time))
         logger.info(f"Subtitle Extraction Done! Total time: {total_time}\n")
         self._empty_cache()
         return save_path

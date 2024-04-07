@@ -781,7 +781,7 @@ class SubtitleExtractorGUI:
         self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]][0]
         self._draw_current_subtitle_area()
         end = time.perf_counter()
-        completion_message = f"Done detecting subtitle(s)! Total time: {round(end - start, 3)}s"
+        completion_message = f"Done detecting subtitle(s)! Total time: {round(end - start)}s"
         self.send_notification("Subtitle Detection Completed!", completion_message)
         logger.info(f"{completion_message}\n")
 
