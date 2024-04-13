@@ -452,7 +452,7 @@ class SubtitleExtractor:
         sub_area = sub_area or self.default_sub_area(frame_width, frame_height)
 
         logger.info(f"File Path: {self.video_path}\n"
-                    f"Frame Total: {frame_total}, Frame Rate: {fps}\n"
+                    f"Frame Total: {frame_total:,}, Frame Rate: {fps}\n"
                     f"Resolution: {frame_width} X {frame_height}\n"
                     f"Subtitle Area: {sub_area}\n"
                     f"Start Frame No: {start_frame}, Stop Frame No: {stop_frame}")
