@@ -59,10 +59,11 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
     :param frame_output: directory of the frames
     :param text_output: directory for extracted texts
     """
-    # Size of files given to each processor.
-    chunk_size = utils.Config.text_extraction_chunk_size
-    # Cancel if process has been cancelled by gui.
-    if utils.Process.interrupt_process:
+    chunk_size = utils.Config.text_extraction_chunk_size  # Size of files given to each processor.
+    # Number of processes to be used.
+    ocr_max_processes = utils.Config.ocr_gpu_max_processes if utils.Config.use_gpu else None
+
+    if utils.Process.interrupt_process:  # Cancel if process has been cancelled by gui.
         logger.warning("Text extraction process interrupted!")
         return
 
@@ -74,7 +75,7 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
     prefix = "Text Extraction"
     logger.debug("Using multiprocessing for text extraction")
 
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(ocr_max_processes) as executor:
         futures = [executor.submit(extract_text, text_output, files) for files in file_chunks]
         for i, _ in enumerate(as_completed(futures)):  # as each  process completes
             utils.print_progress(i, len(file_chunks) - 1, prefix)
