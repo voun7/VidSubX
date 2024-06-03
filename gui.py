@@ -351,10 +351,7 @@ class SubtitleExtractorGUI:
         scale = scale or self.current_rescale_factor
 
         if frame is not None:
-            height = int(frame.shape[0] * scale)
-            width = int(frame.shape[1] * scale)
-            dimensions = (width, height)
-            return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
+            return cv.resize(frame, None, fx=scale, fy=scale)
 
         if subtitle_area:
             return tuple(map(lambda c: int(c * scale), subtitle_area))
