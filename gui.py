@@ -162,6 +162,7 @@ class SubtitleExtractorGUI:
 
         self.status_label = tk.Label(self.main_frame)
         self.status_label.grid(column=0, row=3, padx=18, sticky="E")
+        self.status_label.configure(text=f"{'GPU in use.' if utils.Config.use_gpu else 'CPU in use.'}")
 
     def _menu_bar(self) -> None:
         # Remove dashed lines that come default with tkinter menu bar.
@@ -649,7 +650,6 @@ class SubtitleExtractorGUI:
         """
         Add all opened videos to a queue along with default values.
         """
-        logger.info(f"{'GPU is being used.' if utils.Config.use_gpu else 'GPU not available, CPU in use.'}\n")
         logger.info("Opening video(s)...")
         self.thread_running = True
         for filename in filenames:
