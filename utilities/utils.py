@@ -45,6 +45,7 @@ class Config:
 
     # Default values
     use_gpu = paddle.device.is_compiled_with_cuda()
+    device_msg = "GPU in use." if use_gpu else "CPU in use."
 
     default_frame_extraction_frequency = 2
     default_frame_extraction_chunk_size = 250

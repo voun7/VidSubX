@@ -475,6 +475,7 @@ class SubtitleExtractor:
 if __name__ == '__main__':
     setup_logging()
     logger.debug("\n\nMain program Started.")
+    logger.info(utils.Config.device_msg)
     test_se = SubtitleExtractor()
     test_vid = r""
     test_se.run_extraction(test_vid)

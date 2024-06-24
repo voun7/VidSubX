@@ -162,7 +162,7 @@ class SubtitleExtractorGUI:
 
         self.status_label = tk.Label(self.main_frame)
         self.status_label.grid(column=0, row=3, padx=18, sticky="E")
-        self.status_label.configure(text=f"{'GPU in use.' if utils.Config.use_gpu else 'CPU in use.'}")
+        self.status_label.configure(text=utils.Config.device_msg)
 
     def _menu_bar(self) -> None:
         # Remove dashed lines that come default with tkinter menu bar.
@@ -551,7 +551,7 @@ class SubtitleExtractorGUI:
             stop_dur = self.sub_ex.frame_no_to_duration(stop_frame, self.current_fps) if stop_frame else stop_frame
             self.status_label.configure(text=f"Start Frame: {start_dur}, Stop Frame: {stop_dur}")
         else:
-            self.status_label.configure(text='')
+            self.status_label.configure(text=utils.Config.device_msg)
 
     def _video_indexer(self) -> tuple:
         """
