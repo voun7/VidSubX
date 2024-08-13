@@ -17,53 +17,72 @@ import sys
 import tarfile
 
 import requests
+from ppocr.utils.logging import get_logger
 
-from utilities.utils import print_progress
+# from tqdm import tqdm
+
+MODELS_DIR = os.path.expanduser("~/.paddleocr/models/")
 
 
 def download_with_progressbar(url, save_path):
+    logger = get_logger()
+    if save_path and os.path.exists(save_path):
+        logger.info(f"Path {save_path} already exists. Skipping...")
+        return
     response = requests.get(url, stream=True)
     if response.status_code == 200:
-        total_size_in_bytes = int(response.headers.get('content-length', 1))
+        total_size_in_bytes = int(response.headers.get("content-length", 1))
         block_size = 1024  # 1 Kibibyte
-        data_progress = 0
-        with open(save_path, 'wb') as file:
+        # progress_bar = tqdm(total=total_size_in_bytes, unit="iB", unit_scale=True)
+        with open(save_path, "wb") as file:
             for data in response.iter_content(block_size):
-                data_progress += block_size
-                print_progress(data_progress, total_size_in_bytes, "Downloading model")
+                # progress_bar.update(len(data))
                 file.write(data)
-            print("Download complete.")
+        # progress_bar.close()
     else:
-        print("Something went wrong while downloading the model.")
+        logger.error("Something went wrong while downloading models")
         sys.exit(0)
 
 
 def maybe_download(model_storage_directory, url):
     # using custom model
-    tar_file_name_list = ['.pdiparams', '.pdiparams.info', '.pdmodel']
-    if not os.path.exists(os.path.join(model_storage_directory, 'inference.pdiparams')
-                          ) or not os.path.exists(os.path.join(model_storage_directory, 'inference.pdmodel')):
-        assert url.endswith('.tar'), 'Only supports tar compressed package'
-        tmp_path = os.path.join(model_storage_directory, url.split('/')[-1])
-        print(f'\nDownloading model from: {url}\nto: {tmp_path}')
+    tar_file_name_list = [".pdiparams", ".pdiparams.info", ".pdmodel"]
+    if not os.path.exists(
+            os.path.join(model_storage_directory, "inference.pdiparams")
+    ) or not os.path.exists(os.path.join(model_storage_directory, "inference.pdmodel")):
+        assert url.endswith(".tar"), "Only supports tar compressed package"
+        tmp_path = os.path.join(model_storage_directory, url.split("/")[-1])
+        print("download {} to {}".format(url, tmp_path))
         os.makedirs(model_storage_directory, exist_ok=True)
         download_with_progressbar(url, tmp_path)
-        with tarfile.open(tmp_path, 'r') as tarObj:
+        with tarfile.open(tmp_path, "r") as tarObj:
             for member in tarObj.getmembers():
                 filename = None
                 for tar_file_name in tar_file_name_list:
                     if member.name.endswith(tar_file_name):
-                        filename = 'inference' + tar_file_name
+                        filename = "inference" + tar_file_name
                 if filename is None:
                     continue
                 file = tarObj.extractfile(member)
-                with open(os.path.join(model_storage_directory, filename), 'wb') as f:
+                with open(os.path.join(model_storage_directory, filename), "wb") as f:
                     f.write(file.read())
         os.remove(tmp_path)
 
 
+def maybe_download_params(model_path):
+    if os.path.exists(model_path) or not is_link(model_path):
+        return model_path
+    else:
+        url = model_path
+    tmp_path = os.path.join(MODELS_DIR, url.split("/")[-1])
+    print("download {} to {}".format(url, tmp_path))
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    download_with_progressbar(url, tmp_path)
+    return tmp_path
+
+
 def is_link(s):
-    return s is not None and s.startswith('http')
+    return s is not None and s.startswith("http")
 
 
 def confirm_model_dir_url(model_dir, default_model_dir, default_url):
@@ -71,7 +90,7 @@ def confirm_model_dir_url(model_dir, default_model_dir, default_url):
     if model_dir is None or is_link(model_dir):
         if is_link(model_dir):
             url = model_dir
-        file_name = url.split('/')[-1][:-4]
+        file_name = url.split("/")[-1][:-4]
         model_dir = default_model_dir
         model_dir = os.path.join(model_dir, file_name)
     return model_dir, url
