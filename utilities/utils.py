@@ -190,7 +190,7 @@ def print_progress(iteration: int, total: int, prefix: str = '', suffix: str = '
     Call in a loop to create standard out progress bar.
     :param iteration: current iteration
     :param total: total iterations
-    :param prefix: prefix string
+    :param prefix: a prefix string to be printed in progress bar
     :param suffix: suffix string
     :param decimals: positive number of decimals in percent complete
     :param bar_length: character length of bar

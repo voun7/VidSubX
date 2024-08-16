@@ -70,12 +70,12 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     # how many frames to split into chunks (one chunk per cpu core process)
     chunk_size = utils.Config.frame_extraction_chunk_size
     # cancel if process has been cancelled by gui.
+    prefix = "Frame Extraction"
     if utils.Process.interrupt_process:
-        logger.warning("Frame extraction process interrupted!")
+        logger.warning(f"{prefix} process interrupted!")
         return
 
-    logger.info("Starting frame extraction from video...")
-
+    logger.info(f"Starting {prefix} from video...")
     capture = cv.VideoCapture(video_path)  # load the video
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
@@ -91,14 +91,13 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     # split the frames into chunk lists
     frame_chunks = [[i, i + chunk_size] for i in range(start_frame, stop_frame, chunk_size)]
     frame_chunks[-1][-1] = stop_frame  # make sure last chunk has correct end frame
-    logger.debug(f"Frame extraction chunks = {frame_chunks}")
-
-    prefix = "Frame Extraction"  # a prefix string to be printed in progress bar
-    logger.debug("Using multiprocessing for frame extraction")
+    no_chunks = len(frame_chunks)
+    logger.debug(f"Using multiprocessing for {prefix}")
     # create a process pool to execute across multiple cpu cores to speed up processing
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)
-        for i, _ in enumerate(as_completed(futures)):  # as each process completes
-            utils.print_progress(i, len(frame_chunks) - 1, prefix)
-    logger.info("Frame extraction done!")
+        for i, f in enumerate(as_completed(futures)):  # as each process completes
+            f.result()  # Prevents silent bugs. Exceptions raised will now be displayed.
+            utils.print_progress(i, no_chunks - 1, prefix)
+    logger.info(f"{prefix} done!")

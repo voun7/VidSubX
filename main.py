@@ -392,8 +392,8 @@ class SubtitleExtractor:
         """
         logger.debug("Loading extracted tests...")
         for file in sorted(self.text_output.iterdir(), key=lambda name: float(name.stem)):
-            file_text = file.read_text(encoding="utf-8")
-            self.subtitle_texts[file.stem] = file_text
+            if file_text := file.read_text(encoding="utf-8"):
+                self.subtitle_texts[file.stem] = file_text
 
     def gen_sub_file_name(self) -> Path:
         """
@@ -431,8 +431,12 @@ class SubtitleExtractor:
         """
         Get the frames and the images from the video by calling external functions.
         """
-        video_to_frames(str(self.video_path), self.frame_output, sub_area, start_frame, stop_frame)
-        frames_to_text(self.frame_output, self.text_output)
+        try:
+            video_to_frames(str(self.video_path), self.frame_output, sub_area, start_frame, stop_frame)
+            frames_to_text(self.frame_output, self.text_output)
+        except Exception as error:
+            logger.exception(f"An error occurred during frame & text extraction! \nError: {error}")
+        assert len(list(self.frame_output.iterdir())) == len(list(self.text_output.iterdir()))
 
     def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
                        stop_frame: int = None) -> Path | None:
