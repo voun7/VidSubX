@@ -13,13 +13,19 @@ Program that extracts hard coded subtitles from video and creates external subti
 
 ### Install packages:
 
+For CPU
+
+```commandline
+pip install paddlepaddle==2.6.1
+```
+
 For GPU
 
 ```commandline
 conda install paddlepaddle-gpu==2.6.1 cudatoolkit=11.6 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
 ```
 
-For CPU and/or Other packages
+For Other packages
 
 ```commandline
 pip install -r requirements.txt
