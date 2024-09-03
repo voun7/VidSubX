@@ -54,7 +54,7 @@ class Config:
     default_ocr_gpu_max_processes = 4
     default_ocr_rec_language = "ch"
 
-    default_text_similarity_threshold = 0.8
+    default_text_similarity_threshold = 0.85
     default_min_consecutive_sub_dur_ms = 500.0
     default_max_consecutive_short_durs = 4
     default_min_sub_duration_ms = 120.0
@@ -63,7 +63,7 @@ class Config:
     default_split_stop = 0.5
     default_no_of_frames = 200
     default_sub_area_x_rel_padding = 0.85
-    default_sub_area_y_abs_padding = 10
+    default_sub_area_y_abs_padding = 20
     default_use_search_area = True
 
     default_win_notify_sound = "Default"
