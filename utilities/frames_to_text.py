@@ -43,12 +43,13 @@ def extract_text(text_output: Path, files: list) -> None:
     :param files: files with text for extraction.
     """
     for file in files:
-        result = paddle_ocr.ocr(str(file))
-        text_list = [line[1][0] for line in result[0]] if result[0] else ""
-        text = " ".join(text_list)
         name = Path(f"{text_output}/{file.stem}.txt")
-        with open(name, 'w', encoding="utf-8") as text_file:
-            text_file.write(text)
+        if not name.exists():  # condition is used when rerunning after failed text extraction.
+            result = paddle_ocr.ocr(str(file))
+            text_list = [line[1][0] for line in result[0]] if result[0] else ""
+            text = " ".join(text_list)
+            with open(name, 'w', encoding="utf-8") as text_file:
+                text_file.write(text)
 
 
 def frames_to_text(frame_output: Path, text_output: Path) -> None:
@@ -58,7 +59,10 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
     :param text_output: directory for extracted texts
     """
     chunk_size = utils.Config.text_extraction_chunk_size  # Size of files given to each processor.
-    max_processes = utils.Config.ocr_gpu_max_processes if utils.Config.use_gpu else None
+    if utils.Config.use_gpu:
+        max_processes = utils.Config.ocr_gpu_max_processes
+    else:
+        max_processes = utils.Config.ocr_cpu_max_processes
     prefix = "Text Extraction"
     if utils.Process.interrupt_process:  # Cancel if process has been cancelled by gui.
         logger.warning(f"{prefix} process interrupted!")

@@ -76,6 +76,9 @@ class CustomMessageBox(tk.Toplevel):
 
         self.text_box = tk.Text(self, state="disabled", borderwidth=10.0, relief="flat")
         self.text_box.grid(sticky="N, S, E, W")
+        # Create scrollbar widget for text widget.
+        output_scroll = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text_box.yview)
+        output_scroll.grid(column=1, row=0, sticky="N,S")
 
         # Resize text message box frame if main frame is resized.
         self.grid_rowconfigure(0, weight=1)
@@ -1091,19 +1094,32 @@ class PreferencesUI(tk.Toplevel):
             width=self.entry_size
         ).grid(column=1, row=0)
 
-        ttk.Label(text_extraction_frame, text="OCR GPU Max Processes:\n(Used if GPU available)").grid(column=0, row=1)
-        self.ocr_gpu_max_processes = tk.IntVar(value=utils.Config.ocr_gpu_max_processes)
-        self.ocr_gpu_max_processes.trace_add("write", self._set_reset_button)
+        ttk.Label(text_extraction_frame, text="OCR CPU Max Processes:").grid(column=0, row=1)
+        self.ocr_cpu_max_processes = tk.IntVar(value=utils.Config.ocr_cpu_max_processes)
+        self.ocr_cpu_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
             from_=1, to=20,
-            textvariable=self.ocr_gpu_max_processes,
+            textvariable=self.ocr_cpu_max_processes,
             state="readonly",
             width=self.spinbox_size
         ).grid(column=1, row=1)
 
-        ttk.Label(text_extraction_frame, text="OCR Recognition Language:\n(Change requires program restart)").grid(
+        ttk.Label(text_extraction_frame, text="OCR GPU Max Processes:\n(Used if GPU available)").grid(
             column=0, row=2, pady=self.wgt_y_padding
+        )
+        self.ocr_gpu_max_processes = tk.IntVar(value=utils.Config.ocr_gpu_max_processes)
+        self.ocr_gpu_max_processes.trace_add("write", self._set_reset_button)
+        ttk.Spinbox(
+            text_extraction_frame,
+            from_=1, to=10,
+            textvariable=self.ocr_gpu_max_processes,
+            state="readonly",
+            width=self.spinbox_size
+        ).grid(column=1, row=2)
+
+        ttk.Label(text_extraction_frame, text="OCR Recognition Language:\n(Change requires program restart)").grid(
+            column=0, row=3
         )
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
@@ -1114,7 +1130,7 @@ class PreferencesUI(tk.Toplevel):
             values=languages,
             state="readonly",
             width=self.combobox_size
-        ).grid(column=1, row=2)
+        ).grid(column=1, row=3)
 
     def _subtitle_generator_tab(self) -> None:
         """
@@ -1229,6 +1245,7 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_frame_extraction_chunk_size,
             utils.Config.default_text_extraction_chunk_size,
             utils.Config.default_ocr_gpu_max_processes,
+            utils.Config.default_ocr_cpu_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_similarity_threshold,
             utils.Config.default_min_consecutive_sub_dur_ms,
@@ -1250,6 +1267,7 @@ class PreferencesUI(tk.Toplevel):
                 self.frame_extraction_chunk_size.get(),
                 self.text_extraction_chunk_size.get(),
                 self.ocr_gpu_max_processes.get(),
+                self.ocr_cpu_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_similarity_threshold.get(),
                 self.min_consecutive_sub_dur_ms.get(),
@@ -1308,6 +1326,7 @@ class PreferencesUI(tk.Toplevel):
         # Text extraction settings.
         self.text_extraction_chunk_size.set(utils.Config.default_text_extraction_chunk_size)
         self.ocr_gpu_max_processes.set(utils.Config.default_ocr_gpu_max_processes)
+        self.ocr_cpu_max_processes.set(utils.Config.default_ocr_cpu_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
@@ -1338,6 +1357,7 @@ class PreferencesUI(tk.Toplevel):
                     # Text extraction settings.
                     utils.Config.keys[2]: self.text_extraction_chunk_size.get(),
                     utils.Config.keys[3]: self.ocr_gpu_max_processes.get(),
+                    utils.Config.keys[17]: self.ocr_cpu_max_processes.get(),
                     utils.Config.keys[4]: self.ocr_rec_language.get(),
                     # Subtitle generator settings.
                     utils.Config.keys[5]: self.text_similarity_threshold.get(),

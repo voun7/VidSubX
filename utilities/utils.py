@@ -1,5 +1,6 @@
 import logging
 from configparser import ConfigParser
+from os import cpu_count
 from pathlib import Path
 
 import paddle
@@ -38,7 +39,7 @@ class Config:
             "ocr_gpu_max_processes", "ocr_rec_language", "text_similarity_threshold", "min_consecutive_sub_dur_ms",
             "max_consecutive_short_durs", "min_sub_duration_ms", "split_start", "split_stop", "no_of_frames",
             "sub_area_x_rel_padding", "sub_area_y_abs_padding", "use_search_area", "win_notify_sound",
-            "win_notify_loop_sound"]
+            "win_notify_loop_sound", "ocr_cpu_max_processes"]
 
     # Permanent values
     subarea_height_scaler = 0.75
@@ -52,6 +53,7 @@ class Config:
 
     default_text_extraction_chunk_size = 150
     default_ocr_gpu_max_processes = 4
+    default_ocr_cpu_max_processes = cpu_count() // 2
     default_ocr_rec_language = "ch"
 
     default_text_similarity_threshold = 0.85
@@ -71,7 +73,7 @@ class Config:
 
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
-    text_extraction_chunk_size = ocr_gpu_max_processes = ocr_rec_language = None
+    text_extraction_chunk_size = ocr_gpu_max_processes = ocr_cpu_max_processes = ocr_rec_language = None
     text_similarity_threshold = min_consecutive_sub_dur_ms = max_consecutive_short_durs = min_sub_duration_ms = None
     split_start = split_stop = no_of_frames = sub_area_x_rel_padding = sub_area_y_abs_padding = use_search_area = None
     win_notify_sound = win_notify_loop_sound = None
@@ -89,6 +91,7 @@ class Config:
                                          self.keys[1]: self.default_frame_extraction_chunk_size}
         self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_chunk_size,
                                          self.keys[3]: self.default_ocr_gpu_max_processes,
+                                         self.keys[17]: self.default_ocr_cpu_max_processes,
                                          self.keys[4]: self.default_ocr_rec_language}
         self.config[self.sections[2]] = {self.keys[5]: str(self.default_text_similarity_threshold),
                                          self.keys[6]: self.default_min_consecutive_sub_dur_ms,
@@ -115,6 +118,7 @@ class Config:
 
         cls.text_extraction_chunk_size = cls.config[cls.sections[1]].getint(cls.keys[2])
         cls.ocr_gpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[3])
+        cls.ocr_cpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[17])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
 
         cls.text_similarity_threshold = cls.config[cls.sections[2]].getfloat(cls.keys[5])
@@ -149,6 +153,8 @@ class Config:
         cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
         cls.ocr_gpu_max_processes = kwargs.get(cls.keys[3], cls.ocr_gpu_max_processes)
         cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_gpu_max_processes)
+        cls.ocr_cpu_max_processes = kwargs.get(cls.keys[17], cls.ocr_cpu_max_processes)
+        cls.config[cls.sections[1]][cls.keys[17]] = str(cls.ocr_cpu_max_processes)
         cls.ocr_rec_language = kwargs.get(cls.keys[4], cls.ocr_rec_language)
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
 
