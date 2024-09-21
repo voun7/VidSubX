@@ -1105,14 +1105,14 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=1)
 
-        ttk.Label(text_extraction_frame, text="OCR GPU Max Processes:\n(Used if GPU available)").grid(
+        ttk.Label(text_extraction_frame, text="OCR GPU Max Processes:\n(Used only if GPU is available)").grid(
             column=0, row=2, pady=self.wgt_y_padding
         )
         self.ocr_gpu_max_processes = tk.IntVar(value=utils.Config.ocr_gpu_max_processes)
         self.ocr_gpu_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
-            from_=1, to=10,
+            from_=1, to=12,
             textvariable=self.ocr_gpu_max_processes,
             state="readonly",
             width=self.spinbox_size
