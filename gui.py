@@ -5,6 +5,7 @@ import re
 import sys
 import time
 import tkinter as tk
+from os import cpu_count
 from pathlib import Path
 from threading import Thread
 from tkinter import ttk, filedialog, messagebox
@@ -12,8 +13,8 @@ from tkinter import ttk, filedialog, messagebox
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
+from sub_ocr import SubtitleOCR
 
-import custom_paddleocr.paddleocr as cp
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
 from utilities.logger_setup import setup_logging
@@ -929,7 +930,7 @@ class PreferencesUI(tk.Toplevel):
         # Shared widget values.
         self.entry_size = 15
         self.spinbox_size = 13
-        self.combobox_size = 15
+        self.combobox_size = 12
         self.wgt_x_padding = 70
         self.wgt_y_padding = 20
 
@@ -1099,7 +1100,7 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_cpu_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
-            from_=1, to=20,
+            from_=1, to=cpu_count(),
             textvariable=self.ocr_cpu_max_processes,
             state="readonly",
             width=self.spinbox_size
@@ -1112,7 +1113,7 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_gpu_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
-            from_=1, to=12,
+            from_=1, to=cpu_count(),
             textvariable=self.ocr_gpu_max_processes,
             state="readonly",
             width=self.spinbox_size
@@ -1123,14 +1124,25 @@ class PreferencesUI(tk.Toplevel):
         )
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
-        languages = list(cp.MODEL_URLS['OCR'][cp.DEFAULT_OCR_MODEL_VERSION]['rec'].keys())
         ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
-            values=languages,
+            values=SubtitleOCR.supported_languages,
             state="readonly",
             width=self.combobox_size
         ).grid(column=1, row=3)
+
+        ttk.Label(text_extraction_frame, text="Text Drop Score:").grid(column=0, row=4, pady=self.wgt_y_padding)
+        self.text_drop_score = tk.DoubleVar(value=utils.Config.text_drop_score)
+        self.text_drop_score.trace_add("write", self._set_reset_button)
+        ttk.Spinbox(
+            text_extraction_frame,
+            from_=0, to=1.0,
+            increment=0.01,
+            textvariable=self.text_drop_score,
+            state="readonly",
+            width=self.spinbox_size
+        ).grid(column=1, row=4)
 
     def _subtitle_generator_tab(self) -> None:
         """
@@ -1223,7 +1235,7 @@ class PreferencesUI(tk.Toplevel):
             textvariable=self.win_notify_sound,
             values=Sound.all_sounds(),
             state="readonly",
-            width=self.combobox_size
+            width=self.combobox_size + 3
         ).grid(column=1, row=0)
 
         self.win_notify_loop_sound = tk.BooleanVar(value=utils.Config.win_notify_loop_sound)
@@ -1247,6 +1259,7 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_ocr_gpu_max_processes,
             utils.Config.default_ocr_cpu_max_processes,
             utils.Config.default_ocr_rec_language,
+            utils.Config.default_text_drop_score,
             utils.Config.default_text_similarity_threshold,
             utils.Config.default_min_consecutive_sub_dur_ms,
             utils.Config.default_max_consecutive_short_durs,
@@ -1269,6 +1282,7 @@ class PreferencesUI(tk.Toplevel):
                 self.ocr_gpu_max_processes.get(),
                 self.ocr_cpu_max_processes.get(),
                 self.ocr_rec_language.get(),
+                self.text_drop_score.get(),
                 self.text_similarity_threshold.get(),
                 self.min_consecutive_sub_dur_ms.get(),
                 self.max_consecutive_short_durs.get(),
@@ -1328,6 +1342,7 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_gpu_max_processes.set(utils.Config.default_ocr_gpu_max_processes)
         self.ocr_cpu_max_processes.set(utils.Config.default_ocr_cpu_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
+        self.text_drop_score.set(utils.Config.default_text_drop_score)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
         self.min_consecutive_sub_dur_ms.set(utils.Config.default_min_consecutive_sub_dur_ms)
@@ -1359,6 +1374,7 @@ class PreferencesUI(tk.Toplevel):
                     utils.Config.keys[3]: self.ocr_gpu_max_processes.get(),
                     utils.Config.keys[17]: self.ocr_cpu_max_processes.get(),
                     utils.Config.keys[4]: self.ocr_rec_language.get(),
+                    utils.Config.keys[18]: self.text_drop_score.get(),
                     # Subtitle generator settings.
                     utils.Config.keys[5]: self.text_similarity_threshold.get(),
                     utils.Config.keys[6]: self.min_consecutive_sub_dur_ms.get(),

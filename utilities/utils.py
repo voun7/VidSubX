@@ -3,7 +3,7 @@ from configparser import ConfigParser
 from os import cpu_count
 from pathlib import Path
 
-import paddle
+import torch
 
 logger = logging.getLogger(__name__)
 
@@ -39,13 +39,13 @@ class Config:
             "ocr_gpu_max_processes", "ocr_rec_language", "text_similarity_threshold", "min_consecutive_sub_dur_ms",
             "max_consecutive_short_durs", "min_sub_duration_ms", "split_start", "split_stop", "no_of_frames",
             "sub_area_x_rel_padding", "sub_area_y_abs_padding", "use_search_area", "win_notify_sound",
-            "win_notify_loop_sound", "ocr_cpu_max_processes"]
+            "win_notify_loop_sound", "ocr_cpu_max_processes", "text_drop_score"]
 
     # Permanent values
     subarea_height_scaler = 0.75
 
     # Default values
-    use_gpu = paddle.device.is_compiled_with_cuda()
+    use_gpu = torch.cuda.is_available()
     device_msg = "GPU in use." if use_gpu else "CPU in use."
 
     default_frame_extraction_frequency = 2
@@ -55,6 +55,7 @@ class Config:
     default_ocr_gpu_max_processes = 4
     default_ocr_cpu_max_processes = cpu_count() // 2
     default_ocr_rec_language = "ch"
+    default_text_drop_score = 0.7
 
     default_text_similarity_threshold = 0.85
     default_min_consecutive_sub_dur_ms = 500.0
@@ -65,7 +66,7 @@ class Config:
     default_split_stop = 0.5
     default_no_of_frames = 200
     default_sub_area_x_rel_padding = 0.85
-    default_sub_area_y_abs_padding = 20
+    default_sub_area_y_abs_padding = 10
     default_use_search_area = True
 
     default_win_notify_sound = "Default"
@@ -73,7 +74,7 @@ class Config:
 
     # Initial values
     frame_extraction_frequency = frame_extraction_chunk_size = None
-    text_extraction_chunk_size = ocr_gpu_max_processes = ocr_cpu_max_processes = ocr_rec_language = None
+    text_extraction_chunk_size = ocr_gpu_max_processes = ocr_cpu_max_processes = ocr_rec_language = text_drop_score = None
     text_similarity_threshold = min_consecutive_sub_dur_ms = max_consecutive_short_durs = min_sub_duration_ms = None
     split_start = split_stop = no_of_frames = sub_area_x_rel_padding = sub_area_y_abs_padding = use_search_area = None
     win_notify_sound = win_notify_loop_sound = None
@@ -92,7 +93,8 @@ class Config:
         self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_chunk_size,
                                          self.keys[3]: self.default_ocr_gpu_max_processes,
                                          self.keys[17]: self.default_ocr_cpu_max_processes,
-                                         self.keys[4]: self.default_ocr_rec_language}
+                                         self.keys[4]: self.default_ocr_rec_language,
+                                         self.keys[18]: self.default_text_drop_score}
         self.config[self.sections[2]] = {self.keys[5]: str(self.default_text_similarity_threshold),
                                          self.keys[6]: self.default_min_consecutive_sub_dur_ms,
                                          self.keys[7]: self.default_max_consecutive_short_durs,
@@ -120,6 +122,7 @@ class Config:
         cls.ocr_gpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[3])
         cls.ocr_cpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[17])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
+        cls.text_drop_score = cls.config[cls.sections[1]].getfloat(cls.keys[18])
 
         cls.text_similarity_threshold = cls.config[cls.sections[2]].getfloat(cls.keys[5])
         cls.min_consecutive_sub_dur_ms = cls.config[cls.sections[2]].getfloat(cls.keys[6])
@@ -157,6 +160,8 @@ class Config:
         cls.config[cls.sections[1]][cls.keys[17]] = str(cls.ocr_cpu_max_processes)
         cls.ocr_rec_language = kwargs.get(cls.keys[4], cls.ocr_rec_language)
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
+        cls.text_drop_score = kwargs.get(cls.keys[18], cls.text_drop_score)
+        cls.config[cls.sections[1]][cls.keys[18]] = str(cls.text_drop_score)
 
         cls.text_similarity_threshold = kwargs.get(cls.keys[5], cls.text_similarity_threshold)
         cls.config[cls.sections[2]][cls.keys[5]] = str(cls.text_similarity_threshold)
