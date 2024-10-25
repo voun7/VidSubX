@@ -13,7 +13,7 @@ from tkinter import ttk, filedialog, messagebox
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
-from sub_ocr import SubtitleOCR
+from sub_ocr.subtitle_ocr import SubtitleOCR
 
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor

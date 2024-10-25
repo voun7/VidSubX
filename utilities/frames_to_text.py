@@ -2,7 +2,7 @@ import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-from sub_ocr import SubtitleOCR
+from sub_ocr.subtitle_ocr import SubtitleOCR
 
 import utilities.utils as utils
 
