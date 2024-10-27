@@ -75,7 +75,6 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
         logger.warning(f"{prefix} process interrupted!")
         return
 
-    logger.info(f"Starting {prefix} from video...")
     capture = cv.VideoCapture(video_path)  # load the video
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
@@ -92,8 +91,8 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     frame_chunks = [[i, i + chunk_size] for i in range(start_frame, stop_frame, chunk_size)]
     frame_chunks[-1][-1] = stop_frame  # make sure last chunk has correct end frame
     no_chunks = len(frame_chunks)
-    logger.debug(f"Using multiprocessing for {prefix}")
     # create a process pool to execute across multiple cpu cores to speed up processing
+    logger.info(f"Starting Multiprocess {prefix} from video...")
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
                    for f in frame_chunks]  # submit the processes: extract_frames(...)

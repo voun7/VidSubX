@@ -13,7 +13,6 @@ from tkinter import ttk, filedialog, messagebox
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
-from sub_ocr.subtitle_ocr import SubtitleOCR
 
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
@@ -166,7 +165,6 @@ class SubtitleExtractorGUI:
 
         self.status_label = tk.Label(self.main_frame)
         self.status_label.grid(column=0, row=3, padx=18, sticky="E")
-        self.status_label.configure(text=utils.Config.device_msg)
 
     def _menu_bar(self) -> None:
         # Remove dashed lines that come default with tkinter menu bar.
@@ -555,7 +553,7 @@ class SubtitleExtractorGUI:
             stop_dur = self.sub_ex.frame_no_to_duration(stop_frame, self.current_fps) if stop_frame else stop_frame
             self.status_label.configure(text=f"Start Frame: {start_dur}, Stop Frame: {stop_dur}")
         else:
-            self.status_label.configure(text=utils.Config.device_msg)
+            self.status_label.configure(text="")
 
     def _video_indexer(self) -> tuple:
         """
@@ -1113,21 +1111,19 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_gpu_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
-            from_=1, to=cpu_count(),
+            from_=1, to=cpu_count() // 2,
             textvariable=self.ocr_gpu_max_processes,
             state="readonly",
             width=self.spinbox_size
         ).grid(column=1, row=2)
 
-        ttk.Label(text_extraction_frame, text="OCR Recognition Language:\n(Change requires program restart)").grid(
-            column=0, row=3
-        )
+        ttk.Label(text_extraction_frame, text="OCR Recognition Language:").grid(column=0, row=3)
         self.ocr_rec_language = tk.StringVar(value=utils.Config.ocr_rec_language)
         self.ocr_rec_language.trace_add("write", self._set_reset_button)
         ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
-            values=SubtitleOCR.supported_languages,
+            values=['ch', 'en', 'korean', 'japan', 'chinese_cht'],
             state="readonly",
             width=self.combobox_size
         ).grid(column=1, row=3)
@@ -1205,6 +1201,14 @@ class PreferencesUI(tk.Toplevel):
             width=self.entry_size
         ).grid(column=1, row=3)
 
+        self.use_gpu = tk.BooleanVar(value=utils.Config.use_gpu)
+        self.use_gpu.trace_add("write", self._set_reset_button)
+        ttk.Checkbutton(
+            subtitle_generator_frame,
+            text='Use GPU if available',
+            variable=self.use_gpu
+        ).grid(column=0, row=4, pady=self.wgt_y_padding)
+
     def _notifications_tab(self) -> None:
         """
         Choose notification tab depending on platform os.
@@ -1264,6 +1268,7 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_min_consecutive_sub_dur_ms,
             utils.Config.default_max_consecutive_short_durs,
             utils.Config.default_min_sub_duration_ms,
+            utils.Config.default_use_gpu,
             utils.Config.default_split_start,
             utils.Config.default_split_stop,
             utils.Config.default_no_of_frames,
@@ -1287,6 +1292,7 @@ class PreferencesUI(tk.Toplevel):
                 self.min_consecutive_sub_dur_ms.get(),
                 self.max_consecutive_short_durs.get(),
                 self.min_sub_duration_ms.get(),
+                self.use_gpu.get(),
                 self.split_start.get(),
                 self.split_stop.get(),
                 self.no_of_frames.get(),
@@ -1348,6 +1354,7 @@ class PreferencesUI(tk.Toplevel):
         self.min_consecutive_sub_dur_ms.set(utils.Config.default_min_consecutive_sub_dur_ms)
         self.max_consecutive_short_durs.set(utils.Config.default_max_consecutive_short_durs)
         self.min_sub_duration_ms.set(utils.Config.default_min_sub_duration_ms)
+        self.use_gpu.set(utils.Config.default_use_gpu)
         # Subtitle detection settings.
         self.split_start.set(utils.Config.default_split_start)
         self.split_stop.set(utils.Config.default_split_stop)
@@ -1380,6 +1387,7 @@ class PreferencesUI(tk.Toplevel):
                     utils.Config.keys[6]: self.min_consecutive_sub_dur_ms.get(),
                     utils.Config.keys[7]: self.max_consecutive_short_durs.get(),
                     utils.Config.keys[8]: self.min_sub_duration_ms.get(),
+                    utils.Config.keys[19]: self.use_gpu.get(),
                     # Subtitle detection settings.
                     utils.Config.keys[9]: self.split_start.get(),
                     utils.Config.keys[10]: self.split_stop.get(),

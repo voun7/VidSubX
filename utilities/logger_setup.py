@@ -54,7 +54,7 @@ def get_file_handler(log_dir: Path, log_format: logging.Formatter) -> logging.ha
     """
     log_file = log_dir / "runtime.log"
     file_handler = TimedRotatingFileHandler(log_file, when='midnight', interval=1, backupCount=7, encoding='utf-8')
-    file_handler.namer = my_namer
+    file_handler.namer = log_namer
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(log_format)
     return file_handler
@@ -110,7 +110,7 @@ def setup_logging() -> None:
     logger.addHandler(get_file_handler(log_dir, log_format))
 
 
-def my_namer(default_name: str) -> str:
+def log_namer(default_name: str) -> str:
     """
     This will be called when doing the log rotation
     default_name is the default filename that would be assigned, e.g. Rotate_Test.txt.YYYY-MM-DD

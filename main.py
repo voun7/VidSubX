@@ -46,7 +46,7 @@ class SubtitleDetector:
         # Split the frames into chunk lists.
         frame_chunks = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
         frame_chunks_len = len(frame_chunks)
-        logger.debug(f"Frame total = {self.frame_total}, Chunk length = {frame_chunks_len}")
+        logger.debug(f"{self.frame_total=}, {frame_chunks_len=}")
         start_duration = self.sub_ex.frame_no_to_duration(relative_start, self.fps)
         stop_duration = self.sub_ex.frame_no_to_duration(relative_stop, self.fps)
         logger.info(f"Split Start = {start_duration}, Split Stop = {stop_duration}")
@@ -56,7 +56,7 @@ class SubtitleDetector:
         last_frame_chunk = frame_chunks[-1][-1]
         if last_frame_chunk > self.frame_total:
             frame_chunks[-1][-1] = relative_stop
-        logger.debug(f"Frame chunks = {frame_chunks}")
+        logger.debug(f"{frame_chunks=}")
         # Part of the video to look for subtitles.
         if self.use_search_area:
             logger.info("Default sub area is being used as search area.")
@@ -419,7 +419,7 @@ class SubtitleExtractor:
         :return: The save path of generated subtitle.
         """
         if not lines:
-            logger.debug(f"No lines in subtitles generated. Name: {self.video_path.name}")
+            logger.info(f"No lines in subtitles generated. Name: {self.video_path.name}")
             return
         save_path = self.gen_sub_file_name()
         with open(save_path, 'w', encoding="utf-8") as new_sub:
@@ -479,7 +479,6 @@ class SubtitleExtractor:
 if __name__ == '__main__':
     setup_logging()
     logger.debug("\n\nMain program Started.")
-    logger.info(utils.Config.device_msg)
     test_se = SubtitleExtractor()
     test_vid = r""
     test_se.run_extraction(test_vid)
