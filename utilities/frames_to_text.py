@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 UNCLIP_RATIO = 2.5
 
 
+# PaddleOCR will cause a memory related error when extracting text from a large no of images.
+# https://github.com/PaddlePaddle/PaddleOCR/issues/7823
+
+
 def download_models() -> None:
     """
     Download models if dir does not exist.

@@ -779,7 +779,7 @@ class SubtitleExtractorGUI:
                 new_sub_area = sub_dt.get_sub_area()
                 self.video_queue[video][0] = new_sub_area
         except Exception as error:
-            logger.exception(f"An error occurred while detecting subtitles! \nError: {error}")
+            logger.exception(f"\nAn error occurred while detecting subtitles! \nError: {error}")
         self.thread_running = False
         self._stop_sub_detection_process()
         self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]][0]
@@ -832,7 +832,7 @@ class SubtitleExtractorGUI:
                 self.progress_bar['value'] += 1
                 self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         except Exception as error:
-            logger.exception(f"An error occurred while extracting subtitles! \nError: {error}")
+            logger.exception(f"\nAn error occurred while extracting subtitles! \nError: {error}")
         self.thread_running = False
         self._stop_sub_extraction_process()
         self.send_notification("Subtitle Extraction Completed!")
@@ -1133,7 +1133,7 @@ class PreferencesUI(tk.Toplevel):
         ttk.Combobox(
             text_extraction_frame,
             textvariable=self.ocr_rec_language,
-            values=['ch', 'en', 'korean', 'japan', 'chinese_cht'],
+            values=['ch', 'en', 'korean', 'japan', 'chinese_cht', 'latin', 'arabic', 'cyrillic', 'devanagari'],
             state="readonly",
             width=self.combobox_size
         ).grid(column=1, row=3)
