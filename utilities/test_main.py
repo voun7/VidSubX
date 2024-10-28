@@ -17,11 +17,11 @@ class TestSubtitleDetector(TestCase):
 
     def test_dir(self):
         print("\nRunning test for vd_output_dir existence...")
-        self.assertTrue(self.sd.vd_output_dir.exists())
+        self.assertTrue(self.sd.sub_ex.vd_output_dir.exists())
 
     def test__get_key_frames(self):
         print("\nRunning test for _get_key_frames method...")
-        self.sd._empty_cache()
+        self.sd.sub_ex.empty_cache()
         self.sd.frame_output.mkdir(parents=True)
         self.sd._get_key_frames()
         no_of_frames = len(list(self.sd.frame_output.iterdir()))
@@ -35,13 +35,13 @@ class TestSubtitleDetector(TestCase):
         print("\nRunning test for _reposition_sub_area method...")
         self.assertEqual(self.sd._reposition_sub_area((288, 148), (1632, 234)), ((288, 958), (1632, 1044)))
 
-    def test__empty_cache(self):
+    def test_empty_cache(self):
         print("\nRunning test for _empty_cache method...")
-        self.sd._empty_cache()
+        self.sd.sub_ex.empty_cache()
         self.sd.frame_output.mkdir(parents=True)
-        self.assertTrue(self.sd.vd_output_dir.exists())
-        self.sd._empty_cache()
-        self.assertFalse(self.sd.vd_output_dir.exists())
+        self.assertTrue(self.sd.sub_ex.vd_output_dir.exists())
+        self.sd.sub_ex.empty_cache()
+        self.assertFalse(self.sd.sub_ex.vd_output_dir.exists())
 
     def test_get_sub_area_search_area(self):
         print("\nRunning test for get_sub_area method with search area...")

@@ -27,8 +27,7 @@ class SubtitleDetector:
         self.use_search_area = use_search_area
         self.sub_ex = SubtitleExtractor()
         self.fps, self.frame_total, self.frame_width, self.frame_height = self.sub_ex.video_details(self.video_file)
-        self.vd_output_dir = Path(__file__).parent / "output"  # Create cache directory.
-        self.frame_output = self.vd_output_dir / "sub detect frames"  # Extracted video frame storage directory.
+        self.frame_output = self.sub_ex.vd_output_dir / "sub detect frames"  # Extracted video frame storage directory.
 
     def _get_key_frames(self) -> None:
         """
@@ -96,14 +95,6 @@ class SubtitleDetector:
         else:
             return top_left, bottom_right
 
-    def _empty_cache(self) -> None:
-        """
-        Delete all cache files produced during subtitle extraction.
-        """
-        if self.vd_output_dir.exists():
-            logger.debug("Emptying cache...")
-            shutil.rmtree(self.vd_output_dir)
-
     @staticmethod
     def _get_max_boundaries(bboxes: list) -> tuple:
         """
@@ -134,7 +125,7 @@ class SubtitleDetector:
         if not video_path.exists() or not video_path.is_file():
             logger.error(f"Video file: {video_path.name} ...could not be found!\n")
             return
-        self._empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
+        self.sub_ex.empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
         if not self.frame_output.exists():
             self.frame_output.mkdir(parents=True)
 
@@ -149,7 +140,7 @@ class SubtitleDetector:
             new_sub_area = top_left[0], top_left[1], bottom_right[0], bottom_right[1]
 
         logger.info(f"New sub area = {new_sub_area}\n")
-        self._empty_cache()
+        self.sub_ex.empty_cache()
         return new_sub_area
 
 
@@ -158,8 +149,7 @@ class SubtitleExtractor:
         """
         Extracts hardcoded subtitles from video.
         """
-        self.video_path = None
-        self.subtitle_texts = {}
+        self.video_path, self.subtitle_texts = None, {}
         self.divider = "--"  # Characters for separating time durations(ms) in key name.
         self.vd_output_dir = Path(__file__).parent / "output"  # Create cache directory.
         # Extracted video frame storage directory. Extracted text file storage directory.
@@ -196,13 +186,15 @@ class SubtitleExtractor:
         duration = self.timecode(frame_no_to_ms).replace(",", ":")
         return duration
 
-    def _empty_cache(self) -> None:
+    def empty_cache(self) -> None:
         """
         Delete all cache files and dictionary content produced during subtitle extraction.
         """
         if self.vd_output_dir.exists():
             logger.debug("Emptying cache...")
             shutil.rmtree(self.vd_output_dir)
+        if self.subtitle_texts:
+            logger.debug("Clearing subtitle texts cache...")
             self.subtitle_texts = {}
 
     def merge_adjacent_equal_texts(self) -> None:
@@ -298,13 +290,12 @@ class SubtitleExtractor:
         Delete all key durations in the set if they exist.
         """
         for key in keys:
-            if key in self.subtitle_texts:
-                del self.subtitle_texts[key]
+            del self.subtitle_texts[key]
 
     def remove_short_duration_consecutive_subs(self) -> None:
         """
         Deletes keys that contain subtitles that have durations that are shorter than the given minimum duration
-        in the given number of consecutive rows.
+        in the given number of consecutive texts.
         """
         logger.debug("Removing short duration consecutive subs")
         # Minimum allowed consecutive duration in milliseconds.
@@ -447,7 +438,7 @@ class SubtitleExtractor:
         if not self.video_path.exists() or not self.video_path.is_file():
             logger.error(f"Video file: {self.video_path.name} ...could not be found!\n")
             return
-        self._empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
+        self.empty_cache()  # Empty cache at the beginning of program run before it recreates itself.
         # If the directories do not exist, create the directories.
         self.frame_output.mkdir(parents=True)
         self.text_output.mkdir(parents=True)
@@ -472,7 +463,7 @@ class SubtitleExtractor:
         total_time = (end - start) / cv.getTickFrequency()
         total_time = timedelta(seconds=round(total_time))
         logger.info(f"Subtitle Extraction Done! Total time: {total_time}\n")
-        self._empty_cache()
+        self.empty_cache()
         return save_path
 
 
