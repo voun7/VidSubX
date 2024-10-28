@@ -1,6 +1,6 @@
 # Video Sub Extractor
 
-![python version](https://img.shields.io/badge/Python-3.12-blue)
+![python version](https://img.shields.io/badge/Python-3.11-blue)
 ![support os](https://img.shields.io/badge/OS-Windows-green.svg)
 
 Program that extracts hard coded subtitles from video and creates external subtitles.
@@ -31,40 +31,22 @@ Other packages
 pip install -r requirements.txt
 ```
 
-[//]: # (### Compile Instructions)
+### Compile Instructions
 
-[//]: # ()
+Install package
 
-[//]: # (Install package)
+```
+pip install Nuitka==2.4.11
+```
 
-[//]: # ()
+Compile command:
 
-[//]: # (```)
+```
+nuitka --standalone --enable-plugin=tk-inter --windows-console-mode=disable --include-package-data=paddleocr --include-data-files=VSE.ico=VSE.ico --windows-icon-from-ico=VSE.ico gui.py
+```
 
-[//]: # (pip install Nuitka==2.4.11)
+#### Run compiled program:
 
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # (Compile command:)
-
-[//]: # ()
-
-[//]: # (```)
-
-[//]: # (nuitka --standalone --enable-plugin=tk-inter --disable-console --include-data-files=VSE.ico=VSE.ico --windows-icon-from-ico=VSE.ico gui.py)
-
-[//]: # (```)
-
-[//]: # ()
-
-[//]: # (#### Run compiled program:)
-
-[//]: # ()
-
-[//]: # (```)
-
-[//]: # (.\gui.dist\gui.exe)
-
-[//]: # (```)
+```
+.\gui.dist\gui.exe
+```
