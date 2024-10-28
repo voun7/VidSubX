@@ -1,7 +1,6 @@
 import ctypes
 import logging
 import platform
-import re
 import sys
 import time
 import tkinter as tk
@@ -16,6 +15,7 @@ from PIL import Image, ImageTk
 
 import utilities.utils as utils
 from main import SubtitleDetector, SubtitleExtractor
+from utilities.frames_to_text import download_models
 from utilities.logger_setup import setup_logging
 from utilities.win_notify import Notification, Sound
 
@@ -130,7 +130,6 @@ class SubtitleExtractorGUI:
         self.video_queue = {}
         self.current_video = self.video_capture = self.subtitle_rect = self.non_subarea_rect = None
         self.video_target_height = 500
-        self.progress_pattern = re.compile(r'.+\s\|[ #-]+\|\s[\d.]+%\s')
         self.thread_running = False
         self._console_redirector()
 
@@ -717,12 +716,12 @@ class SubtitleExtractorGUI:
 
     def _set_progress_output(self, text: str) -> None:
         """
-        Overwrite progress bar text in text widget, if detected in previous line.
+        Overwrite progress bar text in text widget, if detected in present and previous line.
         """
-        if self.progress_pattern.search(text):
+        if " |#" in text or "-| " in text or "it/s" in text:
             start, stop = 'end - 1 lines', 'end - 1 lines lineend'
             previous_line = self.text_output_widget.get(start, stop)
-            if self.progress_pattern.search(previous_line):
+            if " |#" in previous_line or "-| " in previous_line or "it/s" in previous_line:
                 self.clear_output(start, stop)
 
     def write_to_output(self, text: str) -> None:
@@ -751,6 +750,15 @@ class SubtitleExtractorGUI:
             toast.set_audio(sound, loop=utils.Config.win_notify_loop_sound)
             toast.show()
 
+    def gui_model_download(self) -> None:
+        """
+        Modify the gui to properly display the download of the models. This method should not be run from main thread.
+        tqdm uses stderr so the download progress texts are rerouted.
+        """
+        sys.stderr.write = self.write_to_output
+        download_models()  # if lang changes, the new lang model will be downloaded.
+        sys.stderr.write = self.error_message_handler
+
     def _detect_subtitles(self) -> None:
         """
         Detect sub area of videos in the queue and set as new sub area.
@@ -760,6 +768,7 @@ class SubtitleExtractorGUI:
         use_search_area = utils.Config.use_search_area
         self.thread_running = True
         try:
+            self.gui_model_download()
             for video in self.video_queue.keys():
                 if utils.Process.interrupt_process:
                     logger.warning("Process interrupted\n")
@@ -809,6 +818,7 @@ class SubtitleExtractorGUI:
         logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}\n")
         self.thread_running = True
         try:
+            self.gui_model_download()
             for video, sub_info in self.video_queue.items():
                 sub_area, start_frame, stop_frame = sub_info[0], sub_info[1], sub_info[2]
                 start_frame = int(start_frame) if start_frame else start_frame
