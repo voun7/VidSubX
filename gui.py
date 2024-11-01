@@ -764,11 +764,11 @@ class SubtitleExtractorGUI:
         Detect sub area of videos in the queue and set as new sub area.
         """
         logger.info("Detecting subtitle area in video(s)...")
-        start = time.perf_counter()
-        use_search_area = utils.Config.use_search_area
+        start, use_search_area = time.perf_counter(), utils.Config.use_search_area
         self.thread_running = True
         try:
             self.gui_model_download()
+            start = time.perf_counter()
             for video in self.video_queue.keys():
                 if utils.Process.interrupt_process:
                     logger.warning("Process interrupted\n")
