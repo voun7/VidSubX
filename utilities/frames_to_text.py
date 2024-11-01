@@ -9,7 +9,7 @@ import utilities.utils as utils
 
 logger = logging.getLogger(__name__)
 
-UNCLIP_RATIO = 2.5
+UNCLIP_RATIO = 2
 
 
 # PaddleOCR will cause a memory related error when extracting text from a large no of images.

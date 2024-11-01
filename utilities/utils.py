@@ -62,7 +62,7 @@ class Config:
     default_split_stop = 0.5
     default_no_of_frames = 200
     default_sub_area_x_rel_padding = 0.85
-    default_sub_area_y_abs_padding = 20
+    default_sub_area_y_abs_padding = 10
     default_use_search_area = True
 
     default_win_notify_sound = "Default"
