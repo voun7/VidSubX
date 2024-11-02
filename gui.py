@@ -141,7 +141,8 @@ class SubtitleExtractorGUI:
         self.window_title = "Video Subtitle Extractor"
         self.icon_file = "VSE.ico"
         self.root.title(self.window_title)
-        self.root.iconbitmap(self.icon_file)
+        if platform.system() == "Windows":
+            self.root.iconbitmap(self.icon_file)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_rowconfigure(0, weight=1)
 
@@ -483,9 +484,9 @@ class SubtitleExtractorGUI:
             cv2image = cv.cvtColor(frame, cv.COLOR_BGR2RGBA)
             frame_resized = self.rescale(cv2image)  # Make image fit canvas (usually a down scale).
             img = Image.fromarray(frame_resized)
-            photo = ImageTk.PhotoImage(image=img)
-            self.canvas.create_image(0, 0, image=photo, anchor=tk.NW)
-            self.canvas.image = photo
+            tk_img = ImageTk.PhotoImage(img)
+            self.canvas.create_image(0, 0, image=tk_img, anchor=tk.NW)
+            self.canvas.image = tk_img
 
     def _frame_slider(self, scale_value: str) -> None:
         """
@@ -924,7 +925,8 @@ class PreferencesUI(tk.Toplevel):
         Create layout for preferences window.
         """
         self.title("Preferences")
-        self.iconbitmap(self.icon_file)
+        if platform.system() == "Windows":
+            self.iconbitmap(self.icon_file)
         self.resizable(tk.FALSE, tk.FALSE)
 
         # Create main frame that will contain notebook.
