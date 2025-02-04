@@ -18,7 +18,39 @@ A free program that extracts hard coded subtitles from a video and generates an 
 - Non subtitle area of the video can be hidden to limit spoilers
 - Toast Notification available on Windows upon completion of subtitle detection and extraction
 - Preferences available for modification of options when extraction subtitles
-- Multiple languages supported. They will be automatically downloaded as needed.
+- Multiple languages supported through [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR). They will be
+  automatically downloaded as needed.
+
+**Supported languages**
+
+| Language            | Abbreviation | | Language          | Abbreviation | | Language     | Abbreviation |
+|---------------------|--------------|-|-------------------|--------------|-|--------------|--------------|
+| Chinese & English   | ch           | | Arabic            | ar           | | Avar         | ava          |
+| English             | en           | | Hindi             | hi           | | Dargwa       | dar          |
+| French              | fr           | | Uyghur            | ug           | | Ingush       | inh          |
+| German              | german       | | Persian           | fa           | | Lak          | lbe          |
+| Japanese            | japan        | | Urdu              | ur           | | Lezghian     | lez          |
+| Korean              | korean       | | Serbian(latin)    | rs_latin     | | Tabassaran   | tab          |
+| Chinese Traditional | chinese_cht  | | Occitan           | oc           | | Bihari       | bh           |
+| Italian             | it           | | Marathi           | mr           | | Maithili     | mai          |
+| Spanish             | es           | | Nepali            | ne           | | Angika       | ang          |
+| Portuguese          | pt           | | Serbian(cyrillic) | rs_cyrillic  | | Bhojpuri     | bho          |
+| Russian             | ru           | | Bulgarian         | bg           | | Magahi       | mah          |
+| Ukranian            | uk           | | Estonian          | et           | | Nagpur       | sck          |
+| Belarusian          | be           | | Irish             | ga           | | Newari       | new          |
+| Telugu              | te           | | Croatian          | hr           | | Goan Konkani | gom          |
+| Sanskrit            | sa           | | Hungarian         | hu           | | Norwegian    | no           |
+| Tamil               | ta           | | Indonesian        | id           | | Polish       | pl           |
+| Afrikaans           | af           | | Icelandic         | is           | | Romanian     | ro           |
+| Azerbaijani         | az           | | Kurdish           | ku           | | Slovak       | sk           |
+| Bosnian             | bs           | | Lithuanian        | lt           | | Slovenian    | sl           |
+| Czech               | cs           | | Latvian           | lv           | | Albanian     | sq           |
+| Welsh               | cy           | | Maori             | mi           | | Swedish      | sv           |
+| Danish              | da           | | Malay             | ms           | | Swahili      | sw           |
+| Maltese             | mt           | | Adyghe            | ady          | | Tagalog      | tl           |
+| Dutch               | nl           | | Kabardian         | kbd          | | Turkish      | tr           |
+| Uzbek               | uz           | | Vietnamese        | vi           | | Mongolian    | mn           | 
+| Abaza               | abq          |
 
 **Download**
 
@@ -64,7 +96,7 @@ Run `gui.py` to use Graphical interface and `main.py` to use Terminal.
 Install package
 
 ```
-pip install Nuitka==2.4.11
+pip install Nuitka==2.6.4
 ```
 
 Compile command:
