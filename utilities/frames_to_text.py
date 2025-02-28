@@ -49,17 +49,18 @@ def extract_bboxes(files: Path) -> list:
     return boxes
 
 
-def extract_text(text_output: Path, files: list, ocr_config: dict) -> None:
+def extract_text(text_output: Path, files: list, ocr_config: dict, line_sep: str) -> None:
     """
     Extract text from a frame using paddle ocr.
     :param text_output: directory for extracted texts.
     :param files: files with text for extraction.
     :param ocr_config: config for ocr.
+    :param line_sep: line seperator for the text.
     """
     ocr_fn = PaddleOCR(**ocr_config)
     for file in files:
         result = ocr_fn.ocr(str(file))
-        text = " ".join([line[1][0] for line in result[0]] if result[0] else "")
+        text = line_sep.join([line[1][0] for line in result[0]] if result[0] else "")
         with open(f"{text_output}/{file.stem}.txt", 'w', encoding="utf-8") as text_file:
             text_file.write(text)
 
@@ -82,13 +83,14 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
 
     ocr_config = {"use_gpu": utils.Config.use_gpu, "drop_score": utils.Config.text_drop_score, "use_angle_cls": True,
                   "lang": utils.Config.ocr_rec_language, "det_db_unclip_ratio": UNCLIP_RATIO, "show_log": False}
+    line_sep = "\n" if utils.Config.line_break else " "
     files = list(frame_output.iterdir())
     file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
     no_chunks = len(file_chunks)
     logger.info(f"Starting Multiprocess {prefix} from frames on {device}... "
                 f"Processes: {max_processes}, Chunks: {no_chunks}")
     with ProcessPoolExecutor(max_processes) as executor:
-        futures = [executor.submit(extract_text, text_output, files, ocr_config) for files in file_chunks]
+        futures = [executor.submit(extract_text, text_output, files, ocr_config, line_sep) for files in file_chunks]
         for i, f in enumerate(as_completed(futures)):  # as each  process completes
             f.result()  # Prevents silent bugs. Exceptions raised will be displayed.
             utils.print_progress(i, no_chunks - 1, prefix)

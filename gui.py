@@ -192,8 +192,8 @@ class SubtitleExtractorGUI:
         self.file_menu.add_command(label="Close", command=self._on_closing)
 
         # Add menu items to view menu.
-        self.view_menu.add_command(label=f"Video Zoom In   (Ctrl+Plus)", command=lambda: self.resize_video("equal"))
-        self.view_menu.add_command(label=f"Video Zoom Out  (Ctrl+Minus)", command=lambda: self.resize_video("minus"))
+        self.view_menu.add_command(label="Video Zoom In   (Ctrl+Plus)", command=lambda: self.resize_video("equal"))
+        self.view_menu.add_command(label="Video Zoom Out  (Ctrl+Minus)", command=lambda: self.resize_video("minus"))
         self.root.bind("<Control-equal>", self.resize_video)  # equal instead of plus. It prevents need for shift key.
         self.root.bind("<Control-minus>", self.resize_video)
 
@@ -1157,6 +1157,14 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=4)
 
+        self.line_break = tk.BooleanVar(value=utils.Config.line_break)
+        self.line_break.trace_add("write", self._set_reset_button)
+        ttk.Checkbutton(
+            text_extraction_frame,
+            text='Use Line Break',
+            variable=self.line_break
+        ).grid(column=0, row=5)
+
     def _subtitle_generator_tab(self) -> None:
         """
         Creates widgets in the Subtitle generator preferences tab frame.
@@ -1281,6 +1289,7 @@ class PreferencesUI(tk.Toplevel):
             utils.Config.default_ocr_cpu_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_drop_score,
+            utils.Config.default_line_break,
             utils.Config.default_text_similarity_threshold,
             utils.Config.default_min_consecutive_sub_dur_ms,
             utils.Config.default_max_consecutive_short_durs,
@@ -1305,6 +1314,7 @@ class PreferencesUI(tk.Toplevel):
                 self.ocr_cpu_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_drop_score.get(),
+                self.line_break.get(),
                 self.text_similarity_threshold.get(),
                 self.min_consecutive_sub_dur_ms.get(),
                 self.max_consecutive_short_durs.get(),
@@ -1366,6 +1376,7 @@ class PreferencesUI(tk.Toplevel):
         self.ocr_cpu_max_processes.set(utils.Config.default_ocr_cpu_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         self.text_drop_score.set(utils.Config.default_text_drop_score)
+        self.line_break.set(utils.Config.default_line_break)
         # Subtitle generator settings.
         self.text_similarity_threshold.set(utils.Config.default_text_similarity_threshold)
         self.min_consecutive_sub_dur_ms.set(utils.Config.default_min_consecutive_sub_dur_ms)
@@ -1399,6 +1410,7 @@ class PreferencesUI(tk.Toplevel):
                     utils.Config.keys[17]: self.ocr_cpu_max_processes.get(),
                     utils.Config.keys[4]: self.ocr_rec_language.get(),
                     utils.Config.keys[18]: self.text_drop_score.get(),
+                    utils.Config.keys[20]: self.line_break.get(),
                     # Subtitle generator settings.
                     utils.Config.keys[5]: self.text_similarity_threshold.get(),
                     utils.Config.keys[6]: self.min_consecutive_sub_dur_ms.get(),
