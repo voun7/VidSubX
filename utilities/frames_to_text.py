@@ -20,9 +20,12 @@ def download_models() -> None:
     """
     Download models if dir does not exist.
     """
-    det_model_dir = Path(f"~/.paddleocr/whl/det").expanduser()
-    rec_model_dir = Path(f"~/.paddleocr/whl/rec/{utils.Config.ocr_rec_language}").expanduser()
-    cls_model_dir = Path(f"~/.paddleocr/whl/cls").expanduser()
+    from paddleocr.paddleocr import parse_lang  # imported here to prevent multiprocessing spawn error
+
+    lang, det_lang = parse_lang(utils.Config.ocr_rec_language)
+    det_model_dir = Path(f"~/.paddleocr/whl/det/{det_lang}").expanduser()
+    rec_model_dir = Path(f"~/.paddleocr/whl/rec/{lang}").expanduser()
+    cls_model_dir = Path("~/.paddleocr/whl/cls").expanduser()
     if not det_model_dir.exists() or not rec_model_dir.exists() or not cls_model_dir.exists():
         logger.info("Requested model not found, downloading...")
         _ = PaddleOCR(lang=utils.Config.ocr_rec_language, show_log=False)
