@@ -10,14 +10,14 @@ A free program that extracts hard coded subtitles from a video and generates an 
 
 **Features**
 
-- Detect subtitle area by searching common area
-- Manual resize or change of subtitle area (click and drag mouse to perform)
-- Single and Batch subtitle detection and extraction
-- Start and Stop subtitle extraction positions can be selected (use arrow keys for precise selection)
-- Resize video display (Zoom In (Ctrl+Plus), Zoom Out (Ctrl+Minus))
-- Non subtitle area of the video can be hidden to limit spoilers
-- Toast Notification available on Windows upon completion of subtitle detection and extraction
-- Preferences available for modification of options when extraction subtitles
+- Detect subtitle area by searching common area.
+- Manual resize or change of subtitle area (click and drag mouse to perform).
+- Single and Batch subtitle detection and extraction.
+- Start and Stop subtitle extraction positions can be selected (use arrow keys for precise selection).
+- Resize video display (Zoom In (Ctrl+Plus), Zoom Out (Ctrl+Minus)).
+- Non subtitle area of the video can be hidden to limit spoilers.
+- Toast Notification available on Windows upon completion of subtitle detection and extraction.
+- [Preferences docs](docs/Preferences.md) available for modification of options when extraction subtitles.
 - Multiple languages supported through [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR). They will be
   automatically downloaded as needed.
 
@@ -59,7 +59,7 @@ installed. The program will not start without it.
 
 - [Windows CPU Version](https://github.com/voun7/Video_Sub_Extractor/releases/download/v1.0/VSE-windows-cpu.zip)
 
-## Demo
+## Demo Video
 
 [![Demo Video](docs/images/demo%20screenshot.png)](https://youtu.be/nnm_waobgnI "Demo Video")
 
