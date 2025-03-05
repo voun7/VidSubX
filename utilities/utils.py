@@ -41,6 +41,10 @@ class Config:
 
     # Permanent values
     subarea_height_scaler = 0.75
+    model_dir = Path.cwd() / "models"
+    ocr_opts = {"det_db_unclip_ratio": 2, "use_angle_cls": True, "show_log": False, "use_onnx": True}
+    if model_dir.exists():
+        ocr_opts["base_dir"] = str(model_dir)
 
     # Default values
     default_frame_extraction_frequency = 2
