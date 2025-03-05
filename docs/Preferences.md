@@ -11,7 +11,8 @@ Split Stop: Frame position where subtitle detection will stop. It is relative to
 subtitle detection at the middle of the video and 0.95 will stop the detection towards the end of the video.
 
 No of Frames: The number of frames from the start and stop position that will be taken for subtitle detection. Too
-little frames and the program will fail to detect the subtitles. Too many and detection takes more time.
+little frames and the program will fail to detect the subtitles. Too many and detection takes more time and may capture
+more non subtitle text that will incorrectly increase the boundary box.
 
 X Axis Padding: The x-axis padding determines the length of the horizontal line of the boundary box. Subtitle detection
 is unable to quickly determine the max x-axis length by looking at all the frames. 1.0 would mean the longest subtitle
@@ -40,7 +41,8 @@ Frame Extraction Chunk Size: The number of frames to be extracted by each CPU co
 
 Text Extraction Chunk Size: The number of frames to be extracted by each CPU or GPU core/process.
 
-OCR CPU Max Processes: The maximum number of CPU cores to be used for extraction of text from the video.
+OCR CPU Max Processes: The maximum number of CPU cores to be used for extraction of text from the video. Too little or
+too many will increase extraction time.
 
 OCR GPU Max Processes: The maximum number of GPU processes to be used for extraction of text from the video. Using too
 many will cause a crash if GPU memory is not enough.

@@ -21,6 +21,8 @@ A free program that extracts hard coded subtitles from a video and generates an 
 - Multiple languages supported through [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR). They will be
   automatically downloaded as needed.
 
+Generated subtitles can be translated with this [script](https://github.com/voun7/Subtitle_Translator).
+
 **Supported languages**
 
 | Language            | Abbreviation | | Language          | Abbreviation | | Language     | Abbreviation |
@@ -71,20 +73,6 @@ installed. The program will not start without it.
 
 Install packages
 
-For GPU
-
-```
-conda install paddlepaddle-gpu==2.6.1 cudatoolkit=11.6 -c https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle/ -c conda-forge
-```
-
-For CPU
-
-```
-pip install paddlepaddle==2.6.2
-```
-
-Other packages
-
 ```commandline
 pip install -r requirements.txt
 ```
@@ -93,22 +81,5 @@ Run `gui.py` to use Graphical interface and `main.py` to use Terminal.
 
 ### Compile Instructions
 
-Install package
+Run `compiler.py` to build compiled program
 
-```
-pip install Nuitka==2.6.4
-```
-
-Compile command:
-
-```
-nuitka --standalone --enable-plugin=tk-inter --windows-console-mode=disable --include-package-data=paddleocr --include-data-files=VSE.ico=VSE.ico --windows-icon-from-ico=VSE.ico gui.py
-```
-
-#### Run compiled program:
-
-```
-.\gui.dist\gui.exe
-```
-
-`gui.exe` can be manually renamed to `VSE.exe`
