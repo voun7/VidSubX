@@ -1,10 +1,13 @@
+import os
 from pathlib import Path
 from unittest import TestCase
 
+os.chdir(Path(__file__).parent.parent)
+
 from main import SubtitleDetector, SubtitleExtractor
 
-ch_vid = "../test files/chinese_vid.mp4"
-ch_vid_srt = Path("../test files/chinese_vid.srt")
+ch_vid = "test files/chinese_vid.mp4"
+ch_vid_srt = Path("test files/chinese_vid.srt")
 
 
 class TestSubtitleDetector(TestCase):

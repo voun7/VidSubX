@@ -4,3 +4,5 @@
 /config.ini
 /gui.build/
 /gui.dist/
+/models/
+gui.dist.zip
