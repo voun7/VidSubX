@@ -65,13 +65,10 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     :param start_frame: The frame where image extractions from video starts.
     :param stop_frame: The frame where image extractions from video stops.
     """
-    # extract every this many frames.
-    every = utils.Config.frame_extraction_frequency
-    # how many frames to split into chunks (one chunk per cpu core process)
-    chunk_size = utils.Config.frame_extraction_chunk_size
-    # cancel if process has been cancelled by gui.
+    every = utils.Config.frame_extraction_frequency  # extract every this many frames.
+    batch_size = utils.Config.frame_extraction_batch_size
     prefix = "Frame Extraction"
-    if utils.Process.interrupt_process:
+    if utils.Process.interrupt_process:  # cancel if process has been cancelled by gui.
         logger.warning(f"{prefix} process interrupted!")
         return
 
@@ -79,24 +76,24 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     frame_count = int(capture.get(cv.CAP_PROP_FRAME_COUNT))  # get its total frame count
     capture.release()  # release the capture straight away
 
-    # ignore chunk size if it's greater than frame count
-    chunk_size = chunk_size if frame_count > chunk_size else frame_count - 1
+    # ignore batch size if it's greater than frame count
+    batch_size = batch_size if frame_count > batch_size else frame_count - 1
 
     if frame_count < 1:  # if video has no frames, might be and opencv error
         logger.error("Video has no frames. Check your OpenCV installation")
         return  # end function call
 
     start_frame, stop_frame = start_frame or 0, stop_frame or frame_count
-    # split the frames into chunk lists
-    frame_chunks = [[i, i + chunk_size] for i in range(start_frame, stop_frame, chunk_size)]
-    frame_chunks[-1][-1] = stop_frame  # make sure last chunk has correct end frame
-    no_chunks = len(frame_chunks)
+    # split the frames into batches
+    frame_batches = [[i, i + batch_size] for i in range(start_frame, stop_frame, batch_size)]
+    frame_batches[-1][-1] = stop_frame  # make sure last batch has correct end frame
+    no_batches = len(frame_batches)
     # create a process pool to execute across multiple cpu cores to speed up processing
     logger.info(f"Starting Multiprocess {prefix} from video...")
     with ProcessPoolExecutor() as executor:
         futures = [executor.submit(extract_frames, video_path, frames_dir, key_area, f[0], f[1], every)
-                   for f in frame_chunks]  # submit the processes: extract_frames(...)
+                   for f in frame_batches]  # submit the processes: extract_frames(...)
         for i, f in enumerate(as_completed(futures)):  # as each process completes
             f.result()  # Prevents silent bugs. Exceptions raised will now be displayed.
-            utils.print_progress(i, no_chunks - 1, prefix)
+            utils.print_progress(i, no_batches - 1, prefix)
     logger.info(f"{prefix} done!")

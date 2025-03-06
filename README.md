@@ -1,6 +1,6 @@
 # Video Sub Extractor
 
-![python version](https://img.shields.io/badge/Python-3.11-blue)
+![python version](https://img.shields.io/badge/Python-3.12-blue)
 ![support os](https://img.shields.io/badge/OS-Windows-green.svg)
 
 A free program that extracts hard coded subtitles from a video and generates an external subtitle file.

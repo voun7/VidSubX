@@ -1070,13 +1070,13 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(frame_extraction_frame, text="Frame Extraction Chunk Size:").grid(column=0, row=1)
-        self.frame_extraction_chunk_size = tk.IntVar(value=utils.Config.frame_extraction_chunk_size)
-        self.frame_extraction_chunk_size.trace_add("write", self._set_reset_button)
+        ttk.Label(frame_extraction_frame, text="Frame Extraction Batch Size:").grid(column=0, row=1)
+        self.frame_extraction_batch_size = tk.IntVar(value=utils.Config.frame_extraction_batch_size)
+        self.frame_extraction_batch_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             frame_extraction_frame,
-            textvariable=self.frame_extraction_chunk_size,
+            textvariable=self.frame_extraction_batch_size,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
@@ -1091,40 +1091,38 @@ class PreferencesUI(tk.Toplevel):
         text_extraction_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(text_extraction_frame, text=utils.Config.sections[1])
 
-        ttk.Label(text_extraction_frame, text="Text Extraction Chunk Size:").grid(
+        ttk.Label(text_extraction_frame, text="Text Extraction Batch Size:").grid(
             column=0, row=0, padx=self.wgt_x_padding, pady=self.wgt_y_padding
         )
-        self.text_extraction_chunk_size = tk.IntVar(value=utils.Config.text_extraction_chunk_size)
-        self.text_extraction_chunk_size.trace_add("write", self._set_reset_button)
+        self.text_extraction_batch_size = tk.IntVar(value=utils.Config.text_extraction_batch_size)
+        self.text_extraction_batch_size.trace_add("write", self._set_reset_button)
         check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             text_extraction_frame,
-            textvariable=self.text_extraction_chunk_size,
+            textvariable=self.text_extraction_batch_size,
             validate='key',
             validatecommand=check_int,
             width=self.entry_size
         ).grid(column=1, row=0)
 
-        ttk.Label(text_extraction_frame, text="OCR CPU Max Processes:").grid(column=0, row=1)
+        ttk.Label(text_extraction_frame, text="Onnx Intra Threads:").grid(column=0, row=1)
+        self.onnx_intra_threads = tk.IntVar(value=utils.Config.onnx_intra_threads)
+        self.onnx_intra_threads.trace_add("write", self._set_reset_button)
+        ttk.Spinbox(
+            text_extraction_frame,
+            from_=0, to=cpu_count(),
+            textvariable=self.onnx_intra_threads,
+            state="readonly",
+            width=self.spinbox_size
+        ).grid(column=1, row=1)
+
+        ttk.Label(text_extraction_frame, text="OCR CPU Max Processes:").grid(column=0, row=2, pady=self.wgt_y_padding)
         self.ocr_cpu_max_processes = tk.IntVar(value=utils.Config.ocr_cpu_max_processes)
         self.ocr_cpu_max_processes.trace_add("write", self._set_reset_button)
         ttk.Spinbox(
             text_extraction_frame,
             from_=1, to=cpu_count(),
             textvariable=self.ocr_cpu_max_processes,
-            state="readonly",
-            width=self.spinbox_size
-        ).grid(column=1, row=1)
-
-        ttk.Label(text_extraction_frame, text="OCR GPU Max Processes:\n(Used only if GPU is available)").grid(
-            column=0, row=2, pady=self.wgt_y_padding
-        )
-        self.ocr_gpu_max_processes = tk.IntVar(value=utils.Config.ocr_gpu_max_processes)
-        self.ocr_gpu_max_processes.trace_add("write", self._set_reset_button)
-        ttk.Spinbox(
-            text_extraction_frame,
-            from_=1, to=cpu_count() // 2,
-            textvariable=self.ocr_gpu_max_processes,
             state="readonly",
             width=self.spinbox_size
         ).grid(column=1, row=2)
@@ -1283,9 +1281,9 @@ class PreferencesUI(tk.Toplevel):
         logger.debug(f"Reset button set by -> {args}")
         default_values = (
             utils.Config.default_frame_extraction_frequency,
-            utils.Config.default_frame_extraction_chunk_size,
-            utils.Config.default_text_extraction_chunk_size,
-            utils.Config.default_ocr_gpu_max_processes,
+            utils.Config.default_frame_extraction_batch_size,
+            utils.Config.default_text_extraction_batch_size,
+            utils.Config.default_onnx_intra_threads,
             utils.Config.default_ocr_cpu_max_processes,
             utils.Config.default_ocr_rec_language,
             utils.Config.default_text_drop_score,
@@ -1308,9 +1306,9 @@ class PreferencesUI(tk.Toplevel):
         try:
             values = (
                 self.frame_extraction_frequency.get(),
-                self.frame_extraction_chunk_size.get(),
-                self.text_extraction_chunk_size.get(),
-                self.ocr_gpu_max_processes.get(),
+                self.frame_extraction_batch_size.get(),
+                self.text_extraction_batch_size.get(),
+                self.onnx_intra_threads.get(),
                 self.ocr_cpu_max_processes.get(),
                 self.ocr_rec_language.get(),
                 self.text_drop_score.get(),
@@ -1369,10 +1367,10 @@ class PreferencesUI(tk.Toplevel):
         """
         # Frame extraction settings.
         self.frame_extraction_frequency.set(utils.Config.default_frame_extraction_frequency)
-        self.frame_extraction_chunk_size.set(utils.Config.default_frame_extraction_chunk_size)
+        self.frame_extraction_batch_size.set(utils.Config.default_frame_extraction_batch_size)
         # Text extraction settings.
-        self.text_extraction_chunk_size.set(utils.Config.default_text_extraction_chunk_size)
-        self.ocr_gpu_max_processes.set(utils.Config.default_ocr_gpu_max_processes)
+        self.text_extraction_batch_size.set(utils.Config.default_text_extraction_batch_size)
+        self.onnx_intra_threads.set(utils.Config.default_onnx_intra_threads)
         self.ocr_cpu_max_processes.set(utils.Config.default_ocr_cpu_max_processes)
         self.ocr_rec_language.set(utils.Config.default_ocr_rec_language)
         self.text_drop_score.set(utils.Config.default_text_drop_score)
@@ -1403,10 +1401,10 @@ class PreferencesUI(tk.Toplevel):
                 **{
                     # Frame extraction settings.
                     utils.Config.keys[0]: self.frame_extraction_frequency.get(),
-                    utils.Config.keys[1]: self.frame_extraction_chunk_size.get(),
+                    utils.Config.keys[1]: self.frame_extraction_batch_size.get(),
                     # Text extraction settings.
-                    utils.Config.keys[2]: self.text_extraction_chunk_size.get(),
-                    utils.Config.keys[3]: self.ocr_gpu_max_processes.get(),
+                    utils.Config.keys[2]: self.text_extraction_batch_size.get(),
+                    utils.Config.keys[3]: self.onnx_intra_threads.get(),
                     utils.Config.keys[17]: self.ocr_cpu_max_processes.get(),
                     utils.Config.keys[4]: self.ocr_rec_language.get(),
                     utils.Config.keys[18]: self.text_drop_score.get(),

@@ -54,34 +54,29 @@ def extract_text(ocr_engine, text_output: Path, files: list, line_sep: str) -> N
 
 def frames_to_text(frame_output: Path, text_output: Path) -> None:
     """
-    Extracts the texts from frames using multiprocessing
+    Extracts the texts from frames using multiprocessing.
     :param frame_output: directory of the frames
     :param text_output: directory for extracted texts
     """
-    chunk_size = utils.Config.text_extraction_chunk_size  # Size of files given to each processor.
-    if utils.Config.use_gpu and ort.get_device() == "GPU":
-        device, max_processes = "GPU", utils.Config.ocr_gpu_max_processes
-    else:
-        device, max_processes = "CPU", utils.Config.ocr_cpu_max_processes
-    prefix = "Text Extraction"
+    batch_size = utils.Config.text_extraction_batch_size  # Size of files given to each processor.
+    prefix, device = "Text Extraction", "GPU" if utils.Config.use_gpu and ort.get_device() == "GPU" else "CPU"
     if utils.Process.interrupt_process:  # Cancel if process has been cancelled by gui.
         logger.warning(f"{prefix} process interrupted!")
         return
 
     sess_opt = ort.SessionOptions()
-    sess_opt.intra_op_num_threads = max_processes
+    sess_opt.intra_op_num_threads = utils.Config.onnx_intra_threads
     ocr_config = {"use_gpu": utils.Config.use_gpu, "drop_score": utils.Config.text_drop_score,
                   "lang": utils.Config.ocr_rec_language, "onnx_sess_options": sess_opt} | utils.Config.ocr_opts
     ocr_engine = PaddleOCR(**ocr_config)
     line_sep = "\n" if utils.Config.line_break else " "
     files = list(frame_output.iterdir())
-    file_chunks = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
-    no_chunks = len(file_chunks)
-    logger.info(f"Starting Multiprocess {prefix} from frames on {device}... "
-                f"Max Processes: {max_processes}, Chunks: {no_chunks}")
-    with ThreadPoolExecutor(max_processes) as executor:
-        futures = [executor.submit(extract_text, ocr_engine, text_output, files, line_sep) for files in file_chunks]
+    file_batches = [files[i:i + batch_size] for i in range(0, len(files), batch_size)]
+    no_batches = len(file_batches)
+    logger.info(f"Starting Multiprocess {prefix} from frames on {device}, Batches: {no_batches}.")
+    with ThreadPoolExecutor(utils.Config.ocr_cpu_max_processes) as executor:
+        futures = [executor.submit(extract_text, ocr_engine, text_output, files, line_sep) for files in file_batches]
         for i, f in enumerate(as_completed(futures)):  # as each  process completes
             f.result()  # Prevents silent bugs. Exceptions raised will be displayed.
-            utils.print_progress(i, no_chunks - 1, prefix)
+            utils.print_progress(i, no_batches - 1, prefix)
     logger.info(f"{prefix} done!")

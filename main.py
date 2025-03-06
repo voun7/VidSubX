@@ -42,27 +42,27 @@ class SubtitleDetector:
 
         relative_start, relative_stop = int(self.frame_total * split_start), int(self.frame_total * split_stop)
         logger.debug(f"Relative start frame = {relative_start}, Relative stop frame = {relative_stop}")
-        # Split the frames into chunk lists.
-        frame_chunks = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
-        frame_chunks_len = len(frame_chunks)
-        logger.debug(f"{self.frame_total=}, {frame_chunks_len=}")
+        # Split the frames into batches.
+        frame_batches = [[i, i + no_of_frames] for i in range(relative_start, relative_stop)]
+        no_batches = len(frame_batches)
+        logger.debug(f"{self.frame_total=}, {no_batches=}")
         start_duration = self.sub_ex.frame_no_to_duration(relative_start, self.fps)
         stop_duration = self.sub_ex.frame_no_to_duration(relative_stop, self.fps)
         logger.info(f"Split Start = {start_duration}, Split Stop = {stop_duration}")
-        if frame_chunks_len > 3:
-            middle_chunk = int(frame_chunks_len / 2)
-            frame_chunks = [frame_chunks[0], frame_chunks[middle_chunk], frame_chunks[-1]]
-        last_frame_chunk = frame_chunks[-1][-1]
-        if last_frame_chunk > self.frame_total:
-            frame_chunks[-1][-1] = relative_stop
-        logger.debug(f"{frame_chunks=}")
+        if no_batches > 3:
+            middle_batch = int(no_batches / 2)
+            frame_batches = [frame_batches[0], frame_batches[middle_batch], frame_batches[-1]]
+        last_frame_batch = frame_batches[-1][-1]
+        if last_frame_batch > self.frame_total:
+            frame_batches[-1][-1] = relative_stop
+        logger.debug(f"{frame_batches=}")
         # Part of the video to look for subtitles.
         if self.use_search_area:
             logger.info("Default sub area is being used as search area.")
             search_area = self.sub_ex.default_sub_area(self.frame_width, self.frame_height)
         else:
             search_area = None
-        for frames in frame_chunks:
+        for frames in frame_batches:
             extract_frames(self.video_file, self.frame_output, search_area, frames[0], frames[1], int(self.fps))
 
     def _pad_sub_area(self, top_left: tuple, bottom_right: tuple) -> tuple:

@@ -1,6 +1,5 @@
 import logging
 from configparser import ConfigParser
-from os import cpu_count
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -33,8 +32,8 @@ class Config:
     config.read(config_file)
 
     sections = ["Frame Extraction", "Text Extraction", "Subtitle Generator", "Subtitle Detection", "Notification"]
-    keys = ["frame_extraction_frequency", "frame_extraction_chunk_size", "text_extraction_chunk_size",
-            "ocr_gpu_max_processes", "ocr_rec_language", "text_similarity_threshold", "min_consecutive_sub_dur_ms",
+    keys = ["frame_extraction_frequency", "frame_extraction_batch_size", "text_extraction_batch_size",
+            "onnx_intra_threads", "ocr_rec_language", "text_similarity_threshold", "min_consecutive_sub_dur_ms",
             "max_consecutive_short_durs", "min_sub_duration_ms", "split_start", "split_stop", "no_of_frames",
             "sub_area_x_rel_padding", "sub_area_y_abs_padding", "use_search_area", "win_notify_sound",
             "win_notify_loop_sound", "ocr_cpu_max_processes", "text_drop_score", "use_gpu", "line_break"]
@@ -48,11 +47,11 @@ class Config:
 
     # Default values
     default_frame_extraction_frequency = 2
-    default_frame_extraction_chunk_size = 250
+    default_frame_extraction_batch_size = 250
 
-    default_text_extraction_chunk_size = 150
-    default_ocr_gpu_max_processes = 4
-    default_ocr_cpu_max_processes = cpu_count() // 2
+    default_text_extraction_batch_size = 100
+    default_onnx_intra_threads = 8
+    default_ocr_cpu_max_processes = 6
     default_ocr_rec_language = "ch"
     default_text_drop_score = 0.7
     default_line_break = False
@@ -74,8 +73,8 @@ class Config:
     default_win_notify_loop_sound = True
 
     # Initial values
-    frame_extraction_frequency = frame_extraction_chunk_size = None
-    text_extraction_chunk_size = ocr_gpu_max_processes = ocr_cpu_max_processes = ocr_rec_language = text_drop_score = None
+    frame_extraction_frequency = frame_extraction_batch_size = None
+    text_extraction_batch_size = onnx_intra_threads = ocr_cpu_max_processes = ocr_rec_language = text_drop_score = None
     text_similarity_threshold = min_consecutive_sub_dur_ms = max_consecutive_short_durs = min_sub_duration_ms = use_gpu = None
     split_start = split_stop = no_of_frames = sub_area_x_rel_padding = sub_area_y_abs_padding = use_search_area = None
     win_notify_sound = win_notify_loop_sound = line_break = None
@@ -90,9 +89,9 @@ class Config:
         Creates a new config file with the default values.
         """
         self.config[self.sections[0]] = {self.keys[0]: str(self.default_frame_extraction_frequency),
-                                         self.keys[1]: self.default_frame_extraction_chunk_size}
-        self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_chunk_size,
-                                         self.keys[3]: self.default_ocr_gpu_max_processes,
+                                         self.keys[1]: self.default_frame_extraction_batch_size}
+        self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_batch_size,
+                                         self.keys[3]: self.default_onnx_intra_threads,
                                          self.keys[17]: self.default_ocr_cpu_max_processes,
                                          self.keys[4]: self.default_ocr_rec_language,
                                          self.keys[18]: self.default_text_drop_score,
@@ -119,10 +118,10 @@ class Config:
         Parse the values of the config file into memory.
         """
         cls.frame_extraction_frequency = cls.config[cls.sections[0]].getint(cls.keys[0])
-        cls.frame_extraction_chunk_size = cls.config[cls.sections[0]].getint(cls.keys[1])
+        cls.frame_extraction_batch_size = cls.config[cls.sections[0]].getint(cls.keys[1])
 
-        cls.text_extraction_chunk_size = cls.config[cls.sections[1]].getint(cls.keys[2])
-        cls.ocr_gpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[3])
+        cls.text_extraction_batch_size = cls.config[cls.sections[1]].getint(cls.keys[2])
+        cls.onnx_intra_threads = cls.config[cls.sections[1]].getint(cls.keys[3])
         cls.ocr_cpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[17])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
         cls.text_drop_score = cls.config[cls.sections[1]].getfloat(cls.keys[18])
@@ -154,13 +153,13 @@ class Config:
         cls.frame_extraction_frequency = kwargs.get(cls.keys[0], cls.frame_extraction_frequency)
         # Write the value of the class variable into to the config parser (file).
         cls.config[cls.sections[0]][cls.keys[0]] = str(cls.frame_extraction_frequency)
-        cls.frame_extraction_chunk_size = kwargs.get(cls.keys[1], cls.frame_extraction_chunk_size)
-        cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_chunk_size)
+        cls.frame_extraction_batch_size = kwargs.get(cls.keys[1], cls.frame_extraction_batch_size)
+        cls.config[cls.sections[0]][cls.keys[1]] = str(cls.frame_extraction_batch_size)
 
-        cls.text_extraction_chunk_size = kwargs.get(cls.keys[2], cls.text_extraction_chunk_size)
-        cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_chunk_size)
-        cls.ocr_gpu_max_processes = kwargs.get(cls.keys[3], cls.ocr_gpu_max_processes)
-        cls.config[cls.sections[1]][cls.keys[3]] = str(cls.ocr_gpu_max_processes)
+        cls.text_extraction_batch_size = kwargs.get(cls.keys[2], cls.text_extraction_batch_size)
+        cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_batch_size)
+        cls.onnx_intra_threads = kwargs.get(cls.keys[3], cls.onnx_intra_threads)
+        cls.config[cls.sections[1]][cls.keys[3]] = str(cls.onnx_intra_threads)
         cls.ocr_cpu_max_processes = kwargs.get(cls.keys[17], cls.ocr_cpu_max_processes)
         cls.config[cls.sections[1]][cls.keys[17]] = str(cls.ocr_cpu_max_processes)
         cls.ocr_rec_language = kwargs.get(cls.keys[4], cls.ocr_rec_language)
