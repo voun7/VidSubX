@@ -83,3 +83,4 @@ Run `gui.py` to use Graphical interface and `main.py` to use Terminal.
 
 Run `compiler.py` to build compiled program
 
+For virus warning the file can be submitted [here](https://www.microsoft.com/en-us/wdsi/filesubmission) for analysis.
