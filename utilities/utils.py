@@ -36,7 +36,7 @@ class Config:
             "onnx_intra_threads", "ocr_rec_language", "text_similarity_threshold", "min_consecutive_sub_dur_ms",
             "max_consecutive_short_durs", "min_sub_duration_ms", "split_start", "split_stop", "no_of_frames",
             "sub_area_x_rel_padding", "sub_area_y_abs_padding", "use_search_area", "win_notify_sound",
-            "win_notify_loop_sound", "ocr_cpu_max_processes", "text_drop_score", "use_gpu", "line_break"]
+            "win_notify_loop_sound", "ocr_max_processes", "text_drop_score", "use_gpu", "line_break"]
 
     # Permanent values
     subarea_height_scaler = 0.75
@@ -51,7 +51,7 @@ class Config:
 
     default_text_extraction_batch_size = 100
     default_onnx_intra_threads = 8
-    default_ocr_cpu_max_processes = 6
+    default_ocr_max_processes = 6
     default_ocr_rec_language = "ch"
     default_text_drop_score = 0.7
     default_line_break = False
@@ -74,7 +74,7 @@ class Config:
 
     # Initial values
     frame_extraction_frequency = frame_extraction_batch_size = None
-    text_extraction_batch_size = onnx_intra_threads = ocr_cpu_max_processes = ocr_rec_language = text_drop_score = None
+    text_extraction_batch_size = onnx_intra_threads = ocr_max_processes = ocr_rec_language = text_drop_score = None
     text_similarity_threshold = min_consecutive_sub_dur_ms = max_consecutive_short_durs = min_sub_duration_ms = use_gpu = None
     split_start = split_stop = no_of_frames = sub_area_x_rel_padding = sub_area_y_abs_padding = use_search_area = None
     win_notify_sound = win_notify_loop_sound = line_break = None
@@ -92,7 +92,7 @@ class Config:
                                          self.keys[1]: self.default_frame_extraction_batch_size}
         self.config[self.sections[1]] = {self.keys[2]: self.default_text_extraction_batch_size,
                                          self.keys[3]: self.default_onnx_intra_threads,
-                                         self.keys[17]: self.default_ocr_cpu_max_processes,
+                                         self.keys[17]: self.default_ocr_max_processes,
                                          self.keys[4]: self.default_ocr_rec_language,
                                          self.keys[18]: self.default_text_drop_score,
                                          self.keys[20]: self.default_line_break}
@@ -122,7 +122,7 @@ class Config:
 
         cls.text_extraction_batch_size = cls.config[cls.sections[1]].getint(cls.keys[2])
         cls.onnx_intra_threads = cls.config[cls.sections[1]].getint(cls.keys[3])
-        cls.ocr_cpu_max_processes = cls.config[cls.sections[1]].getint(cls.keys[17])
+        cls.ocr_max_processes = cls.config[cls.sections[1]].getint(cls.keys[17])
         cls.ocr_rec_language = cls.config[cls.sections[1]][cls.keys[4]]
         cls.text_drop_score = cls.config[cls.sections[1]].getfloat(cls.keys[18])
         cls.line_break = cls.config[cls.sections[1]].getboolean(cls.keys[20])
@@ -160,8 +160,8 @@ class Config:
         cls.config[cls.sections[1]][cls.keys[2]] = str(cls.text_extraction_batch_size)
         cls.onnx_intra_threads = kwargs.get(cls.keys[3], cls.onnx_intra_threads)
         cls.config[cls.sections[1]][cls.keys[3]] = str(cls.onnx_intra_threads)
-        cls.ocr_cpu_max_processes = kwargs.get(cls.keys[17], cls.ocr_cpu_max_processes)
-        cls.config[cls.sections[1]][cls.keys[17]] = str(cls.ocr_cpu_max_processes)
+        cls.ocr_max_processes = kwargs.get(cls.keys[17], cls.ocr_max_processes)
+        cls.config[cls.sections[1]][cls.keys[17]] = str(cls.ocr_max_processes)
         cls.ocr_rec_language = kwargs.get(cls.keys[4], cls.ocr_rec_language)
         cls.config[cls.sections[1]][cls.keys[4]] = cls.ocr_rec_language
         cls.text_drop_score = kwargs.get(cls.keys[18], cls.text_drop_score)

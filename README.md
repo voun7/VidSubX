@@ -21,7 +21,7 @@ A free program that extracts hard coded subtitles from a video and generates an 
 - Multiple languages supported through [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR). They will be
   automatically downloaded as needed.
 
-Generated subtitles can be translated with this [script](https://github.com/voun7/Subtitle_Translator).
+### Generated subtitles can be translated with this [script](https://github.com/voun7/Subtitle_Translator).
 
 **Supported languages**
 
@@ -72,6 +72,20 @@ installed. The program will not start without it.
 [Latest Version of Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist)
 
 Install packages
+
+For GPU
+
+```
+pip install onnxruntime-gpu[cuda,cudnn]==1.21.0
+```
+
+For CPU
+
+```
+pip install onnxruntime==1.21.0
+```
+
+Other packages
 
 ```commandline
 pip install -r requirements.txt

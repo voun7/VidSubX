@@ -9,6 +9,10 @@ import utilities.utils as utils
 
 logger = logging.getLogger(__name__)
 
+if ort.get_device() == "GPU":
+    ort.preload_dlls()
+    utils.Config.ocr_opts["onnx_providers"] = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+
 
 def download_models() -> None:
     """
@@ -74,7 +78,7 @@ def frames_to_text(frame_output: Path, text_output: Path) -> None:
     file_batches = [files[i:i + batch_size] for i in range(0, len(files), batch_size)]
     no_batches = len(file_batches)
     logger.info(f"Starting Multiprocess {prefix} from frames on {device}, Batches: {no_batches}.")
-    with ThreadPoolExecutor(utils.Config.ocr_cpu_max_processes) as executor:
+    with ThreadPoolExecutor(utils.Config.ocr_max_processes) as executor:
         futures = [executor.submit(extract_text, ocr_engine, text_output, files, line_sep) for files in file_batches]
         for i, f in enumerate(as_completed(futures)):  # as each  process completes
             f.result()  # Prevents silent bugs. Exceptions raised will be displayed.
