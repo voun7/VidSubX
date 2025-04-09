@@ -85,8 +85,10 @@ def delete_dist_dir() -> None:
 def main() -> None:
     start_time = perf_counter()
 
+    uninstall_package("onnxruntime-gpu")  # not supported by nuitka
+    install_package("onnxruntime==1.21.0")
     install_requirements()
-    install_package("Nuitka==2.6.7")
+    install_package("Nuitka==2.6.9")
     download_all_models()
     remove_non_onnx_models()
     uninstall_package("paddlepaddle")
