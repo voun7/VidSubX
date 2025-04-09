@@ -8,7 +8,7 @@ from pathlib import Path
 import cv2 as cv
 
 import utilities.utils as utils
-from utilities.frames_to_text import extract_bboxes, frames_to_text, download_models
+from utilities.frames_to_text import extract_bboxes, frames_to_text, setup_ocr
 from utilities.logger_setup import setup_logging
 from utilities.video_to_frames import extract_frames, video_to_frames
 
@@ -470,7 +470,7 @@ class SubtitleExtractor:
 if __name__ == '__main__':
     setup_logging()
     logger.debug("\n\nMain program Started.")
-    download_models()
+    setup_ocr()
     test_se = SubtitleExtractor()
     test_vid = r""
     test_se.run_extraction(test_vid)

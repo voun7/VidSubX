@@ -14,8 +14,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 import utilities.utils as utils
-from main import SubtitleDetector, SubtitleExtractor
-from utilities.frames_to_text import download_models
+from main import SubtitleDetector, SubtitleExtractor, setup_ocr
 from utilities.logger_setup import setup_logging
 from utilities.win_notify import Notification, Sound
 
@@ -719,10 +718,10 @@ class SubtitleExtractorGUI:
         """
         Overwrite progress bar text in text widget, if detected in present and previous line.
         """
-        if " |#" in text or "-| " in text or "it/s" in text:
+        if " |#" in text or "-| " in text:
             start, stop = 'end - 1 lines', 'end - 1 lines lineend'
             previous_line = self.text_output_widget.get(start, stop)
-            if " |#" in previous_line or "-| " in previous_line or "it/s" in previous_line:
+            if " |#" in previous_line or "-| " in previous_line:
                 self.clear_output(start, stop)
 
     def write_to_output(self, text: str) -> None:
@@ -751,15 +750,6 @@ class SubtitleExtractorGUI:
             toast.set_audio(sound, loop=utils.Config.win_notify_loop_sound)
             toast.show()
 
-    def gui_model_download(self) -> None:
-        """
-        Modify the gui to properly display the download of the models. This method should not be run from main thread.
-        tqdm uses stderr so the download progress texts are rerouted.
-        """
-        sys.stderr.write = self.write_to_output
-        download_models()  # if lang changes, the new lang model will be downloaded.
-        sys.stderr.write = self.error_message_handler
-
     def _detect_subtitles(self) -> None:
         """
         Detect sub area of videos in the queue and set as new sub area.
@@ -768,7 +758,7 @@ class SubtitleExtractorGUI:
         start, use_search_area = time.perf_counter(), utils.Config.use_search_area
         self.thread_running = True
         try:
-            self.gui_model_download()
+            setup_ocr()
             start = time.perf_counter()
             for video in self.video_queue.keys():
                 if utils.Process.interrupt_process:
@@ -819,7 +809,7 @@ class SubtitleExtractorGUI:
         logger.info(f"Subtitle Language: {utils.Config.ocr_rec_language}\n")
         self.thread_running = True
         try:
-            self.gui_model_download()
+            setup_ocr()
             for video, sub_info in self.video_queue.items():
                 sub_area, start_frame, stop_frame = sub_info[0], sub_info[1], sub_info[2]
                 start_frame = int(start_frame) if start_frame else start_frame

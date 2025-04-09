@@ -11,7 +11,20 @@ logger = logging.getLogger(__name__)
 
 if ort.get_device() == "GPU":
     ort.preload_dlls()
-    utils.Config.ocr_opts["onnx_providers"] = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+
+
+def setup_ocr() -> None:
+    setup_ocr_device()
+    download_models()
+
+
+def setup_ocr_device() -> None:
+    if utils.Config.use_gpu and ort.get_device() == "GPU":
+        logger.debug("GPU is enabled.")
+        utils.Config.ocr_opts["onnx_providers"] = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+    else:
+        logger.debug("GPU is disabled.")
+        utils.Config.ocr_opts.pop("onnx_providers", None)
 
 
 def download_models() -> None:
