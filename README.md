@@ -1,4 +1,4 @@
-# Video Sub Extractor
+# VidSubX
 
 ![python version](https://img.shields.io/badge/Python-3.12-blue)
 ![support os](https://img.shields.io/badge/OS-Windows-green.svg)
@@ -54,16 +54,16 @@ A free program that extracts hard coded subtitles from a video and generates an 
 | Uzbek               | uz           | | Vietnamese        | vi           | | Mongolian    | mn           | 
 | Abaza               | abq          |
 
-**Download**
+### Download
 
 [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist) must be
 installed. The program will not start without it.
 
-- [Windows CPU Version](https://github.com/voun7/Video_Sub_Extractor/releases/download/v1.0/VSE-windows-cpu.zip)
+- [Latest CPU & GPU Version](https://github.com/voun7/VidSubX/releases/latest)
 
 ## Demo Video
 
-[![Demo Video](docs/images/demo%20screenshot.png)](https://youtu.be/nnm_waobgnI "Demo Video")
+[![Demo Video](docs/images/demo%20screenshot.png)](https://youtu.be/i_VNDN7AMP4 "Demo Video")
 
 ## Setup Instructions
 

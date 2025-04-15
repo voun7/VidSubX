@@ -57,9 +57,9 @@ def compile_program() -> None:
         "--enable-plugin=tk-inter",
         "--windows-console-mode=disable",
         "--include-package-data=paddleocr",
-        "--include-data-files=VSE.ico=VSE.ico",
+        "--include-data-files=vsx.ico=vsx.ico",
         "--include-data-dir=models=models",
-        "--windows-icon-from-ico=VSE.ico",
+        "--windows-icon-from-ico=vsx.ico",
         "--remove-output",
         "gui.py"
     ]
@@ -70,7 +70,7 @@ def compile_program() -> None:
 def rename_exe() -> None:
     print("\nRenaming exe file...")
     exe_file = Path("gui.dist/gui.exe")
-    exe_file.rename("gui.dist/VSE.exe")
+    exe_file.rename("gui.dist/VSX.exe")
 
 
 def get_gpu_files() -> None:
@@ -85,7 +85,7 @@ def get_gpu_files() -> None:
 
 def zip_files(gpu_enabled: bool) -> None:
     print("\nZipping distribution files...")
-    name = f"{platform.system().lower()}-{'gpu' if gpu_enabled else 'cpu'}-v"
+    name = f"VSX-{platform.system()}-{'GPU' if gpu_enabled else 'CPU'}-v"
     shutil.make_archive(name, "zip", "gui.dist")
 
 

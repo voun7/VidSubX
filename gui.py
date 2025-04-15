@@ -137,8 +137,8 @@ class SubtitleExtractorGUI:
         Use ttk to create frames for gui.
         """
         # Window title and icon.
-        self.window_title = "Video Subtitle Extractor"
-        self.icon_file = "VSE.ico"
+        self.window_title = "VidSubX"
+        self.icon_file = "vsx.ico"
         self.root.title(self.window_title)
         if platform.system() == "Windows":
             self.root.iconbitmap(self.icon_file)
