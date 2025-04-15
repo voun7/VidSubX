@@ -1,3 +1,4 @@
+import platform
 import shutil
 import site
 import subprocess
@@ -38,7 +39,7 @@ def download_all_models() -> None:
     for lang in languages:
         print(f"\nChecking for {lang} language models...")
         utils.Config.ocr_opts["base_dir"] = utils.Config.model_dir
-        _ = PaddleOCR(lang=lang, **utils.Config.ocr_opts)
+        _ = PaddleOCR(use_gpu=False, lang=lang, **utils.Config.ocr_opts)
 
 
 def remove_non_onnx_models() -> None:
@@ -72,9 +73,16 @@ def rename_exe() -> None:
     exe_file.rename("gui.dist/VSE.exe")
 
 
-def zip_files() -> None:
+def get_gpu_files() -> None:
+    print("\nCopying GPU files...")
+    gpu_files_dir = Path(site.getsitepackages()[1], "nvidia")
+    shutil.copytree(gpu_files_dir, "gui.dist/nvidia")
+
+
+def zip_files(gpu_enabled: bool) -> None:
     print("\nZipping distribution files...")
-    shutil.make_archive("gui.dist", "zip", "gui.dist")
+    name = f"{platform.system().lower()}-{'gpu' if gpu_enabled else 'cpu'}-v"
+    shutil.make_archive(name, "zip", "gui.dist")
 
 
 def delete_dist_dir() -> None:
@@ -82,11 +90,15 @@ def delete_dist_dir() -> None:
     shutil.rmtree("gui.dist")
 
 
-def main() -> None:
+def main(gpu_enabled: bool = True) -> None:
     start_time = perf_counter()
 
-    uninstall_package("onnxruntime-gpu")  # not supported by nuitka
-    install_package("onnxruntime==1.21.0")
+    if gpu_enabled:
+        uninstall_package("onnxruntime")
+        install_package("onnxruntime-gpu[cuda,cudnn]==1.21.0")
+    else:
+        uninstall_package("onnxruntime-gpu")
+        install_package("onnxruntime==1.21.0")
     install_requirements()
     install_package("Nuitka==2.6.9")
     download_all_models()
@@ -95,7 +107,9 @@ def main() -> None:
     uninstall_package("requests")
     compile_program()
     rename_exe()
-    zip_files()
+    if gpu_enabled:
+        get_gpu_files()
+    zip_files(gpu_enabled)
     delete_dist_dir()
 
     print(f"\nCompilation Duration: {timedelta(seconds=round(perf_counter() - start_time))}")
