@@ -46,8 +46,8 @@ Onnx Intra Threads: The number of threads used by Onnx to parallelize the execut
 OCR Max Processes: The maximum number of CPU or GPU core/processes to be used for extraction of text from the video.
 Too little or too many will increase extraction time.
 
-**Note:** Onnx Intra Threads & OCR CPU Max Processes will require some testing with different values to determine the
-optimal values.
+**Note:** Onnx Intra Threads & OCR Max Processes will require some testing with different values to determine the
+optimal values that provide high utilization of CPU or GPU.
 
 OCR Recognition Language: The language of the subtitle in the video to be extracted.
 
@@ -73,7 +73,7 @@ consecutive short durations are greater than the value, they will be removed.
 
 Minimum Sub Duration: Any subtitle with a duration less than or equal to this value will be removed.
 
-Use GPU if available: The GPU will for the subtitle extraction if available.
+Use GPU if available: The GPU will be used to speed up the subtitle extraction if available.
 
 ### Notification
 
