@@ -76,7 +76,11 @@ def rename_exe() -> None:
 def get_gpu_files() -> None:
     print("\nCopying GPU files...")
     gpu_files_dir = Path(site.getsitepackages()[1], "nvidia")
-    shutil.copytree(gpu_files_dir, "gui.dist/nvidia")
+    required_dirs = ["cudnn", "cufft", "cublas", "cuda_runtime"]
+    if platform.system() == "Linux":
+        required_dirs.extend(["cuda_nvrtc", "curand"])
+    for dir_name in required_dirs:
+        shutil.copytree(gpu_files_dir / dir_name, f"gui.dist/nvidia/{dir_name}")
 
 
 def zip_files(gpu_enabled: bool) -> None:
