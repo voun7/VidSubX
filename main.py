@@ -392,16 +392,15 @@ class SubtitleExtractor:
         If the file name already exists, append a unique identifier to the file name.
         :return: new file name with path.
         """
-        name = self.video_path.with_suffix(".srt")
-        if not name.exists():
-            return name
-        else:
-            suffix = 1  # Find an available unique name by appending a number.
-            while True:
-                new_file_path = Path(f"{name.parent}/{name.stem} ({suffix}).srt")
-                if not new_file_path.exists():
-                    return new_file_path
-                suffix += 1
+        new_file_path = self.video_path.with_suffix(".srt")
+        if not new_file_path.exists():
+            return new_file_path
+
+        for i in range(1, 20):  # max copies
+            new_file_path = self.video_path.with_name(f"{self.video_path.stem} ({i}).srt")
+            if not new_file_path.exists():
+                return new_file_path
+        raise RuntimeError("Could not generate a unique save path!")
 
     def save_subtitle(self, lines: list) -> Path | None:
         """
