@@ -64,8 +64,8 @@ def video_to_frames(video_path: str, frames_dir: Path, key_area: tuple | None, s
     :param video_path: path like string to the video
     :param frames_dir: directory to save the frames
     :param key_area: coordinates of the frame containing subtitle
-    :param start_frame: The frame where image extraction from video starts.
-    :param stop_frame: The frame where image extraction from video stops.
+    :param start_frame: The frame where image extraction from the video starts.
+    :param stop_frame: The frame where image extraction from the video stops.
     """
     every = CONFIG.frame_extraction_frequency  # extract every this many frames.
     batch_size = CONFIG.frame_extraction_batch_size

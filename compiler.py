@@ -65,7 +65,7 @@ def remove_non_onnx_models() -> None:
 
 def remove_compiler_leftovers() -> None:
     print("\nRemoving compiler leftovers...")
-    Path("VSX.spec").unlink()
+    Path(f"{AppPaths.exe_name}.spec").unlink()
     shutil.rmtree("build")
     shutil.rmtree("dist")
 
@@ -73,12 +73,12 @@ def remove_compiler_leftovers() -> None:
 def compile_program(gpu_enabled: bool) -> None:
     cmd = [
         "pyinstaller",
-        "--add-data=installer/vsx.ico:installer",
-        "--add-data=installer/version.txt:installer",
-        "--add-data=models:models",
+        f"--add-data={AppPaths.icon_file}:{AppPaths.icon_file.parent.name}",
+        f"--add-data={AppPaths.version_file}:{AppPaths.version_file.parent.name}",
+        f"--add-data={AppPaths.models()}:{AppPaths.models().name}",
         "--collect-data=custom_ocr",
-        "--icon=installer/vsx.ico",
-        "--name=VSX",
+        f"--icon={AppPaths.icon_file}",
+        f"--name={AppPaths.exe_name}",
         "--noconsole",
         "--noconfirm",
         "--clean",
@@ -94,20 +94,20 @@ def compile_program(gpu_enabled: bool) -> None:
 
 def create_installer(gpu_enabled: bool) -> None:
     version = AppPaths.version_file.read_text()
-    name = f"VSX-{platform.system()}-{'GPU' if gpu_enabled else 'CPU'}-v{version}"
+    name = f"{AppPaths.exe_name}-{platform.system()}-{'GPU' if gpu_enabled else 'CPU'}-v{version}"
     inno_exe = Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe")
     if platform.system() == "Windows" and inno_exe.exists():
         cmd = [
             str(inno_exe),
             f"/DMyAppVersion={version}",
             f"/DOutputBaseFilename={name}",
-            "installer/inno script.iss",
+            str(AppPaths.inno_installer_file),
         ]
         print(f"\nCreating {platform.system()} installer for program... \nCommand: {' '.join(cmd)}")
         run_command(cmd)
     else:
         print(f"\nZipping distribution files...")
-        shutil.make_archive(name, "zip", "dist/VSX")
+        shutil.make_archive(name, "zip", f"dist/{AppPaths.exe_name}")
 
 
 def remove_site_pkg_tempdirs() -> None:

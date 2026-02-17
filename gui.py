@@ -166,8 +166,7 @@ class SubtitleExtractorGUI:
         Use ttk to create frames for gui.
         """
         # Window title and icon.
-        self.window_title = AppPaths.program_name
-        self.icon_file = Path(__file__).parent / "installer/vsx.ico"
+        self.window_title, self.icon_file = AppPaths.program_name, AppPaths.icon_file
         self.root.withdraw()  # Hide root window while layout is being drawn
         self.root.title(self.window_title)
         if platform.system() == "Windows":

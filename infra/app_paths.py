@@ -6,9 +6,11 @@ from pathlib import Path
 
 
 class AppPaths:
-    program_name = "VidSubX"
+    program_name, exe_name = "VidSubX", "VSX"
     working_dir = Path(__file__).parent.parent
-    version_file = Path(__file__).parent.parent / "installer/version.txt"
+    icon_file = working_dir / "installer/vsx.ico"
+    version_file = working_dir / "installer/version.txt"
+    inno_installer_file = working_dir / "installer/inno script.iss"
 
     @classmethod
     def output(cls) -> Path:
