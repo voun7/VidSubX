@@ -1,7 +1,6 @@
 import io
 import logging
 import sys
-from logging import Handler
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
@@ -30,7 +29,7 @@ class LogLevelFilter(logging.Filter):
         return record.levelno < self.level
 
 
-def get_console_error_handler() -> Handler:
+def get_console_error_handler() -> logging.Handler:
     """
     Determine how stderr messages for the console will be handled.
     The console sends only messages by default no need for formatter.
@@ -40,7 +39,7 @@ def get_console_error_handler() -> Handler:
     return error_handler
 
 
-def get_console_handler() -> Handler:
+def get_console_handler() -> logging.Handler:
     """
     Determine how stdout messages for the console will be handled.
     The console sends only messages by default no need for formatter.
@@ -51,7 +50,7 @@ def get_console_handler() -> Handler:
     return console_handler
 
 
-def get_file_handler(log_format: logging.Formatter) -> Handler:
+def get_file_handler(log_format: logging.Formatter) -> logging.Handler:
     """
     Determine how the log messages are handled for log files.
     """
@@ -105,7 +104,8 @@ def setup_logging() -> None:
     logger.setLevel(logging.DEBUG)
 
     # Create formatters and add it to handlers.
-    log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logfmt = "%(asctime)s %(levelname)-8s pid:%(process)d %(name)s:%(lineno)03d:%(funcName)s - %(message)s"
+    log_format = logging.Formatter(logfmt)
 
     # Add handlers to the logger.
     logger.addHandler(get_console_handler())
