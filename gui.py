@@ -886,7 +886,8 @@ class SubtitleExtractorGUI:
                     return
                 sub_dt = SubtitleDetector(video, use_search_area)
                 new_sub_area = sub_dt.get_sub_area()
-                self.video_queue[video][0] = new_sub_area
+                if new_sub_area:
+                    self.video_queue[video][0] = new_sub_area
         except Exception as error:
             logger.exception(f"\nAn error occurred while detecting subtitles! \nError: {error}")
             start_time = perf_counter()
