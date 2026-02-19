@@ -11,6 +11,7 @@ from extraction.frames_to_text import frames_to_text, extract_bboxes, setup_ocr
 from extraction.video_to_frames import video_to_frames, extract_frames
 from infra.app_paths import AppPaths
 from infra.logger_setup import setup_logging
+from infra.sleep_inhibitor import SleepInhibitor
 from shared.config import CONFIG
 from shared.process import Process
 from shared.utils import video_details, timecode, default_sub_area, frame_no_to_duration
@@ -444,7 +445,9 @@ if __name__ == '__main__':
     setup_logging()
     logger.debug("\n\nMain program Started.")
     setup_ocr()
+    SleepInhibitor.enable()
     test_se = SubtitleExtractor()
     test_vid = r""
     test_se.run_extraction(test_vid)
+    SleepInhibitor.disable()
     logger.debug("Main program Ended.\n\n")
