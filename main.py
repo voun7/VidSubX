@@ -406,7 +406,6 @@ class SubtitleExtractor:
         if Process.interrupt_process: return
         assert len(list(self.frame_output.iterdir())) == len(list(self.text_output.iterdir()))
 
-    @keep.running
     def run_extraction(self, video_path: str, sub_area: tuple = None, start_frame: int = None,
                        stop_frame: int = None) -> Path | None:
         """
@@ -449,5 +448,6 @@ if __name__ == '__main__':
     setup_ocr()
     test_se = SubtitleExtractor()
     test_vid = r""
-    test_se.run_extraction(test_vid)
+    with keep.running():
+        test_se.run_extraction(test_vid)
     logger.debug("Main program Ended.\n\n")
