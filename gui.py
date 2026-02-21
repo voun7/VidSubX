@@ -17,6 +17,7 @@ from PIL import Image, ImageTk
 from wakepy import keep
 
 from infra.app_paths import AppPaths
+from infra.linux_notify import send_linux_notification
 from infra.logger_setup import setup_logging
 from infra.win_notify import Notification, Sound
 from main import SubtitleDetector, SubtitleExtractor, setup_ocr
@@ -868,6 +869,13 @@ class SubtitleExtractorGUI:
             toast.clear()
             toast.set_audio(sound, loop=CONFIG.win_notify_loop_sound)
             toast.show()
+        elif operating_system == "Linux":
+            send_linux_notification(
+                app_id=self.window_title,
+                title=title,
+                msg=message,
+                icon=str(Path(self.icon_file).absolute()),
+            )
 
     @keep.running
     def _detect_subtitles(self) -> None:
