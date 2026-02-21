@@ -10,9 +10,8 @@ from shared.config import CONFIG
 from shared.process import Process
 from shared.utils import print_progress, cancel_futures
 
-logging.getLogger("custom_ocr").setLevel(logging.INFO)
-
 logger = logging.getLogger(__name__)
+logging.getLogger("custom_ocr").setLevel(logging.INFO)
 
 
 def setup_ocr() -> None:

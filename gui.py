@@ -14,10 +14,10 @@ from tkinter import ttk, filedialog, messagebox
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
+from wakepy import keep
 
 from infra.app_paths import AppPaths
 from infra.logger_setup import setup_logging
-from infra.sleep_inhibitor import SleepInhibitor
 from infra.win_notify import Notification, Sound
 from main import SubtitleDetector, SubtitleExtractor, setup_ocr
 from shared.config import CONFIG
@@ -869,6 +869,7 @@ class SubtitleExtractorGUI:
             toast.set_audio(sound, loop=CONFIG.win_notify_loop_sound)
             toast.show()
 
+    @keep.running
     def _detect_subtitles(self) -> None:
         """
         Detect sub area of videos in the queue and set as new sub area.
@@ -876,7 +877,6 @@ class SubtitleExtractorGUI:
         logger.info("Detecting subtitle area in video(s)...")
         use_search_area = CONFIG.use_search_area
         self.thread_running = True
-        SleepInhibitor.enable()
         try:
             setup_ocr()
             start_time = perf_counter()
@@ -894,7 +894,6 @@ class SubtitleExtractorGUI:
             logger.exception(f"\nAn error occurred while detecting subtitles! \nError: {error}")
             start_time = perf_counter()
         self.thread_running = False
-        SleepInhibitor.disable()
         self._stop_sub_detection_process()
         self.current_sub_area = list(self.video_queue.values())[self._video_indexer()[0]][0]
         self._draw_current_subtitle_area()
@@ -921,6 +920,7 @@ class SubtitleExtractorGUI:
         self.menu_detect_btn.configure(text="Stop Sub Detection", command=self._stop_sub_detection_process)
         Thread(target=self._detect_subtitles, daemon=True).start()
 
+    @keep.running
     def extract_subtitles(self) -> None:
         """
         Use the main module extraction class to extract text from subtitle.
@@ -930,7 +930,6 @@ class SubtitleExtractorGUI:
         self.video_label.configure(text=f"{self.progress_bar['value']} of {queue_len} Video(s) Completed")
         logger.info(f"Subtitle Language: {CONFIG.ocr_rec_language}\n")
         self.thread_running, sub_ex = True, SubtitleExtractor()
-        SleepInhibitor.enable()
         try:
             setup_ocr()
             start_time = perf_counter()
@@ -950,7 +949,6 @@ class SubtitleExtractorGUI:
             logger.exception(f"\nAn error occurred while extracting subtitles! \nError: {error}")
             start_time = perf_counter()
         self.thread_running = False
-        SleepInhibitor.disable()
         self._stop_sub_extraction_process()
         done = f"Subtitle Extraction Completed! Total Duration: {timedelta(seconds=round(perf_counter() - start_time))}"
         self.send_notification(done)
