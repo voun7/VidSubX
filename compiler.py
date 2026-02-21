@@ -144,7 +144,7 @@ def build_dist(gpu_enabled: bool) -> None:
     else:
         uninstall_requirements("gpu")
         install_requirements("cpu")
-    install_package("pyinstaller==6.18.0")
+    install_package("pyinstaller==6.19.0")
     download_all_models()
     remove_non_onnx_models()
     compile_program(gpu_enabled)
