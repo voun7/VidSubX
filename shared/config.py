@@ -38,7 +38,7 @@ class Config:
             "no_of_frames": (int, 200),
             "sub_area_x_rel_padding": (float, 0.9),
             "sub_area_y_abs_padding": (int, 25),
-            "bbox_drop_score": (float, 0.7),
+            "bbox_drop_score": (float, 0.9),
             "use_search_area": (bool, True),
         },
         "Notification": {

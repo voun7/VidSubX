@@ -54,12 +54,12 @@ class TestSubtitleDetector(TestCase):
 
     def test_get_sub_area_search_area(self):
         print("\nRunning test for get_sub_area method with search area...")
-        sub_area = (192, 861, 1728, 1065)
+        sub_area = (192, 941, 1728, 1065)
         result = SubtitleDetector(ch_vid, True).get_sub_area()
         self.assertEqual(sub_area, result)
 
     def test_get_sub_area_full_area(self):
         print("\nRunning test for get_sub_area method without search area...")
-        sub_area = (192, 932, 1728, 1064)
+        sub_area = (192, 944, 1728, 1063)
         result = SubtitleDetector(ch_vid, False).get_sub_area()
         self.assertEqual(sub_area, result)
