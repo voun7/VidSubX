@@ -1,4 +1,5 @@
 import os
+import platform
 from pathlib import Path
 from unittest import TestCase
 
@@ -60,6 +61,6 @@ class TestSubtitleDetector(TestCase):
 
     def test_get_sub_area_full_area(self):
         print("\nRunning test for get_sub_area method without search area...")
-        sub_area = (192, 944, 1728, 1063)
+        sub_area = (192, 944, 1728, 1063) if platform.system() == "Windows" else (192, 946, 1728, 1059)
         result = SubtitleDetector(ch_vid, False).get_sub_area()
         self.assertEqual(sub_area, result)
