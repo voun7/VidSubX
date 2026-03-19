@@ -188,6 +188,15 @@ class SubtitleExtractor:
             logger.debug("Clearing subtitle texts cache...")
             self.subtitle_texts = {}
 
+    def are_timecodes_close(self, timecode1: str, timecode2: str) -> bool:
+        """
+        Check if two timecodes are close to each other. Over 1000ms is usually not close.
+        """
+        if self.divider in timecode1 or self.divider in timecode2:
+            timecode1, timecode2 = timecode1.split(self.divider)[1], timecode2.split(self.divider)[0]
+        difference = float(timecode2) - float(timecode1)
+        return difference <= CONFIG.max_timecode_diff_ms
+
     def merge_adjacent_equal_texts(self) -> None:
         """
         Merge texts that are beside each other and are the exact same.
@@ -198,7 +207,7 @@ class SubtitleExtractor:
         for index, (key1, key2) in enumerate(pairwise(self.subtitle_texts.items()), start=2):
             key1_name, key1_text, key2_name, key2_text = key1[0], key1[1], key2[0], key2[1]
             # print(index, no_of_keys, key1_name, key1_text, key2_name, key2_text)
-            if key1_text == key2_text and index != no_of_keys:
+            if key1_text == key2_text and index != no_of_keys and self.are_timecodes_close(key1_name, key2_name):
                 if not starting_key:
                     starting_key = key1_name
             else:
@@ -249,11 +258,12 @@ class SubtitleExtractor:
             key1_name, key1_txt, key1_dur = key1[0], key1[1], self.name_to_duration(key1[0])
             key2_name, key2_txt, key2_dur = key2[0], key2[1], self.name_to_duration(key2[0])
             similarity = self.similarity(key1_txt, key2_txt)
+            timecodes_close = self.are_timecodes_close(key1_name, key2_name)
             # print(f"Index: {index}, No of Keys: {no_of_keys}\n"
             #       f"Key 1 Name: {key1_name}, Duration: {key1_dur}, Text: {key1_txt}\n"
             #       f"Key 2 Name: {key2_name}, Duration: {key2_dur}, Text: {key2_txt}\n"
-            #       f"Key 1 & 2 Similarity: {similarity}")
-            if similarity >= similarity_threshold and index != no_of_keys:
+            #       f"Key 1 & 2 Similarity: {similarity}, Timecodes Close: {timecodes_close}")
+            if similarity >= similarity_threshold and index != no_of_keys and timecodes_close:
                 if not starting_key:
                     starting_key, starting_key_txt, starting_key_dur = key1_name, key1_txt, key1_dur
 

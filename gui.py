@@ -1415,7 +1415,19 @@ class PreferencesUI(tk.Toplevel):
             width=self.spinbox_size
         ).grid(column=1, row=0)
 
-        ttk.Label(subtitle_generator_frame, text="Minimum Consecutive Sub Duration (ms):").grid(column=0, row=1)
+        ttk.Label(subtitle_generator_frame, text="Max Timecode Difference (ms):").grid(column=0, row=1)
+        self.max_timecode_diff_ms = self.make_pref_var(CONFIG.max_timecode_diff_ms)
+        check_int = (self.register(self._check_integer), '%P')
+        ttk.Entry(
+            subtitle_generator_frame,
+            textvariable=self.max_timecode_diff_ms,
+            validate='key',
+            validatecommand=check_int,
+            width=self.entry_size
+        ).grid(column=1, row=1)
+
+        ttk.Label(subtitle_generator_frame, text="Minimum Consecutive Sub Duration (ms):").grid(
+            column=0, row=2, pady=self.wgt_y_padding)
         self.min_consecutive_sub_dur_ms = self.make_pref_var(CONFIG.min_consecutive_sub_dur_ms)
         check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
@@ -1424,11 +1436,9 @@ class PreferencesUI(tk.Toplevel):
             validate='key',
             validatecommand=check_float,
             width=self.entry_size
-        ).grid(column=1, row=1)
+        ).grid(column=1, row=2)
 
-        ttk.Label(subtitle_generator_frame, text="Max Consecutive Short Durations:").grid(
-            column=0, row=2, pady=self.wgt_y_padding
-        )
+        ttk.Label(subtitle_generator_frame, text="Max Consecutive Short Durations:").grid(column=0, row=3)
         self.max_consecutive_short_durs = self.make_pref_var(CONFIG.max_consecutive_short_durs)
         ttk.Spinbox(
             subtitle_generator_frame,
@@ -1437,9 +1447,11 @@ class PreferencesUI(tk.Toplevel):
             textvariable=self.max_consecutive_short_durs,
             state="readonly",
             width=self.spinbox_size
-        ).grid(column=1, row=2)
+        ).grid(column=1, row=3)
 
-        ttk.Label(subtitle_generator_frame, text="Minimum Sub Duration (ms):").grid(column=0, row=3)
+        ttk.Label(subtitle_generator_frame, text="Minimum Sub Duration (ms):").grid(
+            column=0, row=4, pady=self.wgt_y_padding
+        )
         self.min_sub_duration_ms = self.make_pref_var(CONFIG.min_sub_duration_ms)
         check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
@@ -1448,7 +1460,7 @@ class PreferencesUI(tk.Toplevel):
             validate='key',
             validatecommand=check_float,
             width=self.entry_size
-        ).grid(column=1, row=3)
+        ).grid(column=1, row=4)
 
     def _notifications_tab(self) -> None:
         """

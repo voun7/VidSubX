@@ -94,6 +94,9 @@ determine the optimal values that provide high utilization of the CPU or GPU.
 **Text Similarity Threshold**: The threshold for merging similar texts that appears successively but might be slightly
 different because of OCR variability. A lower threshold will result in texts that are different being merged.
 
+**Max Timecode Difference**: The maximum allowed difference between two timecodes for them to be considered "close".
+Used when comparing the end of one timecode to the start of another.
+
 **Minimum Consecutive Sub Duration**: The minimum duration for subtitles that appear consecutively. Consecutively low
 duration usually means some background text in the video that appears for a short duration was detected.
 
