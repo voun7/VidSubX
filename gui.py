@@ -1401,6 +1401,7 @@ class PreferencesUI(tk.Toplevel):
         subtitle_generator_frame.grid_columnconfigure(0, weight=1)
         subtitle_generator_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_generator_frame, text="Subtitle Generator")
+        check_int, check_float = (self.register(self._check_integer), '%P'), (self.register(self._check_float), '%P')
 
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(
             column=0, row=0, pady=self.wgt_y_padding
@@ -1417,7 +1418,6 @@ class PreferencesUI(tk.Toplevel):
 
         ttk.Label(subtitle_generator_frame, text="Max Timecode Difference (ms):").grid(column=0, row=1)
         self.max_timecode_diff_ms = self.make_pref_var(CONFIG.max_timecode_diff_ms)
-        check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             subtitle_generator_frame,
             textvariable=self.max_timecode_diff_ms,
@@ -1429,12 +1429,11 @@ class PreferencesUI(tk.Toplevel):
         ttk.Label(subtitle_generator_frame, text="Minimum Consecutive Sub Duration (ms):").grid(
             column=0, row=2, pady=self.wgt_y_padding)
         self.min_consecutive_sub_dur_ms = self.make_pref_var(CONFIG.min_consecutive_sub_dur_ms)
-        check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
             subtitle_generator_frame,
             textvariable=self.min_consecutive_sub_dur_ms,
             validate='key',
-            validatecommand=check_float,
+            validatecommand=check_int,
             width=self.entry_size
         ).grid(column=1, row=2)
 
@@ -1453,12 +1452,11 @@ class PreferencesUI(tk.Toplevel):
             column=0, row=4, pady=self.wgt_y_padding
         )
         self.min_sub_duration_ms = self.make_pref_var(CONFIG.min_sub_duration_ms)
-        check_float = (self.register(self._check_float), '%P')
         ttk.Entry(
             subtitle_generator_frame,
             textvariable=self.min_sub_duration_ms,
             validate='key',
-            validatecommand=check_float,
+            validatecommand=check_int,
             width=self.entry_size
         ).grid(column=1, row=4)
 

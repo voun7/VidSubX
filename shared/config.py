@@ -29,9 +29,9 @@ class Config:
         "Subtitle Generator": {
             "text_similarity_threshold": (float, 0.85),
             "max_timecode_diff_ms": (int, 1000),
-            "min_consecutive_sub_dur_ms": (float, 500.0),
+            "min_consecutive_sub_dur_ms": (int, 500),
             "max_consecutive_short_durs": (int, 4),
-            "min_sub_duration_ms": (float, 120.0),
+            "min_sub_duration_ms": (int, 120),
         },
         "Subtitle Detection": {
             "split_start": (float, 0.25),
