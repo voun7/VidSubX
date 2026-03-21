@@ -1050,6 +1050,8 @@ class PreferencesUI(tk.Toplevel):
         self.icon_file = icon_file
         self.geometry(f"+{win_x}+{win_y}")  # Set window position.
         self.sections_to_skip = {"Misc"}  # Sections from Config
+        self.check_int = (self.register(self._check_integer), '%P')
+        self.check_float = (self.register(self._check_float), '%P')
         self._create_layout()
         self.focus()
         self.grab_set()
@@ -1154,12 +1156,11 @@ class PreferencesUI(tk.Toplevel):
 
         ttk.Label(subtitle_detection_frame, text="No of Frames:").grid(column=0, row=2, pady=self.wgt_y_padding)
         self.no_of_frames = self.make_pref_var(CONFIG.no_of_frames)
-        check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.no_of_frames,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=2)
 
@@ -1178,12 +1179,11 @@ class PreferencesUI(tk.Toplevel):
             column=0, row=4, pady=self.wgt_y_padding
         )
         self.sub_area_y_abs_padding = self.make_pref_var(CONFIG.sub_area_y_abs_padding)
-        check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             subtitle_detection_frame,
             textvariable=self.sub_area_y_abs_padding,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=4)
 
@@ -1229,12 +1229,11 @@ class PreferencesUI(tk.Toplevel):
 
         ttk.Label(frame_extraction_frame, text="Frame Extraction Batch Size:").grid(column=0, row=1)
         self.frame_extraction_batch_size = self.make_pref_var(CONFIG.frame_extraction_batch_size)
-        check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             frame_extraction_frame,
             textvariable=self.frame_extraction_batch_size,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=1)
 
@@ -1262,12 +1261,11 @@ class PreferencesUI(tk.Toplevel):
             column=0, row=0, pady=self.wgt_y_padding
         )
         self.text_extraction_batch_size = self.make_pref_var(CONFIG.text_extraction_batch_size)
-        check_int = (self.register(self._check_integer), '%P')
         ttk.Entry(
             text_extraction_frame,
             textvariable=self.text_extraction_batch_size,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=0)
 
@@ -1401,7 +1399,6 @@ class PreferencesUI(tk.Toplevel):
         subtitle_generator_frame.grid_columnconfigure(0, weight=1)
         subtitle_generator_frame.grid_columnconfigure(1, weight=1)
         self.notebook_tab.add(subtitle_generator_frame, text="Subtitle Generator")
-        check_int, check_float = (self.register(self._check_integer), '%P'), (self.register(self._check_float), '%P')
 
         ttk.Label(subtitle_generator_frame, text="Text Similarity Threshold:").grid(
             column=0, row=0, pady=self.wgt_y_padding
@@ -1422,7 +1419,7 @@ class PreferencesUI(tk.Toplevel):
             subtitle_generator_frame,
             textvariable=self.max_timecode_diff_ms,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=1)
 
@@ -1433,7 +1430,7 @@ class PreferencesUI(tk.Toplevel):
             subtitle_generator_frame,
             textvariable=self.min_consecutive_sub_dur_ms,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=2)
 
@@ -1456,7 +1453,7 @@ class PreferencesUI(tk.Toplevel):
             subtitle_generator_frame,
             textvariable=self.min_sub_duration_ms,
             validate='key',
-            validatecommand=check_int,
+            validatecommand=self.check_int,
             width=self.entry_size
         ).grid(column=1, row=4)
 
