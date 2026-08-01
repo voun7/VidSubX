@@ -1,6 +1,7 @@
 import ctypes
 import logging
 import platform
+import re
 import sys
 import tkinter as tk
 from datetime import timedelta
@@ -155,6 +156,7 @@ class SubtitleExtractorGUI:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
         self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
+        self.geometry_config_file = AppPaths.config() / "window_pos.txt"
         self._create_layout()
         self.video_queue = {}
         self.current_video = self.video_capture = self.subtitle_rect = self.non_subarea_rect = None
@@ -162,6 +164,22 @@ class SubtitleExtractorGUI:
         self.thread_running = False
         self._console_redirector()
         self._update_checker()
+
+    def _load_geometry(self) -> None:
+        logger.debug("Loading saved gui position.")
+        if self.geometry_config_file.exists():
+            saved_geometry = self.geometry_config_file.read_text()
+            self.root.geometry(saved_geometry)
+
+    def _save_geometry(self) -> None:
+        winfo = self.root.winfo_geometry()
+        match = re.search(r'([+-]\d+[+-]\d+)$', winfo)  # Extract only the position offset e.g.'+100+200'
+        if match:
+            position_only = match.group(1)
+            logger.debug(f"Saving last position: {position_only}")
+            self.geometry_config_file.write_text(position_only)
+        else:
+            logger.warning(f"Could not parse position from geometry string: {winfo}")
 
     def _create_layout(self) -> None:
         """
@@ -197,6 +215,7 @@ class SubtitleExtractorGUI:
         # Display window after layout is ready
         self._toggle_theme()
         self.root.update_idletasks()
+        self._load_geometry()
         self.root.after(10, self.root.deiconify)  # type: ignore
         self.root.minsize(self.root.winfo_width(), self.root.winfo_height())  # Custom menubar will always be visible
 
@@ -1041,6 +1060,7 @@ class SubtitleExtractorGUI:
         Process.stop_process()
         if not self.thread_running:
             self.clear_notifications()
+            self._save_geometry()
             self.root.quit()
 
 
